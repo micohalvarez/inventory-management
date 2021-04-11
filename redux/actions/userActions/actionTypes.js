@@ -1,0 +1,7 @@
+export const GET_USERS_START = 'GET_USERS_START';
+export const GET_USERS_SUCCESS = 'GET_USERS_SUCCESS';
+export const GET_USERS_FAIL = 'GET_USERS_FAIL';
+
+export const ADD_USERS_START = 'ADD_USERS_START';
+export const ADD_USERS_SUCCESS = 'ADD_USERS_SUCCESS';
+export const ADD_USERS_FAIL = 'ADD_USERS_FAIL';
