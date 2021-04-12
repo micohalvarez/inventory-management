@@ -62,7 +62,7 @@ export const loginNextAuth = (payload) => {
 
             if (!res.error) {
                 dispatch({ type: authActionTypes.LOGIN_SUCCESS })
-                Router.push('/admin/inventory')
+                Router.replace('/admin/inventory')
             } else {
                 dispatch({ type: authActionTypes.LOGIN_FAIL })
             }
