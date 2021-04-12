@@ -1,35 +1,22 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'next/router'
-import { getSession } from 'next-auth/client'
-
-import Login from './admin/login'
+import Router from 'next/router'
 
 const App = (props) => {
-    return <Login />
+    // useEffect(() => {
+    //     Router.push('/admin/login')
+    // })
+
+    return null
 }
-
-const mapStateToProps = (state) => ({
-    state: state
-})
-
-const mapDispatchToProps = (dispatch) => ({})
 
 export async function getServerSideProps (context) {
-    const session = await getSession({ req: context.req })
-
-    if (session) {
-        return {
-            redirect: {
-                destination: '/admin/inventory',
-                permanent: false
-            }
-        }
-    }
-
     return {
-        props: { session }
+        redirect: {
+            destination: '/admin/login',
+            permanent: false
+        }
     }
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))
+export default App

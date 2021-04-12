@@ -18,16 +18,16 @@ const Dashboard = (props) => {
     const [authToken, setAuthToken] = useState(false)
 
     useEffect(() => {
-        const authCreds = localStorage.getLocalStorage('authCreds')
+        // const authCreds = localStorage.getLocalStorage('authCreds')
 
-        if (!authCreds) {
-            Router.push('/')
-        } else {
-            setAuthToken(authCreds.authToken)
-            props.getSales(authCreds.authToken)
-            props.getItems(authCreds.authToken)
-            props.getCategories(authCreds.authToken)
-        }
+        // if (!authCreds) {
+        //     Router.push('/')
+        // } else {
+        //     setAuthToken(authCreds.authToken)
+        //     props.getSales(authCreds.authToken)
+        //     props.getItems(authCreds.authToken)
+        //     props.getCategories(authCreds.authToken)
+        // }
     }, [])
 
     return (
