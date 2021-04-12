@@ -1,10 +1,13 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
+import Router, { withRouter } from 'next/router';
 
 // components
 
 import TableDropdown from '../Dropdowns/TableDropdown.js';
-
 import InventoryType from '../Dropdowns/InventoryType';
 
 import PurchaseFormModal from '../Modals/PurchaseModals/FormModal';
@@ -175,7 +178,9 @@ const DashBoardTable = (props) => {
   const renderSalesDiscountItems = () => {
     return (
       <div className="block w-full overflow-x-auto">
-        <span className={'ml-3 font-bold '}>For Sales Orders Discount Approval</span>
+        <span className={'ml-3 font-bold '}>
+          For Sales Orders Discount Approval
+        </span>
         <table className="items-center w-full bg-transparent border-collapse">
           <thead className="bg-gray-100 ">
             <tr>
@@ -223,7 +228,6 @@ const DashBoardTable = (props) => {
                     class="hover:bg-gray-200 cursor-pointer bg-gray-100 text-gray-800 border-gray-200"
                   >
                     <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
-                      
                       <span className={'ml-3 font-bold '}>
                         {item.order_number}
                       </span>
@@ -236,7 +240,7 @@ const DashBoardTable = (props) => {
                       {item.total_discount + '%'}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                      {item.subtotal - (item.total * (item.total_discount / 100))}
+                      {item.subtotal - item.total * (item.total_discount / 100)}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-right">
                       <button
@@ -244,7 +248,7 @@ const DashBoardTable = (props) => {
                         type="button"
                         onClick={() => setFormShowModal(true)}
                       >
-                       View Order Details
+                        View Order Details
                       </button>
                     </td>
                   </tr>
@@ -260,7 +264,9 @@ const DashBoardTable = (props) => {
   const renderDeadlineItems = () => {
     return (
       <div className="block w-full overflow-x-auto">
-        <span className={'ml-3 font-bold '}>For Sales Orders Discount Approval</span>
+        <span className={'ml-3 font-bold '}>
+          For Sales Orders Discount Approval
+        </span>
         <table className="items-center w-full bg-transparent border-collapse">
           <thead className="bg-gray-100 ">
             <tr>
@@ -294,14 +300,15 @@ const DashBoardTable = (props) => {
                     class="hover:bg-gray-200 cursor-pointer bg-gray-100 text-gray-800 border-gray-200"
                   >
                     <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
-                      
                       <span className={'ml-3 font-bold '}>
                         {item.order_number}
                       </span>
                     </th>
 
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                      {moment(item.payment_details.pdc_date).format('MMM DD, YYYY').toUpperCase()}
+                      {moment(item.payment_details.pdc_date)
+                        .format('MMM DD, YYYY')
+                        .toUpperCase()}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-right">
                       <button
@@ -309,7 +316,7 @@ const DashBoardTable = (props) => {
                         type="button"
                         onClick={() => setFormShowModal(true)}
                       >
-                       View Order Details
+                        View Order Details
                       </button>
                     </td>
                   </tr>
@@ -343,7 +350,11 @@ const DashBoardTable = (props) => {
           'mt-4 relative flex flex-col min-w-0 break-words w-full mb-12 flex-1 shadow-lg rounded '
         }
       >
-        {props.sort === 0 ? renderInventoryItems() : props.sort === 1 ?  renderSalesDiscountItems() :  renderDeadlineItems()}
+        {props.sort === 0
+          ? renderInventoryItems()
+          : props.sort === 1
+          ? renderSalesDiscountItems()
+          : renderDeadlineItems()}
 
         <div
           class="bg-white px-4 py-3 flex items-ce
