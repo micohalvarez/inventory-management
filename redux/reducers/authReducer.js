@@ -27,7 +27,7 @@ const data = (state = initialState, action) => {
             return {
                 ...state,
                 loggingIn: false,
-                errors: null
+                errors: action.error
             }
         case actionTypes.UPDATE_AUTH_STATE:
             return {

@@ -13,11 +13,14 @@ import TableDropdown from '../Dropdowns/TableDropdown.js';
 import FormModal from '../Modals/SalesModals/FormModal';
 import DetailsModal from '../Modals/SalesModals/DetailsModal';
 import EditModal from '../Modals/SalesModals/EditModal';
+import ReportsModal from '../Modals/SalesModals/ReportModal';
 import Tabs from '../Tabs';
 import * as salesActions from '../../redux/actions/salesActions';
+import * as inventoryActions from '../../redux/actions/inventoryActions';
 import * as localStorage from '../../utils/local-storage';
 
 const SalesTable = (props) => {
+  console.log(props, 'hihihi');
   const [showFormModal, setFormShowModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -89,6 +92,10 @@ const SalesTable = (props) => {
     return pagination;
   };
 
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
   return (
     <>
       <FormModal
@@ -114,6 +121,12 @@ const SalesTable = (props) => {
         showModal={showEditModal}
         closeModal={() => setShowEditModal(false)}
       />
+      {/* <ReportsModal
+        allItems={props.allItems}
+        showModal={true}
+        getOrdersPerItem={props.getOrdersPerItem}
+        closeModal={() => setShowReportsModal(false)}
+      /> */}
       <div className="flex flex-row justify-between">
         <Tabs
           getSalesWithFilter={props.getSales}
@@ -192,7 +205,7 @@ const SalesTable = (props) => {
               </tr>
             </thead>
             <tbody>
-              {props.sales ? (
+              {props.sales.length > 0 ? (
                 <>
                   {props.sales.map((item, index) => (
                     <tr
@@ -244,7 +257,17 @@ const SalesTable = (props) => {
                     </tr>
                   ))}
                 </>
-              ) : null}
+              ) : (
+                <tr class="bg-gray-100 text-gray-800 border-gray-200">
+                  <td
+                    colSpan="7"
+                    align="center"
+                    className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4"
+                  >
+                    <span className={'ml-3 font-bold '}>No orders to show</span>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -265,21 +288,22 @@ const SalesTable = (props) => {
           </div>
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm text-gray-700">
+              <p class="text-sm text-gray-700">
                 Showing{' '}
-                <span className="font-medium">
-                  {' '}
+                <span class="font-medium">
                   {parseInt(props.offSet) === 0
-                    ? parseInt(props.offSet) + 1
-                    : parseInt(props.offSet)}{' '}
-                </span>
+                    ? props.items.length === 0
+                      ? 0
+                      : parseInt(props.offSet) + 1
+                    : parseInt(props.offSet)}
+                </span>{' '}
                 to{' '}
-                <span className="font-medium">
+                <span class="font-medium">
                   {props.page <= 1
-                    ? props.sales.length
-                    : parseInt(props.offSet) + props.sales.length}{' '}
+                    ? props.items.length
+                    : parseInt(props.offSet) + props.items.length}{' '}
                 </span>
-                of <span className="font-medium">{props.totalCount} </span>
+                of <span class="font-medium">{props.totalCount} </span>
                 items
               </p>
             </div>
@@ -356,6 +380,8 @@ const mapStateToProps = (state) => ({
   page: state.sales.salesPage,
   discounted: state.sales.discounted,
   paymentTypes: state.sales.paymentTypes,
+  allItems: state.inventory.allItems,
+  itemOrders: state.inventory.itemOrders,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -364,6 +390,8 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(salesActions.getSalesWithFilter(authToken, filter)),
   getNextItems: (authToken, offset, page) =>
     dispatch(salesActions.getNextItems(authToken, offset, page)),
+  getOrdersPerItem: (authToken, slug) =>
+    dispatch(inventoryActions.getOrdersPerItem(authToken, slug)),
   addFilter: (filter) => dispatch(salesActions.addFilter(filter)),
   clearFilter: () => dispatch(salesActions.clearFilter()),
   addDiscount: () => dispatch(salesActions.addDiscount()),

@@ -9,7 +9,6 @@ export const getItems = (authToken) => {
   return (dispatch, getState) => {
     const inventory = getState().inventory;
     dispatch({ type: actionTypes.GET_ITEMS_START });
-    console.log(inventory);
     authInstance
       .get(
         `/product/?limit=${ITEMS_LIMIT}&offset=0` +
@@ -182,6 +181,44 @@ export const addItem = (authToken, payload) => {
     console.log(payload);
 
     return authInstance.post(`/product/`, payload, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+  };
+};
+
+export const getAllItems = (authToken) => {
+  return (dispatch, getState) => {
+    const inventory = getState().inventory;
+    dispatch({ type: actionTypes.GET_ALL_ITEMS_START });
+    authInstance
+      .get(`/product/`, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      })
+      .then((res) => {
+        if (res.status === 200 && res.data.results) {
+          dispatch({
+            type: actionTypes.GET_ALL_ITEMS_SUCCESS,
+            payload: {
+              all_items: res.data.results,
+            },
+          });
+        }
+      })
+      .catch(({ response }) => {
+        dispatch({ type: actionTypes.GET_ALL_ITEMS_FAIL });
+      });
+  };
+};
+
+export const getOrdersPerItem = (authToken, slug) => {
+  return (dispatch) => {
+    dispatch({ type: actionTypes.GET_ORDERS_PER_ITEM_START });
+
+    return authInstance.get(`/product/${slug}/orders/?order_date=2021-04-06`, {
       headers: {
         Authorization: `Token ${authToken}`,
       },

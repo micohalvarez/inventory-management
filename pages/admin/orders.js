@@ -13,29 +13,23 @@ import * as orderActions from '../../redux/actions/orderActions'
 import * as localStorage from '../../utils/local-storage'
 import * as salesActions from '../../redux/actions/salesActions'
 import * as inventoryActions from '../../redux/actions/inventoryActions'
+import { useSession, getSession } from 'next-auth/client'
 
 const Orders = (props) => {
     const [authToken, setAuthToken] = useState(false)
+    const [ session, loading ] = useSession()
 
     useEffect(() => {
-        const authCreds = localStorage.getLocalStorage('authCreds')
-
-        if (!authCreds) {
-            Router.push('/')
-        } else {
-            setAuthToken(authCreds.authToken)
-
-            props.getOrders(authCreds.authToken)
-            props.getPaymentTypes(authCreds.authToken)
-            props.getItems(authCreds.authToken)
-        }
+        props.getOrders(session.user.auth_token)
+        props.getItems(session.user.auth_token)
+        props.getPaymentTypes(session.user.auth_token)
     }, [])
 
     return (
         <Admin>
             <div className="flex flex-wrap mt-10 ">
                 <div className="w-full h-full mb-12 px-4 mt-16 flex flex-col mt-1 justify-center">
-                    <OrdersTable orders={props.orders} authToken={authToken} />
+                    <OrdersTable orders={props.orders} authToken={session.user.authToken} />
                 </div>
             </div>
         </Admin>
@@ -55,5 +49,22 @@ const mapDispatchToProps = (dispatch) => ({
     getPaymentTypes: (authToken) =>
         dispatch(salesActions.getPaymentTypes(authToken))
 })
+
+export async function getServerSideProps (context) {
+    const session = await getSession({ req: context.req })
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: { session }
+    }
+}
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Orders))

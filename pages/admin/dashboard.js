@@ -7,33 +7,27 @@ import DashboardTable from '../../components/Cards/DashboardTable';
 // layout for page
 
 import Admin from '../../layouts/Admin';
-import * as localStorage from '../../utils/local-storage';
-import Router, { withRouter } from 'next/router';
+import { withRouter } from 'next/router';
 import { connect } from 'react-redux';
 import * as dashboardActions from '../../redux/actions/dashboardActions';
-
+import * as inventoryActions from '../../redux/actions/inventoryActions';
 import * as salesActions from '../../redux/actions/salesActions';
+import { useSession,getSession } from 'next-auth/client';
 
 const Dashboard = (props) => {
     const [authToken, setAuthToken] = useState(false)
+    const [ session, loading ] = useSession()
 
     useEffect(() => {
-        // const authCreds = localStorage.getLocalStorage('authCreds')
-
-        // if (!authCreds) {
-        //     Router.push('/')
-        // } else {
-        //     setAuthToken(authCreds.authToken)
-        //     props.getSales(authCreds.authToken)
-        //     props.getItems(authCreds.authToken)
-        //     props.getCategories(authCreds.authToken)
-        // }
+        props.getItems(session.user.auth_token)
+        props.getInventoryItems(session.user.auth_token)
+        props.getPaymentTypes(session.user.auth_token)
     }, [])
 
     return (
         <Admin>
             <div className="flex flex-wrap mt-10">
-                <div className="w-full h-full mb-12 px-4 mt-16 flex flex-row mt-1 justify-center">
+                <div className="w-full h-full mb-12 px-4 mt-16 flex flex-col mt-1 justify-center">
                     <DashboardTable
                         sales={props.sales}
                         items={props.items}
@@ -51,7 +45,28 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getItems: (authToken) => dispatch(dashboardActions.getItems(authToken)),
+  getInventoryItems: (authToken) => dispatch(inventoryActions.getItems(authToken)),
+  getPaymentTypes: (authToken) =>
+  dispatch(salesActions.getPaymentTypes(authToken))
 });
+
+
+export async function getServerSideProps (context) {
+    const session = await getSession({ req: context.req })
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: { session }
+    }
+}
 
 export default withRouter(
   connect(mapStateToProps, mapDispatchToProps)(Dashboard)

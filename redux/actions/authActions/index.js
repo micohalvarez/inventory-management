@@ -64,7 +64,7 @@ export const loginNextAuth = (payload) => {
                 dispatch({ type: authActionTypes.LOGIN_SUCCESS })
                 Router.replace('/admin/inventory')
             } else {
-                dispatch({ type: authActionTypes.LOGIN_FAIL })
+                dispatch({ type: authActionTypes.LOGIN_FAIL, error:res.error })
             }
         }).catch(() => {
             console.log('SIGN IN FAIL')
@@ -81,8 +81,10 @@ export const logout = () => {
     }
 }
 
-export const register = (payload) => {
-    return (dispatch) => {}
+export const clearErrors = () =>{
+  return(dispatch) =>{
+    dispatch({type:authActionTypes.CLEAR_ERRORS})
+  }
 }
 
 export const getUsers = (authToken) => {

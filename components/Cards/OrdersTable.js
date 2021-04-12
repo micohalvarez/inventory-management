@@ -183,7 +183,7 @@ const OrdersTable = (props) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {props.orders ? (
+                            {props.orders.length > 0 ? (
                                 <>
                                     {props.orders.map((item, index) => (
                                         <tr
@@ -234,7 +234,15 @@ const OrdersTable = (props) => {
                                         </tr>
                                     ))}
                                 </>
-                            ) : null}
+                            ) : <tr
+                            class="bg-gray-100 text-gray-800 border-gray-200"
+                          >
+                            <td colSpan="7" align="center" className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                <span className={'ml-3 font-bold '}>
+                                  No orders to show
+                                </span>
+                            </td>
+                          </tr>}
                         </tbody>
                     </table>
                 </div>
@@ -254,25 +262,24 @@ const OrdersTable = (props) => {
                         </a>
                     </div>
                     <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div>
-                            <p className="text-sm text-gray-700">
+                    <div>
+              <p class="text-sm text-gray-700">
                 Showing{' '}
-                                <span className="font-medium">
-                                    {' '}
-                                    {parseInt(props.offSet) === 0
-                                        ? parseInt(props.offSet) + 1
-                                        : parseInt(props.offSet)}{' '}
-                                </span>
-                to{' '}
-                                <span className="font-medium">
-                                    {props.page <= 1
-                                        ? props.orders.length
-                                        : parseInt(props.offSet) + props.orders.length}{' '}
-                                </span>
-                of <span className="font-medium">{props.totalCount} </span>
+                <span class="font-medium">
+                  {parseInt(props.offSet) === 0   
+                    ? props.items.length === 0 ? 0 : parseInt(props.offSet) + 1
+                    : parseInt(props.offSet)}
+                </span>
+                {' '}to{' '}
+                <span class="font-medium">
+                  {props.page <= 1
+                    ? props.items.length
+                    : parseInt(props.offSet) + props.items.length}{' '}
+                </span>
+                of <span class="font-medium">{props.totalCount} </span>
                 items
-                            </p>
-                        </div>
+              </p>
+            </div>
                         <div>
                             <nav
                                 className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"

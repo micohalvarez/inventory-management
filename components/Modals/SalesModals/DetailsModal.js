@@ -5,7 +5,10 @@ import * as salesActions from '../../../redux/actions/salesActions';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useSession } from 'next-auth/client';
 const DetailsModal = (props) => {
+  const [ session, loading ] = useSession()
+
   const [newItems, setNewitems] = useState([
     <>
       <tr
@@ -50,7 +53,7 @@ const DetailsModal = (props) => {
     let discount = totalDiscount ? totalDiscount / 1000 : props.selectedItem.total_discount
 
     event.preventDefault();
-    props.approveDiscount(props.authToken,  props.selectedItem.uuid, discount)
+    props.approveDiscount(session.user.auth_token,  props.selectedItem.uuid, discount)
     setDiscountApproval(false)    
   };
 
@@ -324,18 +327,18 @@ const DetailsModal = (props) => {
       accountNum: accountNum,
       pdc_date: moment(paymentDate).format('YYYY-MM-DD'),
     };
-    props.addPaymentMethod(props.authToken, payload);
+    props.addPaymentMethod(session.user.auth_token, payload);
     clearState();
   };
   const markPaid = (event) => {
     event.preventDefault();
 
     props
-      .markPaid(props.authToken, props.selectedItem.uuid)
+      .markPaid(session.user.auth_token, props.selectedItem.uuid)
       .then((res) => {
         if (res.status === 200) {
           alert('Sales order has been marked as paid');
-          props.getSales(props.authToken);
+          props.getSales(session.user.auth_token);
         } else alert('Sales order cannot be marked as paid');
       })
       .catch(({ response }) => {
@@ -352,11 +355,11 @@ const DetailsModal = (props) => {
     event.preventDefault();
 
     props
-      .markCancel(props.authToken, props.selectedItem.uuid)
+      .markCancel(session.user.auth_token, props.selectedItem.uuid)
       .then((res) => {
         if (res.status === 200) {
           alert('Sales order has been marked as cancelled');
-          props.getSales(props.authToken);
+          props.getSales(session.user.auth_token);
         } else alert('Sales order cannot be marked as cancelled');
       })
       .catch((error) => {

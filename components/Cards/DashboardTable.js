@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 
 import PropTypes from 'prop-types';
-import Router, { withRouter } from 'next/router';
 
 // components
 
@@ -12,17 +11,19 @@ import InventoryType from '../Dropdowns/InventoryType';
 
 import PurchaseFormModal from '../Modals/PurchaseModals/FormModal';
 import PurchaseDetailModal from '../Modals/PurchaseModals/DetailsModal';
-import SalesFormModal from '../Modals/SalesModals/FormModal';
 import SalesDetailsModal from '../Modals/SalesModals/DetailsModal';
 
 import { withRouter } from 'next/router';
-import { connect } from 'react-redux';
+
 import * as dashboardActions from '../../redux/actions/dashboardActions';
 
 import DashboardDropdown from '../Dropdowns/DashboardDropdown';
 import moment from 'moment';
+import { useSession } from 'next-auth/client';
 
 const DashBoardTable = (props) => {
+  const [ session, loading ] = useSession()
+
   const [showFormModal, setFormShowModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -121,7 +122,7 @@ const DashBoardTable = (props) => {
             </tr>
           </thead>
           <tbody>
-            {props.items ? (
+            {props.items.length > 0 ? (
               <>
                 {props.items.map((item, index) => (
                   <tr
@@ -168,7 +169,15 @@ const DashBoardTable = (props) => {
                   </tr>
                 ))}
               </>
-            ) : null}
+            ) : <tr
+            class="bg-gray-100 text-gray-800 border-gray-200"
+          >
+            <td colSpan="3"   align="center" className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                <span className={'ml-3 font-bold '}>
+                  No orders to show
+                </span>
+            </td>
+          </tr>}
           </tbody>
         </table>
       </div>
@@ -220,12 +229,11 @@ const DashBoardTable = (props) => {
             </tr>
           </thead>
           <tbody>
-            {props.items ? (
+            {props.items.length > 0 ? (
               <>
                 {props.items.map((item, index) => (
                   <tr
-                    onClick={() => onPressRow(item)}
-                    class="hover:bg-gray-200 cursor-pointer bg-gray-100 text-gray-800 border-gray-200"
+                    class="text-gray-800 border-gray-200"
                   >
                     <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
                       <span className={'ml-3 font-bold '}>
@@ -246,7 +254,10 @@ const DashBoardTable = (props) => {
                       <button
                         className="hover:bg-gray-800 bg-gray-700 self-end flex text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="button"
-                        onClick={() => setFormShowModal(true)}
+                        onClick={() =>{
+                          setSalesDetailModal(true)
+                          setSelectedSales(item)
+                        }}
                       >
                         View Order Details
                       </button>
@@ -254,7 +265,15 @@ const DashBoardTable = (props) => {
                   </tr>
                 ))}
               </>
-            ) : null}
+            ) : <tr
+                class="text-gray-800 border-gray-200"
+              >
+                <td colSpan="5"   align="center" className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                    <span className={'ml-3 font-bold '}>
+                      No orders to show
+                    </span>
+                </td>
+          </tr>}
           </tbody>
         </table>
       </div>
@@ -292,19 +311,18 @@ const DashBoardTable = (props) => {
             </tr>
           </thead>
           <tbody>
-            {props.items ? (
+            {props.items.length > 0 ? (
               <>
                 {props.items.map((item, index) => (
                   <tr
                     onClick={() => onPressRow(item)}
                     class="hover:bg-gray-200 cursor-pointer bg-gray-100 text-gray-800 border-gray-200"
                   >
-                    <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
-                      <span className={'ml-3 font-bold '}>
-                        {item.order_number}
-                      </span>
-                    </th>
-
+                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                        <span className={'ml-3 font-bold '}>
+                          {item.order_number}
+                        </span>
+                    </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                       {moment(item.payment_details.pdc_date)
                         .format('MMM DD, YYYY')
@@ -314,7 +332,16 @@ const DashBoardTable = (props) => {
                       <button
                         className="hover:bg-gray-800 bg-gray-700 self-end flex text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="button"
-                        onClick={() => setFormShowModal(true)}
+                        onClick={() =>{ 
+                          if(props.sort ===  3){
+                            setSalesDetailModal(true)
+                            setSelectedSales(item)
+                          }
+                          else if(props.sort === 2){
+                            setPurchaseDetailModal(true)
+                            setSelectedPurchase(item)
+                          }
+                        }}
                       >
                         View Order Details
                       </button>
@@ -322,22 +349,64 @@ const DashBoardTable = (props) => {
                   </tr>
                 ))}
               </>
-            ) : null}
+            ) : <tr
+                class="text-gray-800 border-gray-200"
+              >
+                <td colSpan="3"   align="center" className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                    <span className={'ml-3 font-bold '}>
+                      No orders to show
+                    </span>
+                </td>
+              </tr>}
           </tbody>
         </table>
       </div>
     );
   };
 
+
+  const [salesDetailModal,setSalesDetailModal] = useState(false)
+  const [selectedSales,setSelectedSales] = useState(false)
+  const [purchaseDetailiModal,setPurchaseDetailModal] = useState(false)
+  const [selectedPurchase,setSelectedPurchase] = useState(false)
+
+
   return (
     <>
+      <SalesDetailsModal
+        selectedItem={selectedSales}
+        isPaid={
+          !!(
+            selectedSales.status === 'paid' ||
+            selectedSales.status === 'cancelled'
+          )
+        }
+        showModal={salesDetailModal}
+        closeModal={() => setSalesDetailModal(false)}
+        paymentTypes={props.paymentTypes}
+        authToken={session.user.auth_token}
+      />
+      <PurchaseDetailModal
+        selectedItem={selectedPurchase}
+        isPaid={
+          !!(
+            selectedPurchase.status === 'paid' ||
+            selectedPurchase.status === 'cancelled'
+          )
+        }
+        showModal={purchaseDetailiModal}
+        closeModal={() => setPurchaseDetailModal(false)}
+        paymentTypes={props.paymentTypes}
+        authToken={session.user.auth_token}
+      />
+      
       <div className="flex flex-row flex-1">
         <DashboardDropdown
           sort={[
             'Low on Stock',
             'For Sales Orders Discounts',
-            'Upcoming Sales Payments',
             'Upcoming Purchase Payments',
+            'Upcoming Sales Payments',
           ]}
           getItems={props.getItems}
           getDiscountApproveSales={props.getDiscountApproveSales}
@@ -357,8 +426,7 @@ const DashBoardTable = (props) => {
           : renderDeadlineItems()}
 
         <div
-          class="bg-white px-4 py-3 flex items-ce
-        nter justify-between border-t border-gray-200 sm:px-6"
+          class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
         >
           <div class="flex-1 flex justify-between sm:hidden">
             <a
@@ -379,12 +447,11 @@ const DashBoardTable = (props) => {
               <p class="text-sm text-gray-700">
                 Showing{' '}
                 <span class="font-medium">
-                  {' '}
-                  {parseInt(props.offSet) === 0
-                    ? parseInt(props.offSet) + 1
-                    : parseInt(props.offSet)}{' '}
+                  {parseInt(props.offSet) === 0   
+                    ? props.items.length === 0 ? 0 : parseInt(props.offSet) + 1
+                    : parseInt(props.offSet)}
                 </span>
-                to{' '}
+                {' '}to{' '}
                 <span class="font-medium">
                   {props.page <= 1
                     ? props.items.length
@@ -466,6 +533,7 @@ const mapStateToProps = (state) => ({
   offSet: state.dashboard.itemsOffset,
   page: state.dashboard.itemsPage,
   sort: state.dashboard.sort,
+  paymentTypes: state.sales.paymentTypes,
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -3,7 +3,10 @@ import { withRouter } from 'next/router';
 import { connect } from 'react-redux';
 import * as salesActions from '../../../redux/actions/salesActions';
 import { Alert } from 'reactstrap';
+import { useSession } from 'next-auth/client';
 const FormModal = (props) => {
+  const [ session, loading ] = useSession()
+
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [type, setType] = useState('');
@@ -50,7 +53,10 @@ const FormModal = (props) => {
       );
       setNewitems([...newItems]);
     }
-  }, [props.items, newItems]);
+    if(props.selectedId){
+      addType()
+    }
+  }, [props.items, newItems, props.selectedId]);
 
   const [finalItems, setFinalItems] = useState([
     <>
@@ -177,6 +183,13 @@ const FormModal = (props) => {
     setName(event.target.value);
   };
 
+
+  const addType = (index, id) => {
+    console.log(props.selectedId)
+    console.log(props.items)
+    console.log('hi')
+  };
+
   const handleType = (event, index, id) => {
 
     event.preventDefault();
@@ -223,11 +236,11 @@ const FormModal = (props) => {
     event.preventDefault();
 
     props
-      .createSalesOrder(props.authToken, submitItems, setContinue, totalDiscount)
+      .createSalesOrder(session.user.auth_token, submitItems, setContinue, totalDiscount)
       .then((res) => {
         if (res.status === 200) {
           alert('Sales order has been added');
-          props.getSales(props.authToken);
+          props.getSales(session.user.auth_token);
         } else alert('Item has not enough stock');
       })
       .catch((error) => {
@@ -246,7 +259,9 @@ const FormModal = (props) => {
       account_name: accountName,
       accountNum: accountNum,
     };
-    props.addPaymentMethod(props.authToken, payload);
+    console.log(session.user.auth_token
+      )
+    props.addPaymentMethod(session.user.auth_token, payload);
   };
   const clearState = () => {
     props.closeModal();

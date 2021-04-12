@@ -72,12 +72,12 @@ const data = (state = initialState, action) => {
         case actionTypes.ADD_DISCOUNT:
             return {
                 ...state,
-                discounted: 'True'
+                discounted: 'False'
             }
         case actionTypes.CLEAR_DISCOUNT:
             return {
                 ...state,
-                discounted: 'False'
+                discounted: null
             }
         default:
             return state
