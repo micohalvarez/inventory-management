@@ -1,19 +1,22 @@
-import React, { Component } from 'react';
-
-import Login from './admin/login';
-
-import { connect } from 'react-redux';
-
-import { withRouter } from 'next/router';
+import React, { Component, useEffect } from 'react'
+import { connect } from 'react-redux'
+import Router from 'next/router'
 
 const App = (props) => {
-  return <Login />;
-};
+    // useEffect(() => {
+    //     Router.push('/admin/login')
+    // })
 
-const mapStateToProps = (state) => ({
-  state: state,
-});
+    return null
+}
 
-const mapDispatchToProps = (dispatch) => ({});
+export async function getServerSideProps (context) {
+    return {
+        redirect: {
+            destination: '/admin/login',
+            permanent: false
+        }
+    }
+}
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));
+export default App

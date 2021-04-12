@@ -1,6 +1,8 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-tabs */
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { getSession } from 'next-auth/client'
 
 // layout for page
 
@@ -59,7 +61,8 @@ const Login = (props) => {
                 password: password
             }
 
-            props.login(payload)
+            // props.login(payload)
+            props.loginNextAuth(payload)
         }
     }
 
@@ -160,7 +163,25 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-    login: (payload) => dispatch(authActions.login(payload))
+    login: (payload) => dispatch(authActions.login(payload)),
+    loginNextAuth: (payload) => dispatch(authActions.loginNextAuth(payload))
 })
+
+export async function getServerSideProps (context) {
+    const session = await getSession({ req: context.req })
+
+    if (session) {
+        return {
+            redirect: {
+                destination: '/admin/inventory',
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: { session }
+    }
+}
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Login))

@@ -5,7 +5,7 @@ import ordersReducer from './ordersReducer';
 import userReducer from './userReducer';
 import dashboardReducer from './dashboardReducer';
 
-import { combineReducers } from 'redux';
+import { combineReducers } from 'redux'
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -16,4 +16,4 @@ const rootReducer = combineReducers({
   dashboard: dashboardReducer,
 });
 
-export default rootReducer;
+export default rootReducer
