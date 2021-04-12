@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import Router, { withRouter } from 'next/router'
-import { getSession } from 'next-auth/client'
+import { getSession, signOut } from 'next-auth/client'
 
 // components
 
@@ -17,10 +17,6 @@ const Inventory = (props) => {
     const [authToken, setAuthToken] = useState(false)
 
     useEffect(() => {
-        getSession().then(session => {
-            console.log(session)
-        })
-
         // const authCreds = localStorage.getLocalStorage('authCreds')
         // console.log(props.session)
 
@@ -33,10 +29,15 @@ const Inventory = (props) => {
         // }
     }, [])
 
+    const signOutClick = () => {
+        signOut()
+    }
+
     return (
         <Admin>
             <div className="flex flex-wrap mt-10">
                 <div className="w-full h-full mb-12 px-4 mt-16 flex flex-col mt-1 justify-center">
+                    <button onClick={signOutClick}>SIGN OUT</button>
                     <InventoryTable items={props.items} authToken={authToken} />
                 </div>
             </div>
