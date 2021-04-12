@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import Router, { withRouter } from 'next/router'
+import { getSession } from 'next-auth/client'
 
 // components
 
@@ -16,15 +17,20 @@ const Inventory = (props) => {
     const [authToken, setAuthToken] = useState(false)
 
     useEffect(() => {
-        const authCreds = localStorage.getLocalStorage('authCreds')
+        getSession().then(session => {
+            console.log(session)
+        })
 
-        if (!authCreds) {
-            Router.push('/')
-        } else {
-            setAuthToken(authCreds.authToken)
-            props.getItems(authCreds.authToken)
-            props.getCategories(authCreds.authToken)
-        }
+        // const authCreds = localStorage.getLocalStorage('authCreds')
+        // console.log(props.session)
+
+        // if (!authCreds) {
+        //     Router.push('/')
+        // } else {
+        //     setAuthToken(authCreds.authToken)
+        //     props.getItems(authCreds.authToken)
+        //     props.getCategories(authCreds.authToken)
+        // }
     }, [])
 
     return (
@@ -47,6 +53,23 @@ const mapDispatchToProps = (dispatch) => ({
     getCategories: (authToken) =>
         dispatch(inventoryActions.getCategories(authToken))
 })
+
+export async function getServerSideProps (context) {
+    const session = await getSession({ req: context.req })
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: { session }
+    }
+}
 
 export default withRouter(
     connect(mapStateToProps, mapDispatchToProps)(Inventory)

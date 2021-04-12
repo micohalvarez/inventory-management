@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-tabs */
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -59,7 +60,8 @@ const Login = (props) => {
                 password: password
             }
 
-            props.login(payload)
+            // props.login(payload)
+            props.loginNextAuth(payload)
         }
     }
 
@@ -160,7 +162,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-    login: (payload) => dispatch(authActions.login(payload))
+    login: (payload) => dispatch(authActions.login(payload)),
+    loginNextAuth: (payload) => dispatch(authActions.loginNextAuth(payload))
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Login))
