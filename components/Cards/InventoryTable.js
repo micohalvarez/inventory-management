@@ -11,20 +11,7 @@ import InventoryFilter from '../Dropdowns/InventoryFilter';
 import FormModal from '../Modals/Inventorymodals/FormModal';
 import DetailsModal from '../Modals/Inventorymodals/DetailsModal';
 import EditModal from '../Modals/Inventorymodals/EditModal';
-import Router, { withRouter } from 'next/router';
-import moment from 'moment';
-
-import { connect } from 'react-redux';
-import * as inventoryActions from '../../redux/actions/inventoryActions';
-import * as localStorage from '../../utils/local-storage';
-
-const InventoryTable = (props) => {
-  const [showFormModal, setFormShowModal] = useState(false);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(false);
-
-  const onPressRow = (item) => {
+import Router, { withRouter } from 'next/router';  const onPressRow = (item) => {
     setSelectedItem(item);
     setShowDetailsModal(true);
   };
@@ -84,7 +71,19 @@ const InventoryTable = (props) => {
     }
     return pagination;
   };
-  console.log(props);
+import moment from 'moment';
+
+import { connect } from 'react-redux';
+import * as inventoryActions from '../../redux/actions/inventoryActions';
+import * as localStorage from '../../utils/local-storage';
+
+const InventoryTable = (props) => {
+  const [showFormModal, setFormShowModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(false);
+
+
 
   return (
     <>
@@ -371,7 +370,6 @@ const mapStateToProps = (state) => ({
   totalCount: state.inventory.totalCount,
   offSet: state.inventory.itemsOffset,
   page: state.inventory.itemsPage,
-
   categories: state.inventory.categories,
 });
 

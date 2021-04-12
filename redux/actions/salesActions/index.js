@@ -12,7 +12,7 @@ export const getSales = (authToken) => {
     authInstance
       .get(
         `/sales_order/?limit=${SALES_LIMIT}&offset=0` +
-          (sales.filter ? `&status=${sales.filter}&` : '') +
+          (sales.filter ? `&status=${sales.filter}` : '') +
           (sales.discounted ? `&discount_approved=${sales.discounted}` : ''),
         {
           headers: {
@@ -131,11 +131,19 @@ export const getPaymentTypes = (authToken, filter) => {
   };
 };
 
-export const createSalesOrder = (authToken, payload, setContinue) => {
+export const createSalesOrder = (authToken, payload, setContinue,totalDiscount) => {
   return (dispatch) => {
-    const data = {
-      items: payload,
-    };
+    var data
+    if (totalDiscount > 0)
+      data = {
+        items: payload,
+        total_discount: totalDiscount / 100
+      };
+    else
+      data = {
+        items: payload,
+      };
+      console.log(data)
     return authInstance.post(`/sales_order/`, data, {
       headers: {
         Authorization: `Token ${authToken}`,
@@ -167,9 +175,32 @@ export const addPaymentMethod = (authToken, payload) => {
   };
 };
 
+export const approveDiscount = (authToken, uuid, discount) => {
+  return (dispatch) => {
+   
+    authInstance.post(
+      `/sales_order/${uuid}/approve_discount/`,
+      {
+        total_discount: discount
+      },
+      {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      }
+    ).then((res) => {
+      if (res.status === 200) {
+        alert('Sales order has been marked as paid');
+      } else alert('Sales order cannot be marked as paid');
+    })
+    .catch(({ response }) => {
+      alert('An error has occurred');
+    });
+  };
+};
+
 export const markPaid = (authToken, uuid) => {
   return (dispatch) => {
-    dispatch({ type: actionTypes.ADD_SALES_START });
 
     return authInstance.post(
       `/sales_order/${uuid}/mark_as_paid/`,
@@ -182,6 +213,7 @@ export const markPaid = (authToken, uuid) => {
     );
   };
 };
+
 export const cancelOrder = (authToken, uuid) => {
   return (dispatch) => {
     return authInstance.post(

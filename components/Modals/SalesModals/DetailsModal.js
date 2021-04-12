@@ -6,7 +6,6 @@ import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 const DetailsModal = (props) => {
-  console.log(props);
   const [newItems, setNewitems] = useState([
     <>
       <tr
@@ -25,13 +24,277 @@ const DetailsModal = (props) => {
   ]);
 
   const [isContinue, setContinue] = useState(false);
+  const [isDiscount, setDiscountApproval] = useState(false);
 
   const [paymentType, setPaymentType] = useState(null);
   const [bankName, setBankName] = useState(null);
   const [accountNum, setAccountNum] = useState(null);
   const [accountName, setAccountName] = useState(null);
   const [paymentDate, setPaymentDate] = useState(new Date());
+  const [totalDiscount, setTotalDiscount] = useState(null)
 
+  const [discountError, setDiscountError] = useState(false);
+
+  const handleDiscount = (event) => {
+    event.preventDefault();
+    setDiscountError('');
+    if (!(event.target.value > 100 || event.target.value < 0)) {
+  
+      setTotalDiscount(event.target.value);
+    }
+  };
+
+
+
+  const submitDiscount = (event) => {
+    let discount = totalDiscount ? totalDiscount / 1000 : props.selectedItem.total_discount
+
+    event.preventDefault();
+    props.approveDiscount(props.authToken,  props.selectedItem.uuid, discount)
+    setDiscountApproval(false)    
+  };
+
+
+  const renderDiscountContent = ()=>{
+    return (
+      <div className="mt-5 md:mt-0 md:col-span-2">
+      <div className="shadow overflow-hidden sm:rounded-md bg-">
+        <div className="px-4 py-5 bg-white sm:p-6">
+          <div className="grid grid-cols-6 gap-6">
+            <div className="col-span-8 sm:col-span-3">
+              <label
+                for="sales_number"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Sales Order Number
+              </label>
+              <p className="block text-base font-medium">
+                {props.selectedItem.order_number}
+              </p>
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="customer_name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                To be Discounted
+              </label>
+              <p className="block text-base font-medium">
+              {`₱ ${totalDiscount ? numberWithCommas(parseFloat((props.selectedItem.total  * (totalDiscount / 100))).toFixed(2)) : numberWithCommas(parseFloat((props.selectedItem.total * props.selectedItem.total_discount)).toFixed(2))} PHP`}
+              </p>
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="sales_date"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Sub Total
+              </label>
+              <p className="block text-base font-medium ">
+              {'₱' + props.selectedItem.subtotal + ' PHP'}
+              </p>
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="sales_date"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Total Amount
+              </label>
+              <p className="block text-base font-medium ">
+  
+              {`₱ ${totalDiscount ? props.selectedItem.total -
+                    (props.selectedItem.total  * (totalDiscount / 100))
+                    :  numberWithCommas(parseFloat(props.selectedItem.subtotal - (props.selectedItem.total * props.selectedItem.total_discount)).toFixed(2))
+                    } PHP`}
+              </p>
+            </div>
+
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="sales_date"
+                className="block text-sm font-medium text-gray-700"
+              >
+               Total Discount (%)
+              </label>
+              <input
+                value={!totalDiscount && totalDiscount !== '' ? (props.selectedItem.total_discount * 100).toFixed(2): totalDiscount}
+                onChange={handleDiscount}
+                type="number"
+                placeholder="Discount Percent"
+                name="discount"
+                id="discount"
+                autocomplete="discount"
+                className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    )
+  }
+
+  const renderContinue = () =>{
+    return (
+
+      <div className="mt-5 md:mt-0 md:col-span-2">
+      <div className="shadow overflow-hidden sm:rounded-md bg-">
+        <div className="px-4 py-5 bg-white sm:p-6">
+          <div className="grid grid-cols-6 gap-6">
+            <div className="col-span-8 sm:col-span-3">
+              <label
+                for="sales_number"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Sales Order Number
+              </label>
+              <p className="block text-base font-medium">
+                {'#0000' + props.selectedItem.id}
+              </p>
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="customer_name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Status
+              </label>
+              <p className="block text-base font-medium">
+                {props.selectedItem.status.toUpperCase()}
+              </p>
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="sales_date"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Sales Order Date
+              </label>
+              <p className="block text-base font-medium ">
+                {new Date().toDateString()}
+              </p>
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="sales_date"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Total Amount
+              </label>
+              <p className="block text-base font-medium ">
+                {'₱' + props.selectedItem.total + ' PHP'}
+              </p>
+            </div>
+
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="sales_date"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Payment Type
+              </label>
+              <select
+                onChange={(event) => {
+                  handlePaymentType(event);
+                }}
+                id="item_type"
+                placeholder="Item Type/Category"
+                name="item_type"
+                autocomplete="item_type"
+                class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+                <option
+                  class="text-color-gray-300"
+                  value=""
+                  disabled
+                  hidden
+                  selected
+                >
+                  Item Type/Category
+                </option>
+
+                {props.paymentTypes.map((test) => (
+                  <option key={test.id} value={test.id}>
+                    {test.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="sales_date"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Account Number
+              </label>
+              <input
+                value={accountNum}
+                onChange={handleAccountNum}
+                disabled={
+                  paymentType === null || paymentType < 2
+                    ? true
+                    : false
+                }
+                type="text"
+                placeholder="Account Number"
+                name="account_number"
+                id="account_number"
+                autocomplete="given-name"
+                className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="sales_date"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Bank Name
+              </label>
+              <input
+                value={bankName}
+                onChange={handleBankName}
+                disabled={
+                  paymentType === null || paymentType < 2
+                    ? true
+                    : false
+                }
+                type="text"
+                placeholder="Bank Name"
+                name="bank_name"
+                id="bank_name"
+                autocomplete="given-name"
+                className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                for="sales_date"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Amount Date
+              </label>
+              <DatePicker
+                disabled={
+                  paymentType === null || paymentType < 2
+                    ? true
+                    : false
+                }
+                className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                selected={paymentDate}
+                onChange={(date) => {
+                  setPaymentDate(date);
+                  console.log(date);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    )
+  }
   const handlePaymentType = (event) => {
     event.preventDefault();
 
@@ -80,6 +343,10 @@ const DetailsModal = (props) => {
       });
     clearState();
   };
+
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
 
   const markCancel = (event) => {
     event.preventDefault();
@@ -154,7 +421,7 @@ const DetailsModal = (props) => {
                 <div className="mt-5 md:mt-0 md:col-span-2">
                   <div className="shadow overflow-hidden sm:rounded-md bg-">
                     <div className="px-4 py-5 bg-white sm:p-6">
-                      {!isContinue ? (
+                      {!isContinue && !isDiscount? (
                         <>
                           <div className="grid grid-cols-9 gap-6">
                             <div className="col-span-8 sm:col-span-3">
@@ -243,6 +510,7 @@ const DetailsModal = (props) => {
                                       .toUpperCase()}
                               </p>
                             </div>
+                            
                           </div>
                           <div className="mt-4">
                             <table className="items-center w-full bg-transparent border-collapse">
@@ -269,13 +537,7 @@ const DetailsModal = (props) => {
                                   >
                                     Price Per Item
                                   </th>
-                                  <th
-                                    className={
-                                      'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                    }
-                                  >
-                                    Discount
-                                  </th>
+                               
                                   <th
                                     className={
                                       'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
@@ -305,9 +567,7 @@ const DetailsModal = (props) => {
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {`₱${props.selectedItem.items[index].unit_price} PHP`}
                                       </td>
-                                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${props.selectedItem.items[index].discount} PHP`}
-                                      </td>
+                                    
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {`₱ ${(
                                           props.selectedItem.items[index]
@@ -315,21 +575,62 @@ const DetailsModal = (props) => {
                                             parseFloat(
                                               props.selectedItem.items[index]
                                                 .unit_price
-                                            ) -
-                                          props.selectedItem.items[index]
-                                            .discount
+                                            )
                                         ).toFixed(2)} PHP`}
                                       </td>
                                     </tr>
                                   )
                                 )}
+                                <tr>
+                                    <th
+                                      className={
+                                        'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                      }
+                                      align="end"
+                                    >
+                                      <span>Total Discount (%)</span>
+                                    </th>
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                        <span>{parseFloat(props.selectedItem.total_discount* 100).toFixed(2) + '%'} </span>
+                                    </td>
+                                    <th
+                                      className={
+                                        'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                      }
+                                      align="end"
+                                    >
+                                      <span>Total Discount</span>
+                                    </th>
+                                    <td
+                                      className={
+                                        ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold   text-red-500  border-gray-200'
+                                      }
+                                    >
+                                      <span>{`₱ ${numberWithCommas(parseFloat(props.selectedItem.total - props.selectedItem.subtotal).toFixed(2))} PHP`}</span>
+                                    </td>
+                                  </tr>
                               </tbody>
                               <tfoot>
+                                  <th
+                                    className={
+                                      'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                    }
+                                    align="end"
+                                  >
+                                    <span>SubTotal</span>
+                                  </th>
+                                  <td
+                                    className={
+                                      ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                    }
+                                  >
+                                    <span>{`₱ ${numberWithCommas(props.selectedItem.subtotal)} PHP`}</span>
+                                  </td>
                                 <th
                                   className={
                                     'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
                                   }
-                                  colSpan="4"
+                                
                                   align="end"
                                 >
                                   <span>Total Amount</span>
@@ -339,231 +640,19 @@ const DetailsModal = (props) => {
                                     ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
                                   }
                                 >
-                                  <span>{`₱ ${props.selectedItem.total} PHP`}</span>
+                                  <span>{`₱ ${numberWithCommas(props.selectedItem.total)} PHP`}</span>
                                 </td>
                               </tfoot>
                             </table>
                           </div>
                         </>
-                      ) : (
-                        <div className="mt-5 md:mt-0 md:col-span-2">
-                          <div className="shadow overflow-hidden sm:rounded-md bg-">
-                            <div className="px-4 py-5 bg-white sm:p-6">
-                              <div className="grid grid-cols-6 gap-6">
-                                <div className="col-span-8 sm:col-span-3">
-                                  <label
-                                    for="sales_number"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Sales Order Number
-                                  </label>
-                                  <p className="block text-base font-medium">
-                                    {'#0000' + props.selectedItem.id}
-                                  </p>
-                                </div>
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="customer_name"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Status
-                                  </label>
-                                  <p className="block text-base font-medium">
-                                    {props.selectedItem.status.toUpperCase()}
-                                  </p>
-                                </div>
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="sales_date"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Sales Order Date
-                                  </label>
-                                  <p className="block text-base font-medium ">
-                                    {new Date().toDateString()}
-                                  </p>
-                                </div>
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="sales_date"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Total Amount
-                                  </label>
-                                  <p className="block text-base font-medium ">
-                                    {'₱' + props.selectedItem.total + ' PHP'}
-                                  </p>
-                                </div>
-
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="sales_date"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Payment Type
-                                  </label>
-                                  <select
-                                    onChange={(event) => {
-                                      handlePaymentType(event);
-                                    }}
-                                    id="item_type"
-                                    placeholder="Item Type/Category"
-                                    name="item_type"
-                                    autocomplete="item_type"
-                                    class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                  >
-                                    <option
-                                      class="text-color-gray-300"
-                                      value=""
-                                      disabled
-                                      hidden
-                                      selected
-                                    >
-                                      Item Type/Category
-                                    </option>
-
-                                    {props.paymentTypes.map((test) => (
-                                      <option key={test.id} value={test.id}>
-                                        {test.name}
-                                      </option>
-                                    ))}
-                                  </select>
-                                </div>
-
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="sales_date"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Account Number
-                                  </label>
-                                  <input
-                                    value={accountNum}
-                                    onChange={handleAccountNum}
-                                    disabled={
-                                      paymentType === null || paymentType < 2
-                                        ? true
-                                        : false
-                                    }
-                                    type="text"
-                                    placeholder="Account Number"
-                                    name="account_number"
-                                    id="account_number"
-                                    autocomplete="given-name"
-                                    className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                  />
-                                </div>
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="sales_date"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Bank Name
-                                  </label>
-                                  <input
-                                    value={bankName}
-                                    onChange={handleBankName}
-                                    disabled={
-                                      paymentType === null || paymentType < 2
-                                        ? true
-                                        : false
-                                    }
-                                    type="text"
-                                    placeholder="Bank Name"
-                                    name="bank_name"
-                                    id="bank_name"
-                                    autocomplete="given-name"
-                                    className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                  />
-                                </div>
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="sales_date"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Amount Date
-                                  </label>
-                                  <DatePicker
-                                    disabled={
-                                      paymentType === null || paymentType < 2
-                                        ? true
-                                        : false
-                                    }
-                                    className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                    selected={paymentDate}
-                                    onChange={(date) => {
-                                      setPaymentDate(date);
-                                      console.log(date);
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                              {/* <div className="mt-4">
-                                <table className="items-center w-full bg-transparent border-collapse">
-                                  <thead className="bg-gray-100 ">
-                                    <tr>
-                                      <th
-                                        className={
-                                          'px-6 align-middle border border-solid py-3 text-sm uppercase border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                        }
-                                      >
-                                        Sales Order Number
-                                      </th>
-                                      <th
-                                        className={
-                                          'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                        }
-                                      >
-                                        Quantity
-                                      </th>
-                                      <th
-                                        className={
-                                          'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                        }
-                                      >
-                                        Price
-                                      </th>
-                                      <th
-                                        className={
-                                          'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                        }
-                                      >
-                                        Discount
-                                      </th>
-                                      <th
-                                        className={
-                                          'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                        }
-                                      >
-                                        Amount
-                                      </th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>{finalItems}</tbody>
-                                  <tfoot>
-                                    <th
-                                      className={
-                                        'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
-                                      }
-                                      colSpan="4"
-                                      align="end"
-                                    >
-                                      <span>Total Amount</span>
-                                    </th>
-                                    <td
-                                      className={
-                                        ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
-                                      }
-                                    >
-                                      <span>₱10,000 PHP</span>
-                                    </td>
-                                  </tfoot>
-                                </table> */}
-                              {/* </div> */}
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                      ) : isDiscount ? (
+                        renderDiscountContent()
+                      )
+                      : (
+                        renderContinue()
+                      )
+                      }
 
                       <div className="mt-4 text-right ">
                         {props.isPaid ? (
@@ -594,7 +683,18 @@ const DetailsModal = (props) => {
                               Mark as Paid
                             </button>
                           </>
-                        ) : (
+                        ) : props.selectedItem.total_discount > 0 && props.selectedItem.discount_approved === false ? (
+                          <>
+                          <button
+                            className="bg-green-600 text-white hover:bg-green-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                            type="button"
+                            onClick={(event) => !isDiscount ? setDiscountApproval(true) : submitDiscount(event)}
+                          >
+                           {!isDiscount ? 'Approve Discount' : 'Submit'}
+                          </button>
+                          </>
+                          ) :
+                          (
                           <>
                             <button
                               className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -657,6 +757,9 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(salesActions.cancelOrder(authToken, uuid)),
   getSales: (token) => {
     dispatch(salesActions.getSales(token));
+  },
+  approveDiscount: (token,uuid,discount) => {
+    dispatch(salesActions.approveDiscount(token,uuid,discount));
   },
 });
 

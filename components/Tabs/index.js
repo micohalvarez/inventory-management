@@ -8,7 +8,7 @@ const Tabs = (props) => {
 
   const onSelectFilter = (type) => {
     setFilter(type);
-
+    props.clearDiscount();
     if (type === '') props.clearFilter();
     else props.addFilter(type);
     props.getSalesWithFilter(
@@ -17,11 +17,8 @@ const Tabs = (props) => {
   };
 
   const onSelectDiscount = () => {
-    console.log(props.discounted);
-    if (props.discounted === 'TRUE') props.clearDiscount();
-    else props.addDiscount();
-    console.log(props.discounted);
-
+    props.addDiscount();
+    props.addFilter('pending');
     props.getSalesWithFilter(
       localStorage.getLocalStorage('authCreds').authToken
     );
@@ -126,7 +123,7 @@ const Tabs = (props) => {
                 href="#link3"
                 role="tablist"
               >
-                <i className="fas fa-ban text-base mr-1"></i> For Approval
+                <i className="fas fa-ban text-base mr-1"></i> For Discount Approval
               </a>
             </li>
           </ul>

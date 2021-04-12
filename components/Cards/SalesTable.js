@@ -84,6 +84,11 @@ const SalesTable = (props) => {
     return pagination;
   };
 
+
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
   return (
     <>
       <FormModal
@@ -147,14 +152,14 @@ const SalesTable = (props) => {
                     'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
                   }
                 >
-                  Amount
+                 Total Amount
                 </th>
                 <th
                   className={
                     'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
                   }
                 >
-                  Status
+                  Order Status
                 </th>
                 <th
                   className={
@@ -199,7 +204,7 @@ const SalesTable = (props) => {
                         </span>
                       </th>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                        {`₱${item.total} PHP`}
+                        {`₱${numberWithCommas(item.total)} PHP`}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                         {item.status === 'paid' ? (
@@ -211,6 +216,7 @@ const SalesTable = (props) => {
                         ) : null}
                         {item.status.toUpperCase()}
                       </td>
+          
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                         {item.payment_details
                           ? item.payment_details.type.name
