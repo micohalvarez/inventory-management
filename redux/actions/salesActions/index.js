@@ -131,19 +131,19 @@ export const getPaymentTypes = (authToken, filter) => {
   };
 };
 
-export const createSalesOrder = (authToken, payload, setContinue,totalDiscount) => {
+export const createSalesOrder = (authToken, payload, totalDiscount) => {
   return (dispatch) => {
-    var data
+    var data;
     if (totalDiscount > 0)
       data = {
         items: payload,
-        total_discount: totalDiscount / 100
+        total_discount: totalDiscount / 100,
       };
     else
       data = {
         items: payload,
       };
-      console.log(data)
+
     return authInstance.post(`/sales_order/`, data, {
       headers: {
         Authorization: `Token ${authToken}`,
@@ -156,52 +156,41 @@ export const addPaymentMethod = (authToken, payload) => {
   return (dispatch) => {
     dispatch({ type: actionTypes.ADD_SALES_START });
 
-    authInstance
-      .post(`/payment/`, payload, {
-        headers: {
-          Authorization: `Token ${authToken}`,
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        if (res.status === 200) {
-          alert('Sales order has bene marked as paid');
-          dispatch({ type: actionTypes.ADD_SALES_SUCCESS, payload: res.data });
-        } else alert('Item has not enough stock');
-      })
-      .catch(({ response }) => {
-        dispatch({ type: actionTypes.ADD_SALES_FAIL });
-      });
+    return authInstance.post(`/payment/`, payload, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
   };
 };
 
 export const approveDiscount = (authToken, uuid, discount) => {
   return (dispatch) => {
-   
-    authInstance.post(
-      `/sales_order/${uuid}/approve_discount/`,
-      {
-        total_discount: discount
-      },
-      {
-        headers: {
-          Authorization: `Token ${authToken}`,
+    authInstance
+      .post(
+        `/sales_order/${uuid}/approve_discount/`,
+        {
+          total_discount: discount,
         },
-      }
-    ).then((res) => {
-      if (res.status === 200) {
-        alert('Sales order has been marked as paid');
-      } else alert('Sales order cannot be marked as paid');
-    })
-    .catch(({ response }) => {
-      alert('An error has occurred');
-    });
+        {
+          headers: {
+            Authorization: `Token ${authToken}`,
+          },
+        }
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          alert('Sales order has been marked as paid');
+        } else alert('Sales order cannot be marked as paid');
+      })
+      .catch(({ response }) => {
+        alert('An error has occurred');
+      });
   };
 };
 
 export const markPaid = (authToken, uuid) => {
   return (dispatch) => {
-
     return authInstance.post(
       `/sales_order/${uuid}/mark_as_paid/`,
       {},

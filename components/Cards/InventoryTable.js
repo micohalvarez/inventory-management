@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-
+import { useSession } from 'next-auth/client';
 // components
 
 import TableDropdown from '../Dropdowns/TableDropdown.js';
@@ -27,6 +27,7 @@ const InventoryTable = (props) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(false);
   const [showReportsModal, setShowReportsModal] = useState(false);
+  const [session, loading] = useSession();
 
   const onPressRow = (item) => {
     setSelectedItem(item);
@@ -34,16 +35,12 @@ const InventoryTable = (props) => {
   };
   const onPressNumber = (event) => {
     if (parseInt(event.target.innerText) === 1) {
-      props.getNextItems(
-        localStorage.getLocalStorage('authCreds').authToken,
-        0,
-        0
-      );
+      props.getNextItems(session.user.auth_token, 0, 0);
     } else {
       var multiplier = (parseInt(event.target.innerText) - 1) * 10;
 
       props.getNextItems(
-        localStorage.getLocalStorage('authCreds').authToken,
+        session.user.auth_token,
         props.offSet + multiplier,
         props.page + (parseInt(event.target.innerText) - 1)
       );
@@ -52,7 +49,7 @@ const InventoryTable = (props) => {
 
   const onPressNext = () => {
     props.getNextItems(
-      localStorage.getLocalStorage('authCreds').authToken,
+      session.user.auth_token,
       props.offSet + 10,
       props.page + 1
     );
@@ -60,7 +57,7 @@ const InventoryTable = (props) => {
 
   const onPressPrev = () => {
     props.getNextItems(
-      localStorage.getLocalStorage('authCreds').authToken,
+      session.user.auth_token,
       props.offSet - 10,
       props.page - 1
     );

@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Router, { withRouter } from 'next/router';
 import moment from 'moment';
+import { useSession } from 'next-auth/client';
 
 // components
 
@@ -13,19 +14,27 @@ import TableDropdown from '../Dropdowns/TableDropdown.js';
 import FormModal from '../Modals/SalesModals/FormModal';
 import DetailsModal from '../Modals/SalesModals/DetailsModal';
 import EditModal from '../Modals/SalesModals/EditModal';
-import ReportsModal from '../Modals/SalesModals/ReportModal';
+
+import SuccessModal from '../Modals/SuccessModal';
+
 import Tabs from '../Tabs';
 import * as salesActions from '../../redux/actions/salesActions';
 import * as inventoryActions from '../../redux/actions/inventoryActions';
 import * as localStorage from '../../utils/local-storage';
 
 const SalesTable = (props) => {
-  console.log(props, 'hihihi');
   const [showFormModal, setFormShowModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [isPaid, setPaid] = useState(false);
+
   const [selectedItem, setSelectedItem] = useState(false);
+
+  const [successModal, setSuccessModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState(false);
+  const [modalError, setModalError] = useState(false);
+
+  const [session, loading] = useSession();
 
   const onPressRow = (item) => {
     setShowDetailsModal(true);
@@ -34,16 +43,12 @@ const SalesTable = (props) => {
 
   const onPressNumber = (event) => {
     if (parseInt(event.target.innerText) === 1) {
-      props.getNextItems(
-        localStorage.getLocalStorage('authCreds').authToken,
-        0,
-        0
-      );
+      props.getNextItems(session.user.auth_token, 0, 0);
     } else {
       var multiplier = (parseInt(event.target.innerText) - 1) * 10;
 
       props.getNextItems(
-        localStorage.getLocalStorage('authCreds').authToken,
+        session.user.auth_token,
         props.offSet + multiplier,
         props.page + (parseInt(event.target.innerText) - 1)
       );
@@ -52,7 +57,7 @@ const SalesTable = (props) => {
 
   const onPressNext = () => {
     props.getNextItems(
-      localStorage.getLocalStorage('authCreds').authToken,
+      session.user.auth_token,
       props.offSet + 10,
       props.page + 1
     );
@@ -60,7 +65,7 @@ const SalesTable = (props) => {
 
   const onPressPrev = () => {
     props.getNextItems(
-      localStorage.getLocalStorage('authCreds').authToken,
+      session.user.auth_token,
       props.offSet - 10,
       props.page - 1
     );
@@ -103,6 +108,9 @@ const SalesTable = (props) => {
         closeModal={() => setFormShowModal(false)}
         authToken={props.authToken}
         paymentTypes={props.paymentTypes}
+        setSuccessModal={setSuccessModal}
+        setModalMessage={setModalMessage}
+        setModalError={setModalError}
       />
       <DetailsModal
         selectedItem={selectedItem}
@@ -116,16 +124,24 @@ const SalesTable = (props) => {
         closeModal={() => setShowDetailsModal(false)}
         paymentTypes={props.paymentTypes}
         authToken={props.authToken}
+        setSuccessModal={setSuccessModal}
+        setModalMessage={setModalMessage}
+        setModalError={setModalError}
       />
       <EditModal
         showModal={showEditModal}
         closeModal={() => setShowEditModal(false)}
       />
-      {/* <ReportsModal
-        allItems={props.allItems}
+      <SuccessModal
+        showModal={successModal}
+        setSuccessModal={setSuccessModal}
+        closeModal={() => setSuccessModal(false)}
+        message={modalMessage}
+        hasError={modalError}
+      />
+      {/* <ConfirmModal
         showModal={true}
-        getOrdersPerItem={props.getOrdersPerItem}
-        closeModal={() => setShowReportsModal(false)}
+        message={'Are you sure you want to add sales order?'}
       /> */}
       <div className="flex flex-row justify-between">
         <Tabs
@@ -292,7 +308,7 @@ const SalesTable = (props) => {
                 Showing{' '}
                 <span class="font-medium">
                   {parseInt(props.offSet) === 0
-                    ? props.items.length === 0
+                    ? props.sales.length === 0
                       ? 0
                       : parseInt(props.offSet) + 1
                     : parseInt(props.offSet)}
@@ -300,8 +316,8 @@ const SalesTable = (props) => {
                 to{' '}
                 <span class="font-medium">
                   {props.page <= 1
-                    ? props.items.length
-                    : parseInt(props.offSet) + props.items.length}{' '}
+                    ? props.sales.length
+                    : parseInt(props.offSet) + props.sales.length}{' '}
                 </span>
                 of <span class="font-medium">{props.totalCount} </span>
                 items

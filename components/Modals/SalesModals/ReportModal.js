@@ -7,12 +7,13 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 const Headers = [
   { label: 'Order Number', key: 'order_number' },
-  { label: 'Item Name', key: 'item_name' },
-  { label: 'Total Amount', key: 'total_amount' },
-  { label: 'Total Quantity', key: 'quantity' },
   { label: 'Order Type', key: 'type' },
   { label: 'Date Created', key: 'date_created' },
   { label: 'Created By', key: 'created_by' },
+  { label: 'Quantity', key: 'quantity' },
+  { label: 'Subtotal Amount', key: 'sub_total' },
+  { label: 'Discount %', key: 'total_discount' },
+  { label: 'Final Amount', key: 'total_amount' },
 ];
 
 const ReportModal = (props) => {
@@ -23,9 +24,19 @@ const ReportModal = (props) => {
   const [reportDate, setReportDate] = useState(null);
   const [itemError, setItemError] = useState(null);
   const [loadingBar, setLoadingBar] = useState(false);
+  const [productName, setProductName] = useState(false);
+  function getKeyByValue(object, value) {
+    return object.filter((object) => {
+      return object.product_slug === value;
+    });
+  }
+
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
 
   const getOrdersPerItem = () => {
-    let finalReport = [{}];
+    let finalReport = [];
     setLoadingBar(true);
     if (!selectedItem) {
       setItemError('Please select an Item');
@@ -37,27 +48,58 @@ const ReportModal = (props) => {
       .getOrdersPerItem(session.user.auth_token, selectedItem)
       .then((res) => {
         if (res.status === 200 && res.data.results) {
+          let totalAmount = 0,
+            totalQuantity = 0,
+            totalSub = 0,
+            totalDisc = 0;
+
           res.data.results.map((item, index) => {
             finalReport.push({
-              item_name: '',
               order_number: '',
               date_created: '',
               total_amount: '',
               quantity: '',
               created_by: '',
               type: '',
+              total_discount: '',
+              sub_total: '',
             });
 
-            finalReport[index].item_name = item.items[0].product_name;
+            var curItem = getKeyByValue(item.items, selectedItem);
+
             finalReport[index].order_number = item.order_number;
             finalReport[index].date_created = moment(item.created)
               .format('MMM DD, YYYY')
               .toUpperCase();
-            finalReport[index].total_amount = item.total;
-            finalReport[index].quantity = item.items[0].quantity;
+
+            let curAmount = curItem[0].quantity * curItem[0].unit_price;
+            let subTotal = curAmount;
+            if (item.total_discount > 0) {
+              let discount = curAmount * item.total_discount;
+              curAmount -= discount;
+            }
+            totalSub += subTotal;
+
+            finalReport[index].total_amount = numberWithCommas(curAmount);
+            finalReport[index].total_discount =
+              (item.total_discount * 100).toFixed(2) + '%';
+
+            totalDisc += (item.total_discount * 100).toFixed(2);
+            finalReport[index].sub_total = subTotal;
+            totalAmount += curAmount;
+            totalQuantity += curItem[0].quantity;
+            finalReport[index].quantity = numberWithCommas(curItem[0].quantity);
             finalReport[index].created_by = item.created_by.username;
             finalReport[index].type = item.type;
           });
+          finalReport.push({
+            order_number: 'Total',
+            total_amount: numberWithCommas(totalAmount),
+            sub_total: numberWithCommas(totalSub),
+            total_discount: totalDisc + '%',
+            quantity: numberWithCommas(totalQuantity),
+          });
+          setProductName(selectedItem.toUpperCase());
           setLoadingBar(false);
           setReportData(finalReport);
           generateReport();
@@ -83,7 +125,10 @@ const ReportModal = (props) => {
         data={reportData}
         headers={Headers}
         filename={
-          moment(new Date()).format('MM-DD-YY').toUpperCase() + `_orders.csv`
+          productName +
+          ' ' +
+          moment(new Date()).format('MMM-DD-YY').toUpperCase() +
+          `_orders.csv`
         }
         target="_blank"
         className="hiddencsv"

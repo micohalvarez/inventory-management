@@ -32,7 +32,7 @@ const Tabs = (props) => {
             <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
               <a
                 className={
-                  'hover:bg-gray-800 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5 ' +
+                  'transition ease-in duration-200 hover:bg-gray-800 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5 ' +
                   (openTab === 1
                     ? 'text-white bg-gray-600'
                     : 'text-gray-600 bg-white')
@@ -51,7 +51,7 @@ const Tabs = (props) => {
             <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
               <a
                 class={
-                  'hover:bg-yellow-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5 ' +
+                  'transition ease-in duration-200 hover:bg-yellow-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5 ' +
                   (openTab === 2
                     ? 'text-white bg-orange-500'
                     : 'text-gray-600 bg-white')
@@ -70,7 +70,7 @@ const Tabs = (props) => {
             <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
               <a
                 className={
-                  'hover:bg-green-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5  ' +
+                  'transition ease-in duration-200 hover:bg-green-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5  ' +
                   (openTab === 3
                     ? 'text-white bg-green-500'
                     : 'text-gray-600 bg-white')
@@ -89,7 +89,7 @@ const Tabs = (props) => {
             <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
               <a
                 className={
-                  'hover:bg-red-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5  ' +
+                  'transition ease-in duration-200 hover:bg-red-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5  ' +
                   (openTab === 4
                     ? 'text-white bg-red-500'
                     : 'text-gray-600 bg-white')
@@ -109,7 +109,7 @@ const Tabs = (props) => {
             <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
               <a
                 className={
-                  'hover:bg-red-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5  ' +
+                  'transition ease-in duration-200 hover:bg-red-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5  ' +
                   (openTab === 5
                     ? 'text-white bg-red-500'
                     : 'text-gray-600 bg-white')
@@ -123,7 +123,8 @@ const Tabs = (props) => {
                 href="#link3"
                 role="tablist"
               >
-                <i className="fas fa-ban text-base mr-1"></i> For Discount Approval
+                <i className="fas fa-ban text-base mr-1"></i> For Discount
+                Approval
               </a>
             </li>
           </ul>

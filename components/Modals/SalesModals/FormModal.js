@@ -4,8 +4,9 @@ import { connect } from 'react-redux';
 import * as salesActions from '../../../redux/actions/salesActions';
 import { Alert } from 'reactstrap';
 import { useSession } from 'next-auth/client';
+import SuccessModal from '../SuccessModal';
 const FormModal = (props) => {
-  const [ session, loading ] = useSession()
+  const [session, loading] = useSession();
 
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
@@ -16,7 +17,7 @@ const FormModal = (props) => {
   const [typeError, setTypeError] = useState('');
 
   const [items, setItems] = useState([
-    { type: null, product: null, price: 0, quantity: 0 },
+    { type: null, product: null, price: 0, quantity: 1 },
   ]);
 
   const [submitItems, setSubmitItems] = useState([
@@ -53,8 +54,8 @@ const FormModal = (props) => {
       );
       setNewitems([...newItems]);
     }
-    if(props.selectedId){
-      addType()
+    if (props.selectedId) {
+      addType();
     }
   }, [props.items, newItems, props.selectedId]);
 
@@ -98,9 +99,8 @@ const FormModal = (props) => {
   ]);
 
   function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
-
 
   const addNewItem = () => {
     let testItems = [...items];
@@ -112,7 +112,7 @@ const FormModal = (props) => {
       quantity: 1,
       price: 0,
     });
-    subItems.push({ product: null, quantity: 0 });
+    subItems.push({ product: null, quantity: 1 });
 
     setSubmitItems(subItems);
 
@@ -139,7 +139,6 @@ const FormModal = (props) => {
     event.preventDefault();
     setDiscountError('');
     if (!(event.target.value > 100 || event.target.value < 0)) {
-  
       setTotalDiscount(event.target.value);
     }
   };
@@ -153,45 +152,39 @@ const FormModal = (props) => {
       testItems[index].quantity = event.target.value;
 
       subItems[index].quantity = event.target.value;
-  
+
       handleTotalAmount();
       setSubmitItems(subItems);
       setItems(testItems);
     }
-  
   };
 
   function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
-  
-
 
   const handleTotalAmount = () => {
     let totalAmount = 0;
     items.map((item) => {
       totalAmount += item.price * item.quantity;
     });
-    
+
     setTotalAmount(totalAmount);
   };
 
- 
   const handleName = (event) => {
     event.preventDefault();
     setNameError('');
     setName(event.target.value);
   };
 
-
   const addType = (index, id) => {
-    console.log(props.selectedId)
-    console.log(props.items)
-    console.log('hi')
+    console.log(props.selectedId);
+    console.log(props.items);
+    console.log('hi');
   };
 
   const handleType = (event, index, id) => {
-
     event.preventDefault();
     setType(event.target.value);
     let testItems = [...items];
@@ -199,7 +192,7 @@ const FormModal = (props) => {
     let subItems = [...submitItems];
     testItems[index].price = props.items[event.target.value].unit_price;
     testItems[index].type = event.target.value;
-    console.log(id)
+
     subItems[index].product = id;
 
     setSubmitItems(subItems);
@@ -215,12 +208,10 @@ const FormModal = (props) => {
   const handlePaymentType = (event) => {
     event.preventDefault();
     setType(event.target.value);
-
     setPaymentType(event.target.value);
   };
   const handleAccountNum = (event) => {
     event.preventDefault();
-
     setAccountNum(event.target.value);
   };
   const handleAccountName = (event) => {
@@ -236,22 +227,38 @@ const FormModal = (props) => {
     event.preventDefault();
 
     props
-      .createSalesOrder(session.user.auth_token, submitItems, setContinue, totalDiscount)
+      .createSalesOrder(
+        session.user.auth_token,
+        submitItems,
+        setContinue,
+        totalDiscount
+      )
       .then((res) => {
         if (res.status === 200) {
-          alert('Sales order has been added');
+          props.setModalMessage(
+            'You have successfully added a new sales order.'
+          );
+          props.setModalError(false);
+          props.setSuccessModal(true);
           props.getSales(session.user.auth_token);
-        } else alert('Item has not enough stock');
+        } else {
+          props.setModalMessage('One of the items you added is out of stock');
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        }
       })
       .catch((error) => {
-        alert('A server error has occurred');
+        props.setModalMessage(
+          'A server error has occurred. Please try again later'
+        );
+        props.setModalError(true);
+        props.setSuccessModal(true);
       });
     clearState();
   };
 
   const handlePaymentSubmit = (event) => {
     event.preventDefault();
-
     const payload = {
       order: props.newOrder.id,
       type: paymentType,
@@ -259,8 +266,7 @@ const FormModal = (props) => {
       account_name: accountName,
       accountNum: accountNum,
     };
-    console.log(session.user.auth_token
-      )
+
     props.addPaymentMethod(session.user.auth_token, payload);
   };
   const clearState = () => {
@@ -295,6 +301,11 @@ const FormModal = (props) => {
                     </span>
                   </button>
                 </div>
+                {/* <SuccessModal
+                  showModal={true}
+                  // setSuccessModal={setSuccessModal}
+                  // closeModal={() => setSuccessModal(false)}
+                /> */}
                 {true ? (
                   <div className="p-6 flex-auto mt-10 sm:mt-0">
                     <div className="md:grid md:grid-cols-2 md:gap-6">
@@ -311,7 +322,7 @@ const FormModal = (props) => {
                       <div className="mt-5 md:mt-0 md:col-span-2">
                         <form action="#" method="POST">
                           <div className="shadow overflow-hidden sm:rounded-md bg-">
-                            <div className="p-6 h-2/5 overflow-y-auto">
+                            <div className="p-6 h-2/5 max-h-80 overflow-y-auto">
                               <table className="items-center w-full bg-transparent border-collapse">
                                 <thead className="bg-gray-100 ">
                                   <tr>
@@ -361,7 +372,8 @@ const FormModal = (props) => {
                                               handleType(
                                                 event,
                                                 index,
-                                                props.items[event.target.value].id
+                                                props.items[event.target.value]
+                                                  .id
                                               );
                                             }}
                                             id="item_type"
@@ -393,7 +405,6 @@ const FormModal = (props) => {
                                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                           <input
                                             type="number"
-                                     
                                             disabled={
                                               item.type === null ? true : false
                                             }
@@ -409,12 +420,16 @@ const FormModal = (props) => {
                                           />
                                         </td>
                                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                          <span>{numberWithCommas(item.price)}</span>
+                                          <span>
+                                            {numberWithCommas(item.price)}
+                                          </span>
                                         </td>
 
                                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                           <span>
-                                            {numberWithCommas(item.price * item.quantity)}
+                                            {numberWithCommas(
+                                              item.price * item.quantity
+                                            )}
                                           </span>
                                         </td>
                                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
@@ -476,9 +491,12 @@ const FormModal = (props) => {
                                       }
                                     >
                                       <span>{`₱ ${
-                                      totalDiscount > 0 ? 
-                                        numberWithCommas(totalAmount * (totalDiscount / 100)) :
-                                        0
+                                        totalDiscount > 0
+                                          ? numberWithCommas(
+                                              totalAmount *
+                                                (totalDiscount / 100)
+                                            )
+                                          : 0
                                       } PHP`}</span>
                                     </td>
                                   </tr>
@@ -498,7 +516,9 @@ const FormModal = (props) => {
                                       ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
                                     }
                                   >
-                                    <span>{`₱ ${numberWithCommas(totalAmount)} PHP`}</span>
+                                    <span>{`₱ ${numberWithCommas(
+                                      totalAmount
+                                    )} PHP`}</span>
                                   </td>
                                   <th
                                     className={
@@ -516,7 +536,7 @@ const FormModal = (props) => {
                                     <span>{`₱ ${
                                       totalDiscount
                                         ? totalAmount -
-                                          (totalAmount * (totalDiscount / 100))
+                                          totalAmount * (totalDiscount / 100)
                                         : totalAmount
                                     } PHP`}</span>
                                   </td>
@@ -696,68 +716,7 @@ const FormModal = (props) => {
                             />
                           </div>
                         </div>
-                        {/* <div className="mt-4">
-                          <table className="items-center w-full bg-transparent border-collapse">
-                            <thead className="bg-gray-100 ">
-                              <tr>
-                                <th
-                                  className={
-                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                  }
-                                >
-                                  Sales Order Number
-                                </th>
-                                <th
-                                  className={
-                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                  }
-                                >
-                                  Quantity
-                                </th>
-                                <th
-                                  className={
-                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                  }
-                                >
-                                  Price
-                                </th>
-                                <th
-                                  className={
-                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                  }
-                                >
-                                  Discount
-                                </th>
-                                <th
-                                  className={
-                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                  }
-                                >
-                                  Amount
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>{finalItems}</tbody>
-                            <tfoot>
-                              <th
-                                className={
-                                  'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
-                                }
-                                colSpan="4"
-                                align="end"
-                              >
-                                <span>Total Amount</span>
-                              </th>
-                              <td
-                                className={
-                                  ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
-                                }
-                              >
-                                <span>₱10,000 PHP</span>
-                              </td>
-                            </tfoot>
-                          </table> */}
-                        {/* </div> */}
+
                         <div className="mt-4 text-right ">
                           <button
                             className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -795,8 +754,15 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getSales: (authToken) => dispatch(salesActions.getSales(authToken)),
-  createSalesOrder: (authToken, payload, setContinue,totalDiscount) =>
-    dispatch(salesActions.createSalesOrder(authToken, payload, setContinue,totalDiscount)),
+  createSalesOrder: (authToken, payload, setContinue, totalDiscount) =>
+    dispatch(
+      salesActions.createSalesOrder(
+        authToken,
+        payload,
+        setContinue,
+        totalDiscount
+      )
+    ),
   addPaymentMethod: (authToken, payload) =>
     dispatch(salesActions.addPaymentMethod(authToken, payload)),
 });

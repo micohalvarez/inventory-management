@@ -22,7 +22,7 @@ import moment from 'moment';
 import { useSession } from 'next-auth/client';
 
 const DashBoardTable = (props) => {
-  const [ session, loading ] = useSession()
+  const [session, loading] = useSession();
 
   const [showFormModal, setFormShowModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -37,16 +37,12 @@ const DashBoardTable = (props) => {
   //pagination for all items
   const onPressNumber = (event) => {
     if (parseInt(event.target.innerText) === 1) {
-      props.getNextItems(
-        localStorage.getLocalStorage('authCreds').authToken,
-        0,
-        0
-      );
+      props.getNextItems(session.user.auth_token, 0, 0);
     } else {
       var multiplier = (parseInt(event.target.innerText) - 1) * 10;
 
       props.getNextItems(
-        localStorage.getLocalStorage('authCreds').authToken,
+        session.user.auth_token,
         props.offSet + multiplier,
         props.page + (parseInt(event.target.innerText) - 1)
       );
@@ -54,14 +50,14 @@ const DashBoardTable = (props) => {
   };
   const onPressNext = () => {
     props.getNextItems(
-      localStorage.getLocalStorage('authCreds').authToken,
+      session.user.auth_token,
       props.offSet + 10,
       props.page + 1
     );
   };
   const onPressPrev = () => {
     props.getNextItems(
-      localStorage.getLocalStorage('authCreds').authToken,
+      session.user.auth_token,
       props.offSet - 10,
       props.page - 1
     );
@@ -169,15 +165,17 @@ const DashBoardTable = (props) => {
                   </tr>
                 ))}
               </>
-            ) : <tr
-            class="bg-gray-100 text-gray-800 border-gray-200"
-          >
-            <td colSpan="3"   align="center" className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                <span className={'ml-3 font-bold '}>
-                  No orders to show
-                </span>
-            </td>
-          </tr>}
+            ) : (
+              <tr class="bg-gray-100 text-gray-800 border-gray-200">
+                <td
+                  colSpan="3"
+                  align="center"
+                  className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4"
+                >
+                  <span className={'ml-3 font-bold '}>No orders to show</span>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -232,9 +230,7 @@ const DashBoardTable = (props) => {
             {props.items.length > 0 ? (
               <>
                 {props.items.map((item, index) => (
-                  <tr
-                    class="text-gray-800 border-gray-200"
-                  >
+                  <tr class="text-gray-800 border-gray-200">
                     <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
                       <span className={'ml-3 font-bold '}>
                         {item.order_number}
@@ -254,9 +250,9 @@ const DashBoardTable = (props) => {
                       <button
                         className="hover:bg-gray-800 bg-gray-700 self-end flex text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="button"
-                        onClick={() =>{
-                          setSalesDetailModal(true)
-                          setSelectedSales(item)
+                        onClick={() => {
+                          setSalesDetailModal(true);
+                          setSelectedSales(item);
                         }}
                       >
                         View Order Details
@@ -265,15 +261,17 @@ const DashBoardTable = (props) => {
                   </tr>
                 ))}
               </>
-            ) : <tr
-                class="text-gray-800 border-gray-200"
-              >
-                <td colSpan="5"   align="center" className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                    <span className={'ml-3 font-bold '}>
-                      No orders to show
-                    </span>
+            ) : (
+              <tr class="text-gray-800 border-gray-200">
+                <td
+                  colSpan="5"
+                  align="center"
+                  className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4"
+                >
+                  <span className={'ml-3 font-bold '}>No orders to show</span>
                 </td>
-          </tr>}
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -319,9 +317,9 @@ const DashBoardTable = (props) => {
                     class="hover:bg-gray-200 cursor-pointer bg-gray-100 text-gray-800 border-gray-200"
                   >
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                        <span className={'ml-3 font-bold '}>
-                          {item.order_number}
-                        </span>
+                      <span className={'ml-3 font-bold '}>
+                        {item.order_number}
+                      </span>
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                       {moment(item.payment_details.pdc_date)
@@ -332,14 +330,13 @@ const DashBoardTable = (props) => {
                       <button
                         className="hover:bg-gray-800 bg-gray-700 self-end flex text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="button"
-                        onClick={() =>{ 
-                          if(props.sort ===  3){
-                            setSalesDetailModal(true)
-                            setSelectedSales(item)
-                          }
-                          else if(props.sort === 2){
-                            setPurchaseDetailModal(true)
-                            setSelectedPurchase(item)
+                        onClick={() => {
+                          if (props.sort === 3) {
+                            setSalesDetailModal(true);
+                            setSelectedSales(item);
+                          } else if (props.sort === 2) {
+                            setPurchaseDetailModal(true);
+                            setSelectedPurchase(item);
                           }
                         }}
                       >
@@ -349,27 +346,27 @@ const DashBoardTable = (props) => {
                   </tr>
                 ))}
               </>
-            ) : <tr
-                class="text-gray-800 border-gray-200"
-              >
-                <td colSpan="3"   align="center" className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                    <span className={'ml-3 font-bold '}>
-                      No orders to show
-                    </span>
+            ) : (
+              <tr class="text-gray-800 border-gray-200">
+                <td
+                  colSpan="3"
+                  align="center"
+                  className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4"
+                >
+                  <span className={'ml-3 font-bold '}>No orders to show</span>
                 </td>
-              </tr>}
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
     );
   };
 
-
-  const [salesDetailModal,setSalesDetailModal] = useState(false)
-  const [selectedSales,setSelectedSales] = useState(false)
-  const [purchaseDetailiModal,setPurchaseDetailModal] = useState(false)
-  const [selectedPurchase,setSelectedPurchase] = useState(false)
-
+  const [salesDetailModal, setSalesDetailModal] = useState(false);
+  const [selectedSales, setSelectedSales] = useState(false);
+  const [purchaseDetailiModal, setPurchaseDetailModal] = useState(false);
+  const [selectedPurchase, setSelectedPurchase] = useState(false);
 
   return (
     <>
@@ -399,7 +396,7 @@ const DashBoardTable = (props) => {
         paymentTypes={props.paymentTypes}
         authToken={session.user.auth_token}
       />
-      
+
       <div className="flex flex-row flex-1">
         <DashboardDropdown
           sort={[
@@ -425,9 +422,7 @@ const DashBoardTable = (props) => {
           ? renderSalesDiscountItems()
           : renderDeadlineItems()}
 
-        <div
-          class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-        >
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
           <div class="flex-1 flex justify-between sm:hidden">
             <a
               href="#"
@@ -447,11 +442,13 @@ const DashBoardTable = (props) => {
               <p class="text-sm text-gray-700">
                 Showing{' '}
                 <span class="font-medium">
-                  {parseInt(props.offSet) === 0   
-                    ? props.items.length === 0 ? 0 : parseInt(props.offSet) + 1
+                  {parseInt(props.offSet) === 0
+                    ? props.items.length === 0
+                      ? 0
+                      : parseInt(props.offSet) + 1
                     : parseInt(props.offSet)}
-                </span>
-                {' '}to{' '}
+                </span>{' '}
+                to{' '}
                 <span class="font-medium">
                   {props.page <= 1
                     ? props.items.length

@@ -153,15 +153,6 @@ const Login = (props) => {
                 </div>
               </div>
             </div>
-            <div className="flex justify-center">
-              <a
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-                className="text-gray-800 text-base"
-              >
-                Forgot password?
-              </a>
-            </div>
           </div>
         </div>
       </div>

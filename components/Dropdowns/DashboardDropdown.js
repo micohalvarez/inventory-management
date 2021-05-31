@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { createPopper } from '@popperjs/core';
 
 import * as localStorage from '../../utils/local-storage';
+import { useSession } from 'next-auth/client';
 
 const inventoryFilter = (props) => {
   // dropdown props
   const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
   const btnDropdownRef = React.createRef();
   const popoverDropdownRef = React.createRef();
+  const [session, loading] = useSession();
 
   const [filter, setFilter] = useState(false);
 
@@ -22,20 +24,11 @@ const inventoryFilter = (props) => {
   };
 
   const onSelectFilter = (sort) => {
-    if (sort === 0)
-      props.getItems(localStorage.getLocalStorage('authCreds').authToken);
-    else if (sort === 1)
-      props.getDiscountApproveSales(
-        localStorage.getLocalStorage('authCreds').authToken
-      );
+    if (sort === 0) props.getItems(session.user.auth_token);
+    else if (sort === 1) props.getDiscountApproveSales(session.user.auth_token);
     else if (sort === 2)
-      props.getPurchaseOrdersDeadline(
-        localStorage.getLocalStorage('authCreds').authToken
-      );
-    else if (sort === 3)
-      props.getSalesOrdersDeadline(
-        localStorage.getLocalStorage('authCreds').authToken
-      );
+      props.getPurchaseOrdersDeadline(session.user.auth_token);
+    else if (sort === 3) props.getSalesOrdersDeadline(session.user.auth_token);
 
     closeDropdownPopover();
   };
@@ -43,7 +36,7 @@ const inventoryFilter = (props) => {
   const clearFilter = () => {
     setFilter(null);
     // props.clearSort();
-    props.getItems(localStorage.getLocalStorage('authCreds').authToken);
+    props.getItems(session.user.auth_token);
   };
   return (
     <>

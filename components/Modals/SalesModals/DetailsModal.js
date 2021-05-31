@@ -6,8 +6,10 @@ import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useSession } from 'next-auth/client';
+import SuccessModal from '../SuccessModal';
+import ExportToPdf from '../../ExportToPdf';
 const DetailsModal = (props) => {
-  const [ session, loading ] = useSession()
+  const [session, loading] = useSession();
 
   const [newItems, setNewitems] = useState([
     <>
@@ -30,282 +32,324 @@ const DetailsModal = (props) => {
   const [isDiscount, setDiscountApproval] = useState(false);
 
   const [paymentType, setPaymentType] = useState(null);
+  const [paymentTypeError, setPaymentTypeError] = useState(null);
   const [bankName, setBankName] = useState(null);
+  const [bankNameError, setBankNameError] = useState(null);
   const [accountNum, setAccountNum] = useState(null);
-  const [accountName, setAccountName] = useState(null);
+  const [accountNumError, setAccountNumError] = useState(null);
   const [paymentDate, setPaymentDate] = useState(new Date());
-  const [totalDiscount, setTotalDiscount] = useState(null)
+  const [paymentDateError, setPaymentDateError] = useState(null);
+
+  const [accountName, setAccountName] = useState(null);
+
+  const [totalDiscount, setTotalDiscount] = useState(null);
 
   const [discountError, setDiscountError] = useState(false);
+
+  const [successModal, setSuccessModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState(false);
+  const [modalError, setModalError] = useState(false);
 
   const handleDiscount = (event) => {
     event.preventDefault();
     setDiscountError('');
     if (!(event.target.value > 100 || event.target.value < 0)) {
-  
       setTotalDiscount(event.target.value);
     }
   };
 
-
-
   const submitDiscount = (event) => {
-    let discount = totalDiscount ? totalDiscount / 1000 : props.selectedItem.total_discount
+    let discount = totalDiscount
+      ? totalDiscount / 1000
+      : props.selectedItem.total_discount;
 
     event.preventDefault();
-    props.approveDiscount(session.user.auth_token,  props.selectedItem.uuid, discount)
-    setDiscountApproval(false)    
+    props.approveDiscount(
+      session.user.auth_token,
+      props.selectedItem.uuid,
+      discount
+    );
+    setDiscountApproval(false);
   };
 
-
-  const renderDiscountContent = ()=>{
+  const renderDiscountContent = () => {
     return (
       <div className="mt-5 md:mt-0 md:col-span-2">
-      <div className="shadow overflow-hidden sm:rounded-md bg-">
-        <div className="px-4 py-5 bg-white sm:p-6">
-          <div className="grid grid-cols-6 gap-6">
-            <div className="col-span-8 sm:col-span-3">
-              <label
-                for="sales_number"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Sales Order Number
-              </label>
-              <p className="block text-base font-medium">
-                {props.selectedItem.order_number}
-              </p>
-            </div>
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="customer_name"
-                className="block text-sm font-medium text-gray-700"
-              >
-                To be Discounted
-              </label>
-              <p className="block text-base font-medium">
-              {`₱ ${totalDiscount ? numberWithCommas(parseFloat((props.selectedItem.total  * (totalDiscount / 100))).toFixed(2)) : numberWithCommas(parseFloat((props.selectedItem.total * props.selectedItem.total_discount)).toFixed(2))} PHP`}
-              </p>
-            </div>
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="sales_date"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Sub Total
-              </label>
-              <p className="block text-base font-medium ">
-              {'₱' + props.selectedItem.subtotal + ' PHP'}
-              </p>
-            </div>
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="sales_date"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Total Amount
-              </label>
-              <p className="block text-base font-medium ">
-  
-              {`₱ ${totalDiscount ? props.selectedItem.total -
-                    (props.selectedItem.total  * (totalDiscount / 100))
-                    :  numberWithCommas(parseFloat(props.selectedItem.subtotal - (props.selectedItem.total * props.selectedItem.total_discount)).toFixed(2))
-                    } PHP`}
-              </p>
-            </div>
-
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="sales_date"
-                className="block text-sm font-medium text-gray-700"
-              >
-               Total Discount (%)
-              </label>
-              <input
-                value={!totalDiscount && totalDiscount !== '' ? (props.selectedItem.total_discount * 100).toFixed(2): totalDiscount}
-                onChange={handleDiscount}
-                type="number"
-                placeholder="Discount Percent"
-                name="discount"
-                id="discount"
-                autocomplete="discount"
-                className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    )
-  }
-
-  const renderContinue = () =>{
-    return (
-
-      <div className="mt-5 md:mt-0 md:col-span-2">
-      <div className="shadow overflow-hidden sm:rounded-md bg-">
-        <div className="px-4 py-5 bg-white sm:p-6">
-          <div className="grid grid-cols-6 gap-6">
-            <div className="col-span-8 sm:col-span-3">
-              <label
-                for="sales_number"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Sales Order Number
-              </label>
-              <p className="block text-base font-medium">
-                {'#0000' + props.selectedItem.id}
-              </p>
-            </div>
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="customer_name"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Status
-              </label>
-              <p className="block text-base font-medium">
-                {props.selectedItem.status.toUpperCase()}
-              </p>
-            </div>
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="sales_date"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Sales Order Date
-              </label>
-              <p className="block text-base font-medium ">
-                {new Date().toDateString()}
-              </p>
-            </div>
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="sales_date"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Total Amount
-              </label>
-              <p className="block text-base font-medium ">
-                {'₱' + props.selectedItem.total + ' PHP'}
-              </p>
-            </div>
-
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="sales_date"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Payment Type
-              </label>
-              <select
-                onChange={(event) => {
-                  handlePaymentType(event);
-                }}
-                id="item_type"
-                placeholder="Item Type/Category"
-                name="item_type"
-                autocomplete="item_type"
-                class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                <option
-                  class="text-color-gray-300"
-                  value=""
-                  disabled
-                  hidden
-                  selected
+        <div className="shadow overflow-hidden sm:rounded-md bg-">
+          <div className="px-4 py-5 bg-white sm:p-6">
+            <div className="grid grid-cols-6 gap-6">
+              <div className="col-span-8 sm:col-span-3">
+                <label
+                  for="sales_number"
+                  className="block text-sm font-medium text-gray-700"
                 >
-                  Item Type/Category
-                </option>
+                  Sales Order Number
+                </label>
+                <p className="block text-base font-medium">
+                  {props.selectedItem.order_number}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="customer_name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  To be Discounted
+                </label>
+                <p className="block text-base font-medium">
+                  {`₱ ${
+                    totalDiscount
+                      ? numberWithCommas(
+                          parseFloat(
+                            props.selectedItem.total * (totalDiscount / 100)
+                          ).toFixed(2)
+                        )
+                      : numberWithCommas(
+                          parseFloat(
+                            props.selectedItem.total *
+                              props.selectedItem.total_discount
+                          ).toFixed(2)
+                        )
+                  } PHP`}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Sub Total
+                </label>
+                <p className="block text-base font-medium ">
+                  {'₱' + props.selectedItem.subtotal + ' PHP'}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Total Amount
+                </label>
+                <p className="block text-base font-medium ">
+                  {`₱ ${
+                    totalDiscount
+                      ? props.selectedItem.total -
+                        props.selectedItem.total * (totalDiscount / 100)
+                      : numberWithCommas(
+                          parseFloat(
+                            props.selectedItem.subtotal -
+                              props.selectedItem.total *
+                                props.selectedItem.total_discount
+                          ).toFixed(2)
+                        )
+                  } PHP`}
+                </p>
+              </div>
 
-                {props.paymentTypes.map((test) => (
-                  <option key={test.id} value={test.id}>
-                    {test.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="sales_date"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Account Number
-              </label>
-              <input
-                value={accountNum}
-                onChange={handleAccountNum}
-                disabled={
-                  paymentType === null || paymentType < 2
-                    ? true
-                    : false
-                }
-                type="text"
-                placeholder="Account Number"
-                name="account_number"
-                id="account_number"
-                autocomplete="given-name"
-                className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-              />
-            </div>
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="sales_date"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Bank Name
-              </label>
-              <input
-                value={bankName}
-                onChange={handleBankName}
-                disabled={
-                  paymentType === null || paymentType < 2
-                    ? true
-                    : false
-                }
-                type="text"
-                placeholder="Bank Name"
-                name="bank_name"
-                id="bank_name"
-                autocomplete="given-name"
-                className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-              />
-            </div>
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                for="sales_date"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Amount Date
-              </label>
-              <DatePicker
-                disabled={
-                  paymentType === null || paymentType < 2
-                    ? true
-                    : false
-                }
-                className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                selected={paymentDate}
-                onChange={(date) => {
-                  setPaymentDate(date);
-                  console.log(date);
-                }}
-              />
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Total Discount (%)
+                </label>
+                <input
+                  value={
+                    !totalDiscount && totalDiscount !== ''
+                      ? (props.selectedItem.total_discount * 100).toFixed(2)
+                      : totalDiscount
+                  }
+                  autocomplete="off"
+                  onChange={handleDiscount}
+                  type="number"
+                  placeholder="Discount Percent"
+                  name="discount"
+                  id="discount"
+                  autocomplete="discount"
+                  className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    )
-  }
+    );
+  };
+
+  const renderContinue = () => {
+    return (
+      <div className="mt-5 md:mt-0 md:col-span-2">
+        <div className="shadow overflow-hidden sm:rounded-md bg-">
+          <div className="px-4 py-5 bg-white sm:p-6">
+            <div className="grid grid-cols-6 gap-6">
+              <div className="col-span-8 sm:col-span-3">
+                <label
+                  for="sales_number"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Sales Order Number
+                </label>
+                <p className="block text-base font-medium">
+                  {'#0000' + props.selectedItem.id}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="customer_name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Status
+                </label>
+                <p className="block text-base font-medium">
+                  {props.selectedItem.status.toUpperCase()}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Sales Order Date
+                </label>
+                <p className="block text-base font-medium ">
+                  {new Date().toDateString()}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Total Amount
+                </label>
+                <p className="block text-base font-medium ">
+                  {'₱' + props.selectedItem.total + ' PHP'}
+                </p>
+              </div>
+
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Payment Type
+                </label>
+                <select
+                  onChange={(event) => {
+                    handlePaymentType(event);
+                  }}
+                  id="item_type"
+                  placeholder="Item Type/Category"
+                  name="item_type"
+                  autocomplete="item_type"
+                  class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  <option
+                    class="text-color-gray-300"
+                    value=""
+                    disabled
+                    hidden
+                    selected
+                  >
+                    Item Type/Category
+                  </option>
+
+                  {props.paymentTypes.map((test) => (
+                    <option key={test.id} value={test.id}>
+                      {test.name}
+                    </option>
+                  ))}
+                </select>
+                {paymentTypeError ? (
+                  <span className="text-red-500">{paymentTypeError}</span>
+                ) : null}
+              </div>
+
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Account Number
+                </label>
+                <input
+                  autocomplete="off"
+                  value={accountNum}
+                  onChange={handleAccountNum}
+                  disabled={
+                    paymentType === null || paymentType < 2 ? true : false
+                  }
+                  type="text"
+                  placeholder="Account Number"
+                  name="account_number"
+                  id="account_number"
+                  className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                />
+                {accountNumError ? (
+                  <span className="text-red-500">{accountNumError}</span>
+                ) : null}
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Bank Name
+                </label>
+                <input
+                  autocomplete="off"
+                  value={bankName}
+                  onChange={handleBankName}
+                  disabled={
+                    paymentType === null || paymentType < 2 ? true : false
+                  }
+                  type="text"
+                  placeholder="Bank Name"
+                  name="bank_name"
+                  id="bank_name"
+                  className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                />
+                {bankNameError ? (
+                  <span className="text-red-500">{bankNameError}</span>
+                ) : null}
+              </div>
+              <div className="col-span-6 sm:col-span-3 flex flex-col">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Amount Date
+                </label>
+                <DatePicker
+                  disabled={
+                    paymentType === null || paymentType < 2 ? true : false
+                  }
+                  className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  selected={paymentDate}
+                  onChange={(date) => {
+                    setPaymentDateError(null);
+                    setPaymentDate(date);
+                  }}
+                />
+                {paymentDateError ? (
+                  <span className="text-red-500">{paymentDateError}</span>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
   const handlePaymentType = (event) => {
     event.preventDefault();
-
+    setPaymentTypeError('');
     setPaymentType(event.target.value);
   };
   const handleAccountNum = (event) => {
     event.preventDefault();
-
+    setAccountNumError('');
     setAccountNum(event.target.value);
   };
   const handleAccountName = (event) => {
@@ -314,21 +358,66 @@ const DetailsModal = (props) => {
   };
   const handleBankName = (event) => {
     event.preventDefault();
+    setBankNameError('');
     setBankName(event.target.value);
   };
   const handlePaymentSubmit = (event) => {
     event.preventDefault();
+    let error = false;
+    if (paymentType === null) {
+      setPaymentTypeError('Please up field');
+      error = true;
+    } else if (paymentType !== null || paymentType >= 2) {
+      if (bankName === null || bankName === '') {
+        setBankNameError('Please up field');
+        error = true;
+      }
 
-    const payload = {
-      order: props.selectedItem.id,
-      type: paymentType,
-      bank_name: bankName,
-      account_name: accountName,
-      accountNum: accountNum,
-      pdc_date: moment(paymentDate).format('YYYY-MM-DD'),
-    };
-    props.addPaymentMethod(session.user.auth_token, payload);
-    clearState();
+      if (accountNum === null || accountNum === '') {
+        setAccountNumError('Please up field');
+        error = true;
+      }
+      if (
+        !moment(paymentDate).isValid() ||
+        paymentDate === null ||
+        paymentDate === ''
+      ) {
+        setPaymentDateError('Please enter a valid date');
+      }
+    }
+
+    if (!error) {
+      const payload = {
+        order: props.selectedItem.id,
+        type: paymentType,
+        bank_name: bankName,
+        account_name: accountName,
+        accountNum: accountNum,
+        pdc_date: moment(paymentDate).format('YYYY-MM-DD'),
+      };
+      props
+        .addPaymentMethod(session.user.auth_token, payload)
+        .then((res) => {
+          if (res.status === 200) {
+            props.setModalMessage('Payment Type has been succesfully added.');
+            props.setModalError(false);
+            props.setSuccessModal(true);
+            props.getSales(session.user.auth_token);
+          } else {
+            props.setModalMessage('Payment Type cannot be added.');
+            props.setModalError(true);
+            props.setSuccessModal(true);
+          }
+        })
+        .catch(({ response }) => {
+          props.setModalMessage(
+            'A server error has occurred. Please try again later.'
+          );
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        });
+      clearState();
+    }
   };
   const markPaid = (event) => {
     event.preventDefault();
@@ -337,18 +426,28 @@ const DetailsModal = (props) => {
       .markPaid(session.user.auth_token, props.selectedItem.uuid)
       .then((res) => {
         if (res.status === 200) {
-          alert('Sales order has been marked as paid');
+          props.setModalMessage('Sales order has been marked as paid.');
+          props.setModalError(false);
+          props.setSuccessModal(true);
           props.getSales(session.user.auth_token);
-        } else alert('Sales order cannot be marked as paid');
+        } else {
+          props.setModalMessage('Sales order cannot be marked as paid.');
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        }
       })
       .catch(({ response }) => {
-        alert('An error has occurred');
+        props.setModalMessage(
+          'A server error has occurred. Please try again later.'
+        );
+        props.setModalError(true);
+        props.setSuccessModal(true);
       });
     clearState();
   };
 
   function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
   const markCancel = (event) => {
@@ -358,13 +457,22 @@ const DetailsModal = (props) => {
       .markCancel(session.user.auth_token, props.selectedItem.uuid)
       .then((res) => {
         if (res.status === 200) {
-          alert('Sales order has been marked as cancelled');
+          props.setModalMessage('Sales order has been marked as cancelled.');
+          props.setModalError(false);
+          props.setSuccessModal(true);
           props.getSales(session.user.auth_token);
-        } else alert('Sales order cannot be marked as cancelled');
+        } else {
+          props.setModalMessage('Sales order cannot be marked as cancelled.');
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        }
       })
       .catch((error) => {
-        console.log(error);
-        alert('An error has occurred');
+        props.setModalMessage(
+          'A server error has occurred. Please try again later'
+        );
+        props.setModalError(true);
+        props.setSuccessModal(true);
       });
     clearState();
   };
@@ -399,8 +507,8 @@ const DetailsModal = (props) => {
     <>
       {props.showModal ? (
         <>
-          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-            <div className="relative w-2/3 ">
+          <div className=" justify-center transition duration-500 ease-in-out items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-2/3  transition duration-500 ease-in-out">
               {/*content*/}
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/*header*/}
@@ -424,7 +532,7 @@ const DetailsModal = (props) => {
                 <div className="mt-5 md:mt-0 md:col-span-2">
                   <div className="shadow overflow-hidden sm:rounded-md bg-">
                     <div className="px-4 py-5 bg-white sm:p-6">
-                      {!isContinue && !isDiscount? (
+                      {!isContinue && !isDiscount ? (
                         <>
                           <div className="grid grid-cols-9 gap-6">
                             <div className="col-span-8 sm:col-span-3">
@@ -513,7 +621,6 @@ const DetailsModal = (props) => {
                                       .toUpperCase()}
                               </p>
                             </div>
-                            
                           </div>
                           <div className="mt-4">
                             <table className="items-center w-full bg-transparent border-collapse">
@@ -540,7 +647,7 @@ const DetailsModal = (props) => {
                                   >
                                     Price Per Item
                                   </th>
-                               
+
                                   <th
                                     className={
                                       'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
@@ -570,70 +677,80 @@ const DetailsModal = (props) => {
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {`₱${props.selectedItem.items[index].unit_price} PHP`}
                                       </td>
-                                    
+
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {`₱ ${(
                                           props.selectedItem.items[index]
                                             .quantity *
-                                            parseFloat(
-                                              props.selectedItem.items[index]
-                                                .unit_price
-                                            )
+                                          parseFloat(
+                                            props.selectedItem.items[index]
+                                              .unit_price
+                                          )
                                         ).toFixed(2)} PHP`}
                                       </td>
                                     </tr>
                                   )
                                 )}
                                 <tr>
-                                    <th
-                                      className={
-                                        'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
-                                      }
-                                      align="end"
-                                    >
-                                      <span>Total Discount (%)</span>
-                                    </th>
-                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        <span>{parseFloat(props.selectedItem.total_discount* 100).toFixed(2) + '%'} </span>
-                                    </td>
-                                    <th
-                                      className={
-                                        'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
-                                      }
-                                      align="end"
-                                    >
-                                      <span>Total Discount</span>
-                                    </th>
-                                    <td
-                                      className={
-                                        ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold   text-red-500  border-gray-200'
-                                      }
-                                    >
-                                      <span>{`₱ ${numberWithCommas(parseFloat(props.selectedItem.total - props.selectedItem.subtotal).toFixed(2))} PHP`}</span>
-                                    </td>
-                                  </tr>
-                              </tbody>
-                              <tfoot>
                                   <th
                                     className={
                                       'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
                                     }
                                     align="end"
                                   >
-                                    <span>SubTotal</span>
+                                    <span>Total Discount (%)</span>
+                                  </th>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                    <span>
+                                      {parseFloat(
+                                        props.selectedItem.total_discount * 100
+                                      ).toFixed(2) + '%'}{' '}
+                                    </span>
+                                  </td>
+                                  <th
+                                    className={
+                                      'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                    }
+                                    align="end"
+                                  >
+                                    <span>Total Discount</span>
                                   </th>
                                   <td
                                     className={
-                                      ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                      ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold   text-red-500  border-gray-200'
                                     }
                                   >
-                                    <span>{`₱ ${numberWithCommas(props.selectedItem.subtotal)} PHP`}</span>
+                                    <span>{`₱ ${numberWithCommas(
+                                      parseFloat(
+                                        props.selectedItem.total -
+                                          props.selectedItem.subtotal
+                                      ).toFixed(2)
+                                    )} PHP`}</span>
                                   </td>
+                                </tr>
+                              </tbody>
+                              <tfoot>
                                 <th
                                   className={
                                     'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
                                   }
-                                
+                                  align="end"
+                                >
+                                  <span>SubTotal</span>
+                                </th>
+                                <td
+                                  className={
+                                    ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                  }
+                                >
+                                  <span>{`₱ ${numberWithCommas(
+                                    props.selectedItem.subtotal
+                                  )} PHP`}</span>
+                                </td>
+                                <th
+                                  className={
+                                    'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                  }
                                   align="end"
                                 >
                                   <span>Total Amount</span>
@@ -643,7 +760,9 @@ const DetailsModal = (props) => {
                                     ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
                                   }
                                 >
-                                  <span>{`₱ ${numberWithCommas(props.selectedItem.total)} PHP`}</span>
+                                  <span>{`₱ ${numberWithCommas(
+                                    props.selectedItem.total
+                                  )} PHP`}</span>
                                 </td>
                               </tfoot>
                             </table>
@@ -651,21 +770,22 @@ const DetailsModal = (props) => {
                         </>
                       ) : isDiscount ? (
                         renderDiscountContent()
-                      )
-                      : (
+                      ) : (
                         renderContinue()
-                      )
-                      }
+                      )}
 
                       <div className="mt-4 text-right ">
                         {props.isPaid ? (
-                          <button
-                            className="bg-red-600 text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                            type="button"
-                            onClick={() => props.closeModal()}
-                          >
-                            Close
-                          </button>
+                          <>
+                            <ExportToPdf order={props.selectedItem} />
+                            <button
+                              className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                              type="button"
+                              onClick={() => props.closeModal()}
+                            >
+                              Close
+                            </button>
+                          </>
                         ) : props.selectedItem.payment_details !== null &&
                           props.selectedItem.payment_details.type.id === 2 ? (
                           <>
@@ -686,18 +806,22 @@ const DetailsModal = (props) => {
                               Mark as Paid
                             </button>
                           </>
-                        ) : props.selectedItem.total_discount > 0 && props.selectedItem.discount_approved === false ? (
+                        ) : props.selectedItem.total_discount > 0 &&
+                          props.selectedItem.discount_approved === false ? (
                           <>
-                          <button
-                            className="bg-green-600 text-white hover:bg-green-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                            type="button"
-                            onClick={(event) => !isDiscount ? setDiscountApproval(true) : submitDiscount(event)}
-                          >
-                           {!isDiscount ? 'Approve Discount' : 'Submit'}
-                          </button>
+                            <button
+                              className="bg-green-600 text-white hover:bg-green-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                              type="button"
+                              onClick={(event) =>
+                                !isDiscount
+                                  ? setDiscountApproval(true)
+                                  : submitDiscount(event)
+                              }
+                            >
+                              {!isDiscount ? 'Approve Discount' : 'Submit'}
+                            </button>
                           </>
-                          ) :
-                          (
+                        ) : (
                           <>
                             <button
                               className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -710,10 +834,12 @@ const DetailsModal = (props) => {
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
                               onClick={(event) => {
-                                markCancel(event);
+                                !isContinue
+                                  ? markCancel(event)
+                                  : setContinue(false);
                               }}
                             >
-                              Cancel
+                              {!isContinue ? 'Cancel' : 'Back'}
                             </button>
                             <button
                               className="bg-green-600 text-white hover:bg-green-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -761,8 +887,8 @@ const mapDispatchToProps = (dispatch) => ({
   getSales: (token) => {
     dispatch(salesActions.getSales(token));
   },
-  approveDiscount: (token,uuid,discount) => {
-    dispatch(salesActions.approveDiscount(token,uuid,discount));
+  approveDiscount: (token, uuid, discount) => {
+    dispatch(salesActions.approveDiscount(token, uuid, discount));
   },
 });
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createPopper } from '@popperjs/core';
 
 import * as localStorage from '../../utils/local-storage';
+import { useSession } from 'next-auth/client';
 
 const NotificationDropdown = (props) => {
   // dropdown props
@@ -10,6 +11,8 @@ const NotificationDropdown = (props) => {
   const popoverDropdownRef = React.createRef();
 
   const [filter, setFilter] = useState(false);
+
+  const [session, loading] = useSession();
   console.log(props, 'test');
   const openDropdownPopover = () => {
     createPopper(btnDropdownRef.current, popoverDropdownRef.current, {
@@ -26,15 +29,13 @@ const NotificationDropdown = (props) => {
 
     props.addFilter(type);
 
-    props.getItemsWithFilter(
-      localStorage.getLocalStorage('authCreds').authToken
-    );
+    props.getItemsWithFilter(session.user.auth_token);
     closeDropdownPopover();
   };
   const clearFilter = () => {
     setFilter(null);
     props.clearFilter();
-    props.getItems(localStorage.getLocalStorage('authCreds').authToken);
+    props.getItems(session.user.auth_token);
   };
   return (
     <>

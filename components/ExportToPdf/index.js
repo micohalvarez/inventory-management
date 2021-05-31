@@ -1,0 +1,1792 @@
+// import React, { Component, useEffect, useState } from 'react';
+
+// import { connect } from 'react-redux';
+
+// import {
+//   Page,
+//   Text,
+//   View,
+//   Document,
+//   StyleSheet,
+//   PDFDownloadLink,
+//   ReactPDF,
+// } from '@react-pdf/renderer';
+
+// const styles = StyleSheet.create({
+//   page: {
+//     padding: 10,
+//   },
+//   section: {
+//     flexDirection: 'row',
+//   },
+//   section1: {
+//     flex: 6,
+//   },
+//   section2: {
+//     flex: 4,
+//   },
+//   text: {
+//     fontSize: 14,
+//     margin: 12,
+//   },
+//   qr: {
+//     height: 120,
+//     width: 120,
+//     right: 0,
+//   },
+//   image: {
+//     height: 200,
+//     width: 200,
+//     backgroundColor: '#eee',
+//     objectFit: 'contain',
+//     margin: 12,
+//   },
+//   imageBig: {
+//     height: 270,
+//     width: 270,
+//     backgroundColor: '#eee',
+//     objectFit: 'contain',
+//     margin: 10,
+//   },
+// });
+
+// const ExportToPdf = (props) => {
+//   const [pdf, setPdf] = useState(null);
+
+//   const renderPDF = () => {
+//     return (
+//       <Document>
+//         <Page size="LETTER" style={styles.page}>
+//           <View style={styles.section}>
+//             <View style={styles.section1}></View>
+//           </View>
+//         </Page>
+//       </Document>
+//     );
+//   };
+
+//   const getPdf = () => {
+//     console.log(pdf);
+//     return pdf;
+//   };
+
+//   return (
+//     <>
+//       {pdf ? (
+//         <PDFDownloadLink document={renderPDF} fileName={'test.pdf'}>
+//           {({ blob, url, loading, error }) =>
+//             loading ? 'Loading document...' : <button>Download now</button>
+//           }
+//         </PDFDownloadLink>
+//       ) : (
+//         <button
+//           className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+//           type="button"
+//           onClick={() => setPdf(renderPDF())}
+//         >
+//           Generate PDF
+//         </button>
+//       )}
+//     </>
+//   );
+// };
+
+// export default ExportToPdf;
+
+import React, { Component } from 'react';
+
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  PDFDownloadLink,
+  BlobProvider,
+  pdf,
+  Image,
+} from '@react-pdf/renderer';
+import moment from 'moment';
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 10,
+    display: 'flex',
+    marginRight: 'auto',
+    marginLeft: 'auto',
+    flex: '1',
+  },
+  section: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  textContainer: {
+    flex: '1',
+  },
+  text: {
+    fontSize: 10,
+  },
+
+  title: {
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  table: {
+    display: 'table',
+    width: 'auto',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+    marginTop: 10,
+  },
+  tableRow: { margin: 'auto', flexDirection: 'row' },
+  tableCol: {
+    width: '25%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+  },
+  tableCell: { margin: 'auto', marginTop: 5, fontSize: 10 },
+});
+
+class ExportWinnertoPDF extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      pdf: null,
+    };
+    console.log(props);
+  }
+
+  getPdfDocument() {
+    return this.state.pdf;
+  }
+  getSpecificUser() {
+    var a = (
+      <Document>
+        <Page size="A4" style={styles.page}>
+          <View style={styles.section}>
+            <Text style={styles.title}>Sales Order Receipt</Text>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Status:  \n ${this.props.order.status.toUpperCase()}`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Payment Type:  \n${
+                  this.props.order.payment_details
+                    ? this.props.order.payment_details.type.name
+                    : 'N/A'
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Payment Date:  \n${
+                  this.props.order.payment_details === null
+                    ? 'N/A'
+                    : this.props.order.payment_details.type.id !== 2
+                    ? moment(this.props.order.payment_details.created)
+                        .format('MMM DD, YYYY')
+                        .toUpperCase()
+                    : moment(this.props.order.payment_details.pdc_date)
+                        .format('MMM DD, YYYY')
+                        .toUpperCase()
+                }`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.table}>
+            {/* TableHeader */}
+            <View style={styles.tableRow}>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>Item</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>Quantity</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>Price Per Item</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>Amount</Text>
+              </View>
+            </View>
+            {/* TableContent */}
+            <View style={styles.tableRow}>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>React-PDF</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>3 User </Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>2019-02-20 - 2020-02-19</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>5€</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text
+                style={styles.text}
+              >{`Sales Order #: \n ${this.props.order.order_number}`}</Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created By:  \n ${
+                  this.props.order.created_by.first_name +
+                  ' ' +
+                  this.props.order.created_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Created At:  \n ${moment(this.props.order.created)
+                  .format('MMM DD, YYYY')
+                  .toUpperCase()}`}
+              </Text>
+            </View>
+          </View>
+        </Page>
+      </Document>
+    );
+
+    this.setState({ pdf: a });
+
+    return a;
+  }
+
+  render() {
+    return (
+      <>
+        {this.state.pdf ? (
+          <PDFDownloadLink
+            document={this.getPdfDocument()}
+            fileName={`test.pdf`}
+          >
+            {({ blob, url, loading, error }) =>
+              loading ? 'Loading document...' : <button>Download now</button>
+            }
+          </PDFDownloadLink>
+        ) : (
+          <button
+            className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+            type="button"
+            onClick={() => {
+              this.getSpecificUser();
+            }}
+          >
+            Generate PDF
+          </button>
+        )}
+      </>
+    );
+  }
+}
+
+export default ExportWinnertoPDF;
