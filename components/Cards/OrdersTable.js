@@ -9,7 +9,7 @@ import TableDropdown from '../Dropdowns/TableDropdown.js';
 import FormModal from '../Modals/PurchaseModals/FormModal';
 import DetailsModal from '../Modals/PurchaseModals/DetailsModal';
 import EditModal from '../Modals/PurchaseModals/EditModal';
-import Tabs from '../Tabs';
+import OrderTab from '../Tabs/OrderTab';
 import { withRouter } from 'next/router';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -110,7 +110,7 @@ const OrdersTable = (props) => {
         closeModal={() => setShowEditModal(false)}
       />
       <div className="flex flex-row justify-between">
-        <Tabs
+        <OrderTab
           getSalesWithFilter={props.getOrders}
           addFilter={props.addFilter}
           clearFilter={props.clearFilter}

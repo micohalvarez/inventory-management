@@ -402,6 +402,7 @@ const mapStateToProps = (state) => ({
   page: state.inventory.itemsPage,
   categories: state.inventory.categories,
   itemOrders: state.inventory.itemOrders,
+  allItems: state.inventory.allItems,
 });
 
 const mapDispatchToProps = (dispatch) => ({

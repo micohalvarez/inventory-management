@@ -6,7 +6,7 @@ import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useSession } from 'next-auth/client';
-import SuccessModal from '../SuccessModal';
+
 import ExportToPdf from '../../ExportToPdf';
 const DetailsModal = (props) => {
   const [session, loading] = useSession();
@@ -367,13 +367,13 @@ const DetailsModal = (props) => {
     if (paymentType === null) {
       setPaymentTypeError('Please up field');
       error = true;
-    } else if (paymentType !== null || paymentType >= 2) {
+    } else if (paymentType !== null && paymentType >= 2) {
       if (bankName === null || bankName === '') {
         setBankNameError('Please up field');
         error = true;
       }
 
-      if (accountNum === null || accountNum === '') {
+      if (accountNum === null && accountNum === '') {
         setAccountNumError('Please up field');
         error = true;
       }
@@ -704,7 +704,7 @@ const DetailsModal = (props) => {
                                     <span>
                                       {parseFloat(
                                         props.selectedItem.total_discount * 100
-                                      ).toFixed(2) + '%'}{' '}
+                                      ).toFixed(2) + '%'}
                                     </span>
                                   </td>
                                   <th
@@ -777,7 +777,13 @@ const DetailsModal = (props) => {
                       <div className="mt-4 text-right ">
                         {props.isPaid ? (
                           <>
-                            <ExportToPdf order={props.selectedItem} />
+                            <ExportToPdf
+                              closeModal={props.closeModal}
+                              order={props.selectedItem}
+                              setModalMessage={props.setModalMessage}
+                              setModalError={props.setModalError}
+                              setSuccessModal={props.setSuccessModal}
+                            />
                             <button
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"

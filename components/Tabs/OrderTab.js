@@ -1,27 +1,19 @@
+import { useSession } from 'next-auth/client';
 import React, { useState } from 'react';
 
 import * as localStorage from '../../utils/local-storage';
 
-const Tabs = (props) => {
+const OrderTab = (props) => {
   const [openTab, setOpenTab] = React.useState(1);
   const [filter, setFilter] = useState(false);
+  const [session, loading] = useSession();
 
   const onSelectFilter = (type) => {
     setFilter(type);
-    props.clearDiscount();
+
     if (type === '') props.clearFilter();
     else props.addFilter(type);
-    props.getSalesWithFilter(
-      localStorage.getLocalStorage('authCreds').authToken
-    );
-  };
-
-  const onSelectDiscount = () => {
-    props.addDiscount();
-    props.addFilter('pending');
-    props.getSalesWithFilter(
-      localStorage.getLocalStorage('authCreds').authToken
-    );
+    props.getSalesWithFilter(session.user.auth_token);
   };
 
   return (
@@ -106,27 +98,6 @@ const Tabs = (props) => {
                 <i className="fas fa-ban text-base mr-1"></i> Cancelled
               </a>
             </li>
-            <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
-              <a
-                className={
-                  'transition ease-in duration-200 hover:bg-red-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5  ' +
-                  (openTab === 5
-                    ? 'text-white bg-red-500'
-                    : 'text-gray-600 bg-white')
-                }
-                onClick={(e) => {
-                  e.preventDefault();
-                  setOpenTab(5);
-                  onSelectDiscount();
-                }}
-                data-toggle="tab"
-                href="#link3"
-                role="tablist"
-              >
-                <i className="fas fa-ban text-base mr-1"></i> For Discount
-                Approval
-              </a>
-            </li>
           </ul>
         </div>
       </div>
@@ -134,4 +105,4 @@ const Tabs = (props) => {
   );
 };
 
-export default Tabs;
+export default OrderTab;

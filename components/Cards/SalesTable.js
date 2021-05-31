@@ -2,8 +2,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 
-import PropTypes from 'prop-types';
-import Router, { withRouter } from 'next/router';
 import moment from 'moment';
 import { useSession } from 'next-auth/client';
 
@@ -17,10 +15,10 @@ import EditModal from '../Modals/SalesModals/EditModal';
 
 import SuccessModal from '../Modals/SuccessModal';
 
-import Tabs from '../Tabs';
+import SalesTab from '../Tabs/SalesTab';
 import * as salesActions from '../../redux/actions/salesActions';
 import * as inventoryActions from '../../redux/actions/inventoryActions';
-import * as localStorage from '../../utils/local-storage';
+import { withRouter } from 'next/router';
 
 const SalesTable = (props) => {
   const [showFormModal, setFormShowModal] = useState(false);
@@ -139,12 +137,9 @@ const SalesTable = (props) => {
         message={modalMessage}
         hasError={modalError}
       />
-      {/* <ConfirmModal
-        showModal={true}
-        message={'Are you sure you want to add sales order?'}
-      /> */}
+
       <div className="flex flex-row justify-between">
-        <Tabs
+        <SalesTab
           getSalesWithFilter={props.getSales}
           addFilter={props.addFilter}
           clearFilter={props.clearFilter}
