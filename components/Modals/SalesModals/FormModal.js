@@ -8,6 +8,10 @@ import SuccessModal from '../SuccessModal';
 const FormModal = (props) => {
   const [session, loading] = useSession();
 
+  const [modalError, setModalError] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [successModal, setSuccessModal] = useState(false);
+
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [type, setType] = useState('');
@@ -119,18 +123,17 @@ const FormModal = (props) => {
     setItems(testItems);
   };
 
-  const removeItem = (event, index) => {
+  const removeItem = (event, indexItem) => {
     event.preventDefault();
-    let testItems = [...items];
-    let newTest;
-    newTest = testItems.splice(index, index + 1);
-    setItems(newTest);
-  };
+    if (items.length === 1) {
+      setModalError(true);
+      setSuccessModal(true);
+      setModalMessage('Cannot delete anymore items.');
+    } else {
+      setItems(items.filter((item, index) => index !== indexItem));
 
-  const handleCode = (event) => {
-    event.preventDefault();
-    setCodeError('');
-    setCode(event.target.value);
+      setSubmitItems(submitItems.filter((item, index) => index !== indexItem));
+    }
   };
 
   const [discountError, setDiscountError] = useState(false);
@@ -140,6 +143,7 @@ const FormModal = (props) => {
     setDiscountError('');
     if (!(event.target.value > 100 || event.target.value < 0)) {
       setTotalDiscount(event.target.value);
+      console.log(totalDiscount);
     }
   };
 
@@ -226,35 +230,55 @@ const FormModal = (props) => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    props
-      .createSalesOrder(
-        session.user.auth_token,
-        submitItems,
-        setContinue,
-        totalDiscount
-      )
-      .then((res) => {
-        if (res.status === 200) {
+    var hasError = false;
+    submitItems.map((item) => {
+      console.log(item);
+      if (item.quantity <= 0) {
+        hasError = true;
+        setModalMessage('Quantities must be greater than 0.');
+      }
+      if (item.product === null) {
+        hasError = true;
+        setModalMessage('Order Form has no products added.');
+      }
+    });
+
+    if (hasError) {
+      setModalError(true);
+      setSuccessModal(true);
+      return false;
+    } else {
+      props
+        .createSalesOrder(
+          session.user.auth_token,
+          submitItems,
+
+          totalDiscount
+        )
+        .then((res) => {
+          console.log(res);
+          if (res.status === 200) {
+            props.setModalMessage(
+              'You have successfully added a new sales order.'
+            );
+            props.setModalError(false);
+            props.setSuccessModal(true);
+            props.getSales(session.user.auth_token);
+          } else {
+            props.setModalMessage('One of the items you added is out of stock');
+            props.setModalError(true);
+            props.setSuccessModal(true);
+          }
+        })
+        .catch((error) => {
           props.setModalMessage(
-            'You have successfully added a new sales order.'
+            'A server error has occurred. Please try again later'
           );
-          props.setModalError(false);
-          props.setSuccessModal(true);
-          props.getSales(session.user.auth_token);
-        } else {
-          props.setModalMessage('One of the items you added is out of stock');
           props.setModalError(true);
           props.setSuccessModal(true);
-        }
-      })
-      .catch((error) => {
-        props.setModalMessage(
-          'A server error has occurred. Please try again later'
-        );
-        props.setModalError(true);
-        props.setSuccessModal(true);
-      });
-    clearState();
+        });
+      clearState();
+    }
   };
 
   const handlePaymentSubmit = (event) => {
@@ -273,7 +297,10 @@ const FormModal = (props) => {
     props.closeModal();
     setContinue(false);
     setItems([{ type: null, product: null, price: 0, quantity: 1 }]);
-
+    setTotalAmount(0);
+    setTotalDiscount(0);
+    setTotalDiscountAmount(0);
+    setSuccessModal(false);
     setSubmitItems([{ product: null, quantity: 0 }]);
   };
 
@@ -301,11 +328,12 @@ const FormModal = (props) => {
                     </span>
                   </button>
                 </div>
-                {/* <SuccessModal
-                  showModal={true}
-                  // setSuccessModal={setSuccessModal}
-                  // closeModal={() => setSuccessModal(false)}
-                /> */}
+                <SuccessModal
+                  showModal={successModal}
+                  closeModal={() => setSuccessModal(false)}
+                  message={modalMessage}
+                  hasError={modalError}
+                />
                 {true ? (
                   <div className="p-6 flex-auto mt-10 sm:mt-0">
                     <div className="md:grid md:grid-cols-2 md:gap-6">
@@ -380,6 +408,7 @@ const FormModal = (props) => {
                                             placeholder="Item Type/Category"
                                             name="item_type"
                                             autocomplete="item_type"
+                                            value={item.type}
                                             class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                           >
                                             <option
@@ -754,12 +783,12 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getSales: (authToken) => dispatch(salesActions.getSales(authToken)),
-  createSalesOrder: (authToken, payload, setContinue, totalDiscount) =>
+  createSalesOrder: (authToken, payload, totalDiscount) =>
     dispatch(
       salesActions.createSalesOrder(
         authToken,
         payload,
-        setContinue,
+
         totalDiscount
       )
     ),

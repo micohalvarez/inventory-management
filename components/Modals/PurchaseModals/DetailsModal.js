@@ -6,8 +6,9 @@ import * as orderActions from '../../../redux/actions/orderActions';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
+import { useSession } from 'next-auth/client';
 const DetailsModal = (props) => {
-  console.log(props, 'test');
+  const [session, loading] = useSession();
   const [newItems, setNewitems] = useState([
     <>
       <tr
@@ -62,7 +63,27 @@ const DetailsModal = (props) => {
       accountNum: accountNum,
       pdc_date: moment(paymentDate).format('YYYY-MM-DD'),
     };
-    props.addPaymentMethod(props.authToken, payload);
+    props
+      .addPaymentMethod(session.user.auth_token, payload)
+      .then((res) => {
+        if (res.status === 200) {
+          props.setModalMessage('Payment Type has been succesfully added.');
+          props.setModalError(false);
+          props.setSuccessModal(true);
+          props.getOrders(session.user.auth_token);
+        } else {
+          props.setModalMessage('Payment Type cannot be added.');
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        }
+      })
+      .catch(({ response }) => {
+        props.setModalMessage(
+          'A server error has occurred. Please try again later.'
+        );
+        props.setModalError(true);
+        props.setSuccessModal(true);
+      });
     clearState();
   };
 
@@ -70,15 +91,25 @@ const DetailsModal = (props) => {
     event.preventDefault();
 
     props
-      .markPaid(props.authToken, props.selectedItem.uuid)
+      .markPaid(session.user.auth_token, props.selectedItem.uuid)
       .then((res) => {
         if (res.status === 200) {
-          alert('Purchase order has bene marked as paid');
-          props.getOrders(props.authToken);
-        } else alert('Purchase order cannot be marked as paid');
+          props.setModalMessage('Sales order has been marked as paid.');
+          props.setModalError(false);
+          props.setSuccessModal(true);
+          props.getOrders(session.user.auth_token);
+        } else {
+          props.setModalMessage('Sales order cannot be marked as paid.');
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        }
       })
       .catch(({ response }) => {
-        alert('An error has occurred');
+        props.setModalMessage(
+          'A server error has occurred. Please try again later.'
+        );
+        props.setModalError(true);
+        props.setSuccessModal(true);
       });
     clearState();
   };
@@ -87,11 +118,11 @@ const DetailsModal = (props) => {
     event.preventDefault();
 
     props
-      .markCancel(props.authToken, props.selectedItem.uuid)
+      .markCancel(session.user.auth_token, props.selectedItem.uuid)
       .then((res) => {
         if (res.status === 200) {
           alert('Purchase order has bene marked as cancelled');
-          props.getOrders(props.authToken);
+          props.getOrders(session.user.auth_token);
         } else alert('Purchase order cannot be marked as cancelled');
       })
       .catch(({ response }) => {
@@ -158,7 +189,7 @@ const DetailsModal = (props) => {
                                 for="sales_number"
                                 className="block text-sm font-medium text-gray-700"
                               >
-                                Sales Order Number
+                                Purchase Order Number
                               </label>
                               <p className="block text-base font-medium">
                                 {props.selectedItem.order_number}
@@ -240,7 +271,7 @@ const DetailsModal = (props) => {
                               </p>
                             </div>
                           </div>
-                          <div className="mt-4">
+                          <div className="mt-4 max-h-80 overflow-y-auto">
                             <table className="items-center w-full bg-transparent border-collapse">
                               <thead className="bg-gray-100 ">
                                 <tr>

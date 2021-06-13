@@ -139,29 +139,6 @@ const Sidebar = (props) => {
                 </a>
               </Link>
             </li>
-
-            <li className="items-center">
-              <Link href="/admin/settings">
-                <a
-                  className={
-                    'text-sm uppercase py-3 font-bold block ' +
-                    (router.pathname.indexOf('/admin/settings') !== -1
-                      ? 'text-blue-500 hover:text-blue-600'
-                      : 'text-gray-800 hover:text-gray-600')
-                  }
-                >
-                  <i
-                    className={
-                      'fas fa-tools mr-2 text-sm ' +
-                      (router.pathname.indexOf('/admin/settings') !== -1
-                        ? 'opacity-75'
-                        : 'text-gray-400')
-                    }
-                  ></i>{' '}
-                  Settings
-                </a>
-              </Link>
-            </li>
           </ul>
         </div>
       </div>

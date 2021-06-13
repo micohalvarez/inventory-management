@@ -9,6 +9,8 @@ import TableDropdown from '../Dropdowns/TableDropdown.js';
 import FormModal from '../Modals/PurchaseModals/FormModal';
 import DetailsModal from '../Modals/PurchaseModals/DetailsModal';
 import EditModal from '../Modals/PurchaseModals/EditModal';
+import SuccessModal from '../Modals/SuccessModal';
+
 import OrderTab from '../Tabs/OrderTab';
 import { withRouter } from 'next/router';
 import { connect } from 'react-redux';
@@ -22,6 +24,10 @@ const OrdersTable = (props) => {
   const [selectedItem, setSelectedItem] = useState(false);
   const [paymentDate, setPaymentDate] = useState(new Date());
   const [session, loading] = useSession();
+
+  const [successModal, setSuccessModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState(false);
+  const [modalError, setModalError] = useState(false);
 
   const onPressRow = (item) => {
     setShowDetailsModal(true);
@@ -89,8 +95,10 @@ const OrdersTable = (props) => {
       <FormModal
         showModal={showFormModal}
         closeModal={() => setFormShowModal(false)}
-        authToken={props.authToken}
         paymentTypes={props.paymentTypes}
+        setSuccessModal={setSuccessModal}
+        setModalMessage={setModalMessage}
+        setModalError={setModalError}
       />
       <DetailsModal
         selectedItem={selectedItem}
@@ -103,12 +111,22 @@ const OrdersTable = (props) => {
         showModal={showDetailsModal}
         closeModal={() => setShowDetailsModal(false)}
         paymentTypes={props.paymentTypes}
-        authToken={props.authToken}
+        setSuccessModal={setSuccessModal}
+        setModalMessage={setModalMessage}
+        setModalError={setModalError}
       />
       <EditModal
         showModal={showEditModal}
         closeModal={() => setShowEditModal(false)}
       />
+      <SuccessModal
+        showModal={successModal}
+        setSuccessModal={setSuccessModal}
+        closeModal={() => setSuccessModal(false)}
+        message={modalMessage}
+        hasError={modalError}
+      />
+
       <div className="flex flex-row justify-between">
         <OrderTab
           getSalesWithFilter={props.getOrders}

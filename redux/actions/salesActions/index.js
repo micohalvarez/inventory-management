@@ -134,6 +134,7 @@ export const getPaymentTypes = (authToken, filter) => {
 export const createSalesOrder = (authToken, payload, totalDiscount) => {
   return (dispatch) => {
     var data;
+    console.log(totalDiscount);
     if (totalDiscount > 0)
       data = {
         items: payload,
@@ -143,6 +144,8 @@ export const createSalesOrder = (authToken, payload, totalDiscount) => {
       data = {
         items: payload,
       };
+
+    console.log(data);
 
     return authInstance.post(`/sales_order/`, data, {
       headers: {
@@ -154,8 +157,6 @@ export const createSalesOrder = (authToken, payload, totalDiscount) => {
 
 export const addPaymentMethod = (authToken, payload) => {
   return (dispatch) => {
-    dispatch({ type: actionTypes.ADD_SALES_START });
-
     return authInstance.post(`/payment/`, payload, {
       headers: {
         Authorization: `Token ${authToken}`,
@@ -166,26 +167,18 @@ export const addPaymentMethod = (authToken, payload) => {
 
 export const approveDiscount = (authToken, uuid, discount) => {
   return (dispatch) => {
-    authInstance
-      .post(
-        `/sales_order/${uuid}/approve_discount/`,
-        {
-          total_discount: discount,
+    console.log('hoy');
+    return authInstance.post(
+      `/sales_order/${uuid}/approve_discount/`,
+      {
+        total_discount: discount,
+      },
+      {
+        headers: {
+          Authorization: `Token ${authToken}`,
         },
-        {
-          headers: {
-            Authorization: `Token ${authToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        if (res.status === 200) {
-          alert('Sales order has been marked as paid');
-        } else alert('Sales order cannot be marked as paid');
-      })
-      .catch(({ response }) => {
-        alert('An error has occurred');
-      });
+      }
+    );
   };
 };
 

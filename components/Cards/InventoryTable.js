@@ -94,7 +94,6 @@ const InventoryTable = (props) => {
       <FormModal
         getItems={props.getItems}
         addItem={props.addItem}
-        authToken={props.authToken}
         showModal={showFormModal}
         categories={props.categories}
         closeModal={() => setFormShowModal(false)}
@@ -421,8 +420,8 @@ const mapDispatchToProps = (dispatch) => ({
   clearSort: () => dispatch(inventoryActions.clearSort()),
   addFilter: (filter) => dispatch(inventoryActions.addFilter(filter)),
   clearFilter: () => dispatch(inventoryActions.clearFilter()),
-  getOrdersPerItem: (authToken, slug) =>
-    dispatch(inventoryActions.getOrdersPerItem(authToken, slug)),
+  getOrdersPerItem: (authToken, slug, date) =>
+    dispatch(inventoryActions.getOrdersPerItem(authToken, slug, date)),
 });
 
 export default withRouter(

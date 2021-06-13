@@ -2,16 +2,10 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 
-import PropTypes from 'prop-types';
-
-// components
-
-import TableDropdown from '../Dropdowns/TableDropdown.js';
-import InventoryType from '../Dropdowns/InventoryType';
-
 import PurchaseFormModal from '../Modals/PurchaseModals/FormModal';
 import PurchaseDetailModal from '../Modals/PurchaseModals/DetailsModal';
 import SalesDetailsModal from '../Modals/SalesModals/DetailsModal';
+import SuccessModal from '../Modals/SuccessModal';
 
 import { withRouter } from 'next/router';
 
@@ -29,6 +23,9 @@ const DashBoardTable = (props) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(false);
 
+  const [successModal, setSuccessModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState(false);
+  const [modalError, setModalError] = useState(false);
   const onPressRow = (item) => {
     setSelectedItem(item);
     setShowDetailsModal(true);
@@ -121,10 +118,7 @@ const DashBoardTable = (props) => {
             {props.items.length > 0 ? (
               <>
                 {props.items.map((item, index) => (
-                  <tr
-                    onClick={() => onPressRow(item)}
-                    class="hover:bg-gray-200 cursor-pointer bg-gray-100 text-gray-800 border-gray-200"
-                  >
+                  <tr class="hover:bg-gray-200 cursor-pointer bg-gray-100 text-gray-800 border-gray-200">
                     <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
                       <div className="h-14 w-14  bg-white rounded-full border justify-center flex">
                         <img
@@ -157,7 +151,10 @@ const DashBoardTable = (props) => {
                       <button
                         className="hover:bg-gray-800 bg-gray-700 self-end flex text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="button"
-                        onClick={() => setFormShowModal(true)}
+                        onClick={() => {
+                          setFormShowModal(true);
+                          setSelectedItem(item);
+                        }}
                       >
                         Create Purchase Order
                       </button>
@@ -382,6 +379,9 @@ const DashBoardTable = (props) => {
         closeModal={() => setSalesDetailModal(false)}
         paymentTypes={props.paymentTypes}
         authToken={session.user.auth_token}
+        setSuccessModal={setSuccessModal}
+        setModalMessage={setModalMessage}
+        setModalError={setModalError}
       />
       <PurchaseDetailModal
         selectedItem={selectedPurchase}
@@ -391,10 +391,31 @@ const DashBoardTable = (props) => {
             selectedPurchase.status === 'cancelled'
           )
         }
+        setSuccessModal={setSuccessModal}
+        setModalMessage={setModalMessage}
+        setModalError={setModalError}
         showModal={purchaseDetailiModal}
         closeModal={() => setPurchaseDetailModal(false)}
         paymentTypes={props.paymentTypes}
         authToken={session.user.auth_token}
+      />
+
+      <PurchaseFormModal
+        showModal={showFormModal}
+        selectedItem={selectedItem}
+        closeModal={() => setFormShowModal(false)}
+        paymentTypes={props.paymentTypes}
+        setSuccessModal={setSuccessModal}
+        setModalMessage={setModalMessage}
+        setModalError={setModalError}
+        getItems={props.getItems}
+      />
+      <SuccessModal
+        showModal={successModal}
+        setSuccessModal={setSuccessModal}
+        closeModal={() => setSuccessModal(false)}
+        message={modalMessage}
+        hasError={modalError}
       />
 
       <div className="flex flex-row flex-1">

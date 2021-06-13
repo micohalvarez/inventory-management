@@ -10,7 +10,7 @@ export const getOrders = (authToken) => {
     const orders = getState().orders;
 
     dispatch({ type: actionTypes.GET_ORDERS_START });
-
+    console.log(authToken, 'hi');
     authInstance
       .get(
         `/purchase_order/?limit=${ORDERS_LIMIT}&offset=0` +
@@ -102,7 +102,7 @@ export const getOrdersWithFilter = (authToken, filter) => {
   };
 };
 
-export const createPurchaseOrder = (authToken, payload, setContinue) => {
+export const createPurchaseOrder = (authToken, payload) => {
   return (dispatch) => {
     dispatch({ type: actionTypes.ADD_ORDERS_START });
 
@@ -135,6 +135,7 @@ export const clearFilter = () => {
 
 export const markPaid = (authToken, uuid) => {
   return (dispatch) => {
+    console.log('HOy');
     return authInstance.post(
       `/purchase_order/${uuid}/mark_as_paid/`,
       {},

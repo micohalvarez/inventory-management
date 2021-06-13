@@ -73,8 +73,12 @@ const Login = (props) => {
         password: password,
       };
 
-      // props.login(payload)
       props.loginNextAuth(payload);
+    }
+  };
+  const _handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      console.log('do validate');
     }
   };
 
@@ -146,7 +150,7 @@ const Login = (props) => {
                     >
                       Login
                       {loading ? (
-                        <div class="rounded-lg animate-spin ease duration-300 w-5 h-5 border-2 border-white"></div>
+                        <div class="rounded-lg animate-spin ease duration-300 w-5 h-5 ml-2 border-2 border-white"></div>
                       ) : null}
                     </button>
                   </div>

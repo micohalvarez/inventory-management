@@ -191,7 +191,7 @@ const ReportModal = (props) => {
                       className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                       selected={reportDate}
                       onChange={(date) => {
-                        setReportData(date);
+                        setReportDate(date);
                       }}
                     />
                   </div>

@@ -99,12 +99,12 @@ const SalesTable = (props) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
+  console.log(session.user.auth_token);
   return (
     <>
       <FormModal
         showModal={showFormModal}
         closeModal={() => setFormShowModal(false)}
-        authToken={props.authToken}
         paymentTypes={props.paymentTypes}
         setSuccessModal={setSuccessModal}
         setModalMessage={setModalMessage}
@@ -121,7 +121,6 @@ const SalesTable = (props) => {
         showModal={showDetailsModal}
         closeModal={() => setShowDetailsModal(false)}
         paymentTypes={props.paymentTypes}
-        authToken={props.authToken}
         setSuccessModal={setSuccessModal}
         setModalMessage={setModalMessage}
         setModalError={setModalError}

@@ -29,7 +29,7 @@ const Sales = (props) => {
     <Admin>
       <div className="flex flex-wrap mt-10 ">
         <div className="w-full h-full mb-12 px-4 mt-16 flex flex-col mt-1 justify-center">
-          <SalesTable sales={props.sales} authToken={session.user.authToken} />
+          <SalesTable sales={props.sales} authToken={session.user.auth_token} />
         </div>
       </div>
     </Admin>

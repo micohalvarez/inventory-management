@@ -108,7 +108,7 @@ const FormModal = (props) => {
                                 <input
                                   type="text"
                                   placeholder="Price (₱)"
-                                  value={`₱${props.items[index].unit_price} PHP`}
+                                  value={`₱${props.selectedItem.unit_price} PHP`}
                                   name="price"
                                   id="price"
                                   autocomplete="price"

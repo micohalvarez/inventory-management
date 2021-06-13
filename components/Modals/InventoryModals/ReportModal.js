@@ -45,9 +45,15 @@ const ReportModal = (props) => {
       return;
     }
 
+    let date = null;
+    console.log(reportDate);
+    if (reportDate) {
+      date = moment(reportDate).format('YYYY-MM-DD');
+    }
     props
-      .getOrdersPerItem(session.user.auth_token, selectedItem)
+      .getOrdersPerItem(session.user.auth_token, selectedItem, date)
       .then((res) => {
+        console.log(res);
         if (res.status === 200 && res.data.results) {
           let totalAmount = 0,
             totalQuantity = 0,
@@ -97,7 +103,7 @@ const ReportModal = (props) => {
             order_number: 'Total',
             total_amount: numberWithCommas(totalAmount),
             sub_total: numberWithCommas(totalSub),
-            total_discount: totalDisc + '%',
+            total_discount: '-',
             quantity: numberWithCommas(totalQuantity),
           });
           setProductName(selectedItem.toUpperCase());
@@ -192,7 +198,8 @@ const ReportModal = (props) => {
                       className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                       selected={reportDate}
                       onChange={(date) => {
-                        setReportData(date);
+                        console.log(date);
+                        setReportDate(date);
                       }}
                     />
                   </div>

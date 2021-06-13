@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/client';
 
 import ExportToPdf from '../../ExportToPdf';
 const DetailsModal = (props) => {
+  console.log(props);
   const [session, loading] = useSession();
 
   const [newItems, setNewitems] = useState([
@@ -64,11 +65,34 @@ const DetailsModal = (props) => {
       : props.selectedItem.total_discount;
 
     event.preventDefault();
-    props.approveDiscount(
-      session.user.auth_token,
-      props.selectedItem.uuid,
-      discount
-    );
+    props
+      .approveDiscount(
+        session.user.auth_token,
+        props.selectedItem.uuid,
+        discount
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          props.setModalMessage('Discount has been approved.');
+          props.setModalError(false);
+          props.setSuccessModal(true);
+          props.getSales(session.user.auth_token);
+        } else {
+          props.setModalMessage(
+            'You do not have permissions to approve the discount'
+          );
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        }
+      })
+      .catch(({ response }) => {
+        props.setModalMessage(
+          'A server error has occurred. Please try again later.'
+        );
+        props.setModalError(true);
+        props.setSuccessModal(true);
+      });
+    clearState();
     setDiscountApproval(false);
   };
 
@@ -893,9 +917,8 @@ const mapDispatchToProps = (dispatch) => ({
   getSales: (token) => {
     dispatch(salesActions.getSales(token));
   },
-  approveDiscount: (token, uuid, discount) => {
-    dispatch(salesActions.approveDiscount(token, uuid, discount));
-  },
+  approveDiscount: (token, uuid, discount) =>
+    dispatch(salesActions.approveDiscount(token, uuid, discount)),
 });
 
 export default withRouter(
