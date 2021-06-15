@@ -8,9 +8,13 @@ import UserDropdown from '../Dropdowns/UserDropdown.js';
 const Sidebar = (props) => {
   const [collapseShow, setCollapseShow] = React.useState('hidden');
   const router = useRouter();
-  console.log(props, 'sidebar');
+
   return (
-    <nav className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-no-wrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
+    <nav
+      className={`md:left-0 md:top-0 md:bottom-0 md:block md:fixed md:overflow-y-auto md:flex-row md:flex-no-wrap md:overflow-hidden shadow-xl flex flex-wrap items-center justify-between bg-white  relative md:w-64 z-10 py-8 px-6 ${
+        !props.showNav ? ' md:hidden' : ' '
+      }`}
+    >
       <div className="md:flex-col md:items-stretch md:min-h-full md:flex-no-wrap px-0 flex flex-wrap items-center justify-between w-full mx-auto">
         {/* Toggler */}
 
@@ -26,7 +30,7 @@ const Sidebar = (props) => {
           </h6>
           {/* Navigation */}
 
-          <ul className="md:flex-col md:min-w-full flex flex-col list-none">
+          <ul className="md:flex-col  md:min-w-full flex flex-col list-none">
             <li className="items-center">
               <Link href="/admin/dashboard">
                 <a
@@ -61,7 +65,7 @@ const Sidebar = (props) => {
                 >
                   <i
                     className={
-                      'fas fa-table mr-2 text-sm ' +
+                      'fas fa-warehouse mr-2 text-sm ' +
                       (router.pathname.indexOf('/admin/tables') !== -1
                         ? 'opacity-75'
                         : 'text-gray-400')
@@ -83,7 +87,7 @@ const Sidebar = (props) => {
                 >
                   <i
                     className={
-                      'fas fa-table mr-2 text-sm ' +
+                      'fas fa-file-invoice-dollar mr-2 text-sm ' +
                       (router.pathname.indexOf('/admin/sales') !== -1
                         ? 'opacity-75'
                         : 'text-gray-400')
@@ -106,7 +110,7 @@ const Sidebar = (props) => {
                 >
                   <i
                     className={
-                      'fas fa-table mr-2 text-sm ' +
+                      'fas fa-cart-plus mr-2 text-sm ' +
                       (router.pathname.indexOf('/admin/orders') !== -1
                         ? 'opacity-75'
                         : 'text-gray-400')

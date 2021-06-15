@@ -13,11 +13,11 @@ import * as dashboardActions from '../../redux/actions/dashboardActions';
 import * as inventoryActions from '../../redux/actions/inventoryActions';
 import * as salesActions from '../../redux/actions/salesActions';
 import { useSession, getSession } from 'next-auth/client';
-
+import AdminNavbar from '../../components/Navbars/AdminNavbar';
 const Dashboard = (props) => {
-  const [authToken, setAuthToken] = useState(false);
   const [session, loading] = useSession();
-
+  const [isClicked, setClicked] = useState(false);
+  const [showSideBar, setShowSideBar] = useState(true);
   useEffect(() => {
     props.getItems(session.user.auth_token);
     props.getInventoryItems(session.user.auth_token);
@@ -25,23 +25,27 @@ const Dashboard = (props) => {
   }, []);
 
   return (
-    <Admin>
-      <div className="flex flex-wrap mt-10">
-        <div className="w-full h-full mb-12 px-4 mt-16 flex flex-col mt-1 justify-center">
-          <DashboardTable
-            sales={props.sales}
-            items={props.items}
-            authToken={authToken}
-          />
-        </div>
+    <Admin showSideBar={showSideBar}>
+      <AdminNavbar
+        isClicked={!isClicked}
+        user={session.user}
+        getItems={props.getItems}
+        setShowSideBar={setShowSideBar}
+        showSideBar={showSideBar}
+      />
+      <div
+        onClick={(e) => {
+          setClicked(!isClicked);
+        }}
+        className=" flex flex-col flex-1 px-4 mt-24  "
+      >
+        <DashboardTable isClicked={!isClicked} />
       </div>
     </Admin>
   );
 };
 
-const mapStateToProps = (state) => ({
-  items: state.dashboard.items,
-});
+const mapStateToProps = (state) => ({});
 
 const mapDispatchToProps = (dispatch) => ({
   getItems: (authToken) => dispatch(dashboardActions.getItems(authToken)),

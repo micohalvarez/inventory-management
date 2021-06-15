@@ -1,6 +1,5 @@
 import * as actionTypes from './actionTypes';
 
-import Router from 'next/router';
 import authInstance from '../../../utils/auth-instance';
 
 const ITEMS_LIMIT = 10;
@@ -23,7 +22,7 @@ export const getItems = (authToken) => {
               count: res.data.count,
               offSet: 0,
               page: 1,
-              sort:0,
+              sort: 0,
             },
           });
         }
@@ -52,7 +51,7 @@ export const getNextItems = (authToken, offSet, page) => {
               count: res.data.count,
               offSet: offSet,
               page: page,
-              sort:0,
+              sort: 0,
             },
           });
         }
@@ -65,7 +64,6 @@ export const getNextItems = (authToken, offSet, page) => {
 
 export const getDiscountApproveSales = (authToken) => {
   return (dispatch, getState) => {
-
     dispatch({ type: actionTypes.GET_ITEMS_START_DASHBOARD });
     authInstance
       .get(
@@ -85,7 +83,7 @@ export const getDiscountApproveSales = (authToken) => {
               count: res.data.count,
               offSet: 0,
               page: 1,
-              sort:1,
+              sort: 1,
             },
           });
         }
@@ -117,7 +115,7 @@ export const getNextDiscountApproveSales = (authToken, offSet, page) => {
               count: res.data.count,
               offSet: offSet,
               page: page,
-              sort:1,
+              sort: 1,
             },
           });
         }
@@ -130,17 +128,13 @@ export const getNextDiscountApproveSales = (authToken, offSet, page) => {
 
 export const getPurchaseOrdersDeadline = (authToken) => {
   return (dispatch, getState) => {
-
     dispatch({ type: actionTypes.GET_ITEMS_START_DASHBOARD });
     authInstance
-      .get(
-        `/purchase_order/?limit=${ITEMS_LIMIT}&offset=0&is_deadline=True`,
-        {
-          headers: {
-            Authorization: `Token ${authToken}`,
-          },
-        }
-      )
+      .get(`/purchase_order/?limit=${ITEMS_LIMIT}&offset=0&is_deadline=True`, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      })
       .then((res) => {
         if (res.status === 200 && res.data.results) {
           dispatch({
@@ -150,7 +144,7 @@ export const getPurchaseOrdersDeadline = (authToken) => {
               count: res.data.count,
               offSet: 0,
               page: 1,
-              sort:2,
+              sort: 2,
             },
           });
         }
@@ -163,7 +157,6 @@ export const getPurchaseOrdersDeadline = (authToken) => {
 
 export const getNextPurchaseOrdersDeadline = (authToken) => {
   return (dispatch, getState) => {
-
     dispatch({ type: actionTypes.GET_ITEMS_START_DASHBOARD });
     authInstance
       .get(
@@ -183,7 +176,7 @@ export const getNextPurchaseOrdersDeadline = (authToken) => {
               count: res.data.count,
               offSet: 0,
               page: 1,
-              sort:2,
+              sort: 2,
             },
           });
         }
@@ -196,17 +189,13 @@ export const getNextPurchaseOrdersDeadline = (authToken) => {
 
 export const getSalesOrdersDeadline = (authToken) => {
   return (dispatch, getState) => {
-
     dispatch({ type: actionTypes.GET_ITEMS_START_DASHBOARD });
     authInstance
-      .get(
-        `/sales_order/?limit=${ITEMS_LIMIT}&offset=0&is_deadline=True`,
-        {
-          headers: {
-            Authorization: `Token ${authToken}`,
-          },
-        }
-      )
+      .get(`/sales_order/?limit=${ITEMS_LIMIT}&offset=0&is_deadline=True`, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      })
       .then((res) => {
         if (res.status === 200 && res.data.results) {
           dispatch({
@@ -229,7 +218,6 @@ export const getSalesOrdersDeadline = (authToken) => {
 
 export const getNextSalesOrdersDeadline = (authToken) => {
   return (dispatch, getState) => {
-
     dispatch({ type: actionTypes.GET_ITEMS_START_DASHBOARD });
     authInstance
       .get(

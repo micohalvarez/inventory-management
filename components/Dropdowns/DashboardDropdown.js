@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPopper } from '@popperjs/core';
 
 import * as localStorage from '../../utils/local-storage';
@@ -13,6 +13,9 @@ const inventoryFilter = (props) => {
 
   const [filter, setFilter] = useState(false);
 
+  useEffect(() => {
+    if (dropdownPopoverShow) setDropdownPopoverShow(false);
+  }, [props.isClicked]);
   const openDropdownPopover = () => {
     createPopper(btnDropdownRef.current, popoverDropdownRef.current, {
       placement: 'bottom-start',
@@ -35,7 +38,6 @@ const inventoryFilter = (props) => {
 
   const clearFilter = () => {
     setFilter(null);
-    // props.clearSort();
     props.getItems(session.user.auth_token);
   };
   return (
@@ -50,11 +52,11 @@ const inventoryFilter = (props) => {
         href="#pablo"
         ref={btnDropdownRef}
         onClick={(e) => {
+          e.stopPropagation();
           !filter
-            ? (e.preventDefault(),
-              dropdownPopoverShow
-                ? closeDropdownPopover()
-                : openDropdownPopover())
+            ? dropdownPopoverShow
+              ? closeDropdownPopover()
+              : openDropdownPopover()
             : clearFilter();
         }}
       >

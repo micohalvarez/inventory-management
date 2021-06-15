@@ -217,7 +217,7 @@ export const getAllItems = (authToken) => {
 export const getOrdersPerItem = (authToken, slug, date = null) => {
   return (dispatch) => {
     dispatch({ type: actionTypes.GET_ORDERS_PER_ITEM_START });
-    console.log(date);
+
     return authInstance.get(
       `/product/${slug}/orders` + (date ? `?order_date=${date}` : ''),
       {

@@ -418,7 +418,7 @@ const DashBoardTable = (props) => {
         hasError={modalError}
       />
 
-      <div className="flex flex-row flex-1">
+      <div className="flex flex-row">
         <DashboardDropdown
           sort={[
             'Low on Stock',
@@ -430,13 +430,10 @@ const DashBoardTable = (props) => {
           getDiscountApproveSales={props.getDiscountApproveSales}
           getPurchaseOrdersDeadline={props.getPurchaseOrdersDeadline}
           getSalesOrdersDeadline={props.getSalesOrdersDeadline}
+          isClicked={props.isClicked}
         />
       </div>
-      <div
-        className={
-          'mt-4 relative flex flex-col min-w-0 break-words w-full mb-12 flex-1 shadow-lg rounded '
-        }
-      >
+      <div className={'mt-4 flex flex-col min-w-0  w-full flex-1 rounded '}>
         {props.sort === 0
           ? renderInventoryItems()
           : props.sort === 1

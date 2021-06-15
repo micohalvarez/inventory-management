@@ -5,12 +5,11 @@ import { connect } from 'react-redux';
 // components
 
 import OrdersTable from '../../components/Cards/OrdersTable';
-
+import AdminNavbar from '../../components/Navbars/AdminNavbar';
 // layout for page
 
 import Admin from '../../layouts/Admin';
 import * as orderActions from '../../redux/actions/orderActions';
-import * as localStorage from '../../utils/local-storage';
 import * as salesActions from '../../redux/actions/salesActions';
 import * as inventoryActions from '../../redux/actions/inventoryActions';
 import { useSession, getSession } from 'next-auth/client';
@@ -18,6 +17,8 @@ import { useSession, getSession } from 'next-auth/client';
 const Orders = (props) => {
   const [authToken, setAuthToken] = useState(false);
   const [session, loading] = useSession();
+  const [isClicked, setClicked] = useState(false);
+  const [showSideBar, setShowSideBar] = useState(true);
 
   useEffect(() => {
     props.getOrders(session.user.auth_token);
@@ -26,14 +27,24 @@ const Orders = (props) => {
   }, []);
 
   return (
-    <Admin>
-      <div className="flex flex-wrap mt-10 ">
-        <div className="w-full h-full mb-12 px-4 mt-16 flex flex-col mt-1 justify-center">
-          <OrdersTable
-            orders={props.orders}
-            authToken={session.user.auth_token}
-          />
-        </div>
+    <Admin showSideBar={showSideBar}>
+      <AdminNavbar
+        isClicked={!isClicked}
+        user={session.user}
+        getItems={props.getItems}
+        setShowSideBar={setShowSideBar}
+        showSideBar={showSideBar}
+      />
+      <div
+        onClick={(e) => {
+          setClicked(!isClicked);
+        }}
+        className=" flex flex-col flex-1 px-4 mt-24  "
+      >
+        <OrdersTable
+          orders={props.orders}
+          authToken={session.user.auth_token}
+        />
       </div>
     </Admin>
   );

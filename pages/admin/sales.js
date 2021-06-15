@@ -5,7 +5,7 @@ import Router, { withRouter } from 'next/router';
 // components
 
 import SalesTable from '../../components/Cards/SalesTable';
-
+import AdminNavbar from '../../components/Navbars/AdminNavbar';
 // layout for page
 
 import Admin from '../../layouts/Admin';
@@ -16,6 +16,8 @@ import { useSession, getSession } from 'next-auth/client';
 
 const Sales = (props) => {
   const [session, loading] = useSession();
+  const [isClicked, setClicked] = useState(false);
+  const [showSideBar, setShowSideBar] = useState(true);
 
   useEffect(() => {
     props.getSales(session.user.auth_token);
@@ -26,11 +28,21 @@ const Sales = (props) => {
 
   console.log(props);
   return (
-    <Admin>
-      <div className="flex flex-wrap mt-10 ">
-        <div className="w-full h-full mb-12 px-4 mt-16 flex flex-col mt-1 justify-center">
-          <SalesTable sales={props.sales} authToken={session.user.auth_token} />
-        </div>
+    <Admin showSideBar={showSideBar}>
+      <AdminNavbar
+        isClicked={!isClicked}
+        user={session.user}
+        getItems={props.getItems}
+        setShowSideBar={setShowSideBar}
+        showSideBar={showSideBar}
+      />
+      <div
+        onClick={(e) => {
+          setClicked(!isClicked);
+        }}
+        className=" flex flex-col flex-1 px-4 mt-24  "
+      >
+        <SalesTable sales={props.sales} authToken={session.user.auth_token} />
       </div>
     </Admin>
   );
