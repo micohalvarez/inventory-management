@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPopper } from '@popperjs/core';
 
 import * as localStorage from '../../utils/local-storage';
@@ -13,7 +13,9 @@ const NotificationDropdown = (props) => {
   const [filter, setFilter] = useState(false);
 
   const [session, loading] = useSession();
-  console.log(props, 'test');
+  useEffect(() => {
+    if (dropdownPopoverShow) setDropdownPopoverShow(false);
+  }, [props.isClicked]);
   const openDropdownPopover = () => {
     createPopper(btnDropdownRef.current, popoverDropdownRef.current, {
       placement: 'bottom-start',
@@ -49,6 +51,7 @@ const NotificationDropdown = (props) => {
         href="#pablo"
         ref={btnDropdownRef}
         onClick={(e) => {
+          e.stopPropagation();
           !filter
             ? (e.preventDefault(),
               dropdownPopoverShow

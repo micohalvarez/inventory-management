@@ -71,16 +71,6 @@ const FormModal = (props) => {
     };
     console.log(file);
     setFirstPhoto(file);
-    // imageCompression(file, options)
-    //   .then(function (compressedFile) {
-    //     compressed = compressedFile;
-
-    //     setFirstPhoto(compressed);
-    //   })
-    //   .catch(function (error) {
-    //     // console.log(error.message);
-    //   });
-
     event.target.value = '';
   };
 

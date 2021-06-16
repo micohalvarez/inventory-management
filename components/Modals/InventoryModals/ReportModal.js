@@ -17,7 +17,6 @@ const Headers = [
 ];
 
 const ReportModal = (props) => {
-  console.log(props);
   const [selectedItem, setSelectedItem] = useState(false);
   const [session, loading] = useSession();
   const [reportData, setReportData] = useState([]);
@@ -59,7 +58,7 @@ const ReportModal = (props) => {
             totalQuantity = 0,
             totalSub = 0,
             totalDisc = 0;
-
+          console.log('WHUTT');
           res.data.results.map((item, index) => {
             finalReport.push({
               order_number: '',
@@ -71,7 +70,7 @@ const ReportModal = (props) => {
               total_discount: '',
               sub_total: '',
             });
-
+            console.log('WHUTT');
             var curItem = getKeyByValue(item.items, selectedItem);
 
             finalReport[index].order_number = item.order_number;
@@ -107,6 +106,7 @@ const ReportModal = (props) => {
             quantity: numberWithCommas(totalQuantity),
           });
           setProductName(selectedItem.toUpperCase());
+          console.log(finalReport);
           setLoadingBar(false);
           setReportData(finalReport);
           generateReport();
@@ -119,8 +119,11 @@ const ReportModal = (props) => {
   };
 
   const generateReport = () => {
+    console.log('HOy');
     setTimeout(
       function () {
+        console.log(reportData);
+        console.log(csvLink.link.click());
         csvLink.link.click();
       }.bind(this),
       2000

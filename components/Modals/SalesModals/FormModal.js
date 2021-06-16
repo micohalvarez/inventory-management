@@ -198,6 +198,7 @@ const FormModal = (props) => {
     testItems[index].type = event.target.value;
 
     subItems[index].product = id;
+    subItems[index].quantity = testItems[index].quantity;
 
     setSubmitItems(subItems);
     setItems(testItems);

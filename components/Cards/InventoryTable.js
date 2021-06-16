@@ -33,7 +33,7 @@ const InventoryTable = (props) => {
     setSelectedItem(item);
     setShowDetailsModal(true);
   };
-  const onPressNumber = (event) => {
+  const onPressNumber = (event, maxCount) => {
     if (parseInt(event.target.innerText) === 1) {
       props.getNextItems(session.user.auth_token, 0, 0);
     } else {
@@ -42,7 +42,7 @@ const InventoryTable = (props) => {
       props.getNextItems(
         session.user.auth_token,
         props.offSet + multiplier,
-        props.page + (parseInt(event.target.innerText) - 1)
+        props.page + parseInt(event.target.innerText)
       );
     }
   };
@@ -79,7 +79,15 @@ const InventoryTable = (props) => {
           <a
             key={i}
             onClick={onPressNumber}
-            className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ${
+              props.page === maxPages && i === maxPages
+                ? 'pointer-events-none'
+                : 'cursor-pointer'
+            } ${
+              props.page <= 1 && i === indexStart + 1
+                ? 'pointer-events-none'
+                : 'cursor-pointer'
+            }`}
           >
             {i}
           </a>
@@ -104,7 +112,11 @@ const InventoryTable = (props) => {
         closeModal={() => setShowDetailsModal(false)}
       />
       <EditModal
+        getItems={props.getItems}
+        editItem={props.editItem}
         selectedItem={selectedItem}
+        setSelectedItem={setSelectedItem}
+        categories={props.categories}
         showModal={showEditModal}
         closeModal={() => setShowEditModal(false)}
       />
@@ -124,6 +136,7 @@ const InventoryTable = (props) => {
             addFilter={props.addFilter}
             clearFilter={props.clearFilter}
             getItems={props.getItems}
+            isClicked={props.isClicked}
           />
           <InventoryFilter
             sort={['Name', 'Price', 'Type/Brand', 'Stock', 'Date Created']}
@@ -131,6 +144,7 @@ const InventoryTable = (props) => {
             getItems={props.getItems}
             addSort={props.addSort}
             clearSort={props.clearSort}
+            isClicked={props.isClicked}
           />
         </div>
         <div className=" flex flex-1 justify-end">
@@ -273,6 +287,10 @@ const InventoryTable = (props) => {
                         <TableDropdown
                           setShowEditModal={setShowEditModal}
                           showEditModal={showEditModal}
+                          isClicked={props.isClicked}
+                          setSelectedItem={setSelectedItem}
+                          item={item}
+                          deleteItem={props.deleteItem}
                         />
                       </td>
                     </tr>
@@ -336,7 +354,9 @@ const InventoryTable = (props) => {
               >
                 <a
                   onClick={onPressPrev}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${
+                    props.page <= 1 ? 'pointer-events-none' : 'cursor-pointer'
+                  }`}
                 >
                   <span className="sr-only">Previous</span>
 
@@ -366,8 +386,13 @@ const InventoryTable = (props) => {
                 )}
 
                 <a
+                  disabled={true}
                   onClick={onPressNext}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${
+                    (props.offSet + 10) * props.page >= props.totalCount
+                      ? 'pointer-events-none'
+                      : 'cursor-pointer'
+                  }`}
                 >
                   <span className="sr-only">Next</span>
 
@@ -410,10 +435,12 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(inventoryActions.getItemsWithFilter(authToken, filter)),
   getItemsWithOrdering: (authToken, filter) =>
     dispatch(inventoryActions.getItemsWithOrdering(authToken, filter)),
-  getNextItems: (authToken, filter) =>
-    dispatch(inventoryActions.getNextItems(authToken, filter)),
+  getNextItems: (authToken, offset, page) =>
+    dispatch(inventoryActions.getNextItems(authToken, offset, page)),
   addItem: (authToken, payload) =>
     dispatch(inventoryActions.addItem(authToken, payload)),
+  editItem: (authToken, payload, slug) =>
+    dispatch(inventoryActions.editItem(authToken, payload, slug)),
   getItems: (authToken, payload) =>
     dispatch(inventoryActions.getItems(authToken, payload)),
   addSort: (sort) => dispatch(inventoryActions.addSort(sort)),
@@ -422,6 +449,8 @@ const mapDispatchToProps = (dispatch) => ({
   clearFilter: () => dispatch(inventoryActions.clearFilter()),
   getOrdersPerItem: (authToken, slug, date) =>
     dispatch(inventoryActions.getOrdersPerItem(authToken, slug, date)),
+  deleteItem: (authToken, slug) =>
+    dispatch(inventoryActions.deleteItem(authToken, slug)),
 });
 
 export default withRouter(

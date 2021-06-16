@@ -19,6 +19,7 @@ const initialState = {
 };
 
 const data = (state = initialState, action) => {
+  console.log(action);
   switch (action.type) {
     case actionTypes.GET_ITEMS_START:
       return {

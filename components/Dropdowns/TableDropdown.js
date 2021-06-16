@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPopper } from '@popperjs/core';
-import Dots from '../../assets/svg/Dots';
+import { useSession } from 'next-auth/client';
+
 const NotificationDropdown = (props) => {
   // dropdown props
   const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
   const btnDropdownRef = React.createRef();
   const popoverDropdownRef = React.createRef();
+  const [session, loading] = useSession();
+  useEffect(() => {
+    if (dropdownPopoverShow) setDropdownPopoverShow(false);
+  }, [props.isClicked]);
+
   const openDropdownPopover = () => {
     createPopper(btnDropdownRef.current, popoverDropdownRef.current, {
       placement: 'left-start',
@@ -38,6 +44,7 @@ const NotificationDropdown = (props) => {
         <button
           onClick={(e) => {
             props.setShowEditModal(true);
+            props.setSelectedItem(props.item);
             closeDropdownPopover();
             e.preventDefault();
             e.stopPropagation();
@@ -51,6 +58,7 @@ const NotificationDropdown = (props) => {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
+            props.deleteItem(session.user.auth_token, props.item.slug);
           }}
           class="bg-red-600 w-full flex justify-center  text-white hover:bg-red-800 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
         >

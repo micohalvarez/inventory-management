@@ -37,6 +37,8 @@ const Inventory = (props) => {
         getItems={props.getItems}
         setShowSideBar={setShowSideBar}
         showSideBar={showSideBar}
+        searchItem={props.searchItem}
+        resetData={props.getItems}
       />
       <div
         onClick={(e) => {
@@ -44,7 +46,6 @@ const Inventory = (props) => {
         }}
         className=" flex flex-col flex-1 px-4 mt-24  "
       >
-        {/* <button onClick={signOutClick}>SIGN OUT</button> */}
         <InventoryTable
           isClicked={!isClicked}
           items={props.items}
@@ -64,6 +65,8 @@ const mapDispatchToProps = (dispatch) => ({
   getCategories: (authToken) =>
     dispatch(inventoryActions.getCategories(authToken)),
   getAllItems: (authToken) => dispatch(inventoryActions.getAllItems(authToken)),
+  searchItem: (authToken, slug) =>
+    dispatch(inventoryActions.searchItem(authToken, slug)),
 });
 
 export async function getServerSideProps(context) {
