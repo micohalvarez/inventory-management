@@ -47,8 +47,8 @@ const SalesTable = (props) => {
 
       props.getNextItems(
         session.user.auth_token,
-        props.offSet + multiplier,
-        props.page + (parseInt(event.target.innerText) - 1)
+        multiplier,
+        parseInt(event.target.innerText)
       );
     }
   };
@@ -85,7 +85,15 @@ const SalesTable = (props) => {
           <a
             key={i}
             onClick={onPressNumber}
-            className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ${
+              props.page === maxPages && i === maxPages
+                ? 'pointer-events-none'
+                : 'cursor-pointer'
+            } ${
+              props.page <= 1 && i === indexStart + 1
+                ? 'pointer-events-none'
+                : 'cursor-pointer'
+            }`}
           >
             {i}
           </a>
@@ -99,7 +107,6 @@ const SalesTable = (props) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
-  console.log(session.user.auth_token);
   return (
     <>
       <FormModal
@@ -128,6 +135,12 @@ const SalesTable = (props) => {
       <EditModal
         showModal={showEditModal}
         closeModal={() => setShowEditModal(false)}
+        paymentTypes={props.paymentTypes}
+        setSuccessModal={setSuccessModal}
+        setModalMessage={setModalMessage}
+        setModalError={setModalError}
+        selectedItem={selectedItem}
+        setSelectedItem={setSelectedItem}
       />
       <SuccessModal
         showModal={successModal}
@@ -207,11 +220,11 @@ const SalesTable = (props) => {
                   Date Created
                 </th>
 
-                <th
+                {/* <th
                   className={
                     'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
                   }
-                ></th>
+                ></th> */}
               </tr>
             </thead>
             <tbody>
@@ -258,12 +271,17 @@ const SalesTable = (props) => {
                           .toUpperCase()}
                       </td>
 
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-right">
+                      {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-right">
                         <TableDropdown
                           setShowEditModal={setShowEditModal}
                           showEditModal={showEditModal}
+                          isClicked={props.isClicked}
+                          setSelectedItem={setSelectedItem}
+                          item={item}
+                          deleteItem={props.deleteItem}
+                          status={item.status}
                         />
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </>
@@ -324,7 +342,9 @@ const SalesTable = (props) => {
               >
                 <a
                   onClick={onPressPrev}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${
+                    props.page <= 1 ? 'pointer-events-none' : 'cursor-pointer'
+                  }`}
                 >
                   <span className="sr-only">Previous</span>
 
@@ -355,7 +375,11 @@ const SalesTable = (props) => {
 
                 <a
                   onClick={onPressNext}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${
+                    props.offSet * props.page > props.totalCount
+                      ? 'pointer-events-none'
+                      : 'cursor-pointer'
+                  }`}
                 >
                   <span className="sr-only">Next</span>
 

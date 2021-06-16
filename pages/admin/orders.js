@@ -34,6 +34,8 @@ const Orders = (props) => {
         getItems={props.getItems}
         setShowSideBar={setShowSideBar}
         showSideBar={showSideBar}
+        searchItem={props.searchOrders}
+        resetData={props.getOrders}
       />
       <div
         onClick={(e) => {
@@ -41,10 +43,7 @@ const Orders = (props) => {
         }}
         className=" flex flex-col flex-1 px-4 mt-24  "
       >
-        <OrdersTable
-          orders={props.orders}
-          authToken={session.user.auth_token}
-        />
+        <OrdersTable isClicked={!isClicked} />
       </div>
     </Admin>
   );
@@ -62,6 +61,9 @@ const mapDispatchToProps = (dispatch) => ({
   getItems: (authToken) => dispatch(inventoryActions.getItems(authToken)),
   getPaymentTypes: (authToken) =>
     dispatch(salesActions.getPaymentTypes(authToken)),
+
+  searchOrders: (authToken, id) =>
+    dispatch(orderActions.searchOrders(authToken, id)),
 });
 
 export async function getServerSideProps(context) {

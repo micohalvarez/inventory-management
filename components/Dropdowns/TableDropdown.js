@@ -24,15 +24,26 @@ const NotificationDropdown = (props) => {
   return (
     <>
       <a
-        className="text-gray-600 py-1 px-3"
+        className={`text-gray-600 py-1 px-3 ${
+          props.disabled ? 'pointer-events-none text-gray-300' : ''
+        } ${
+          props.status !== 'paid' && props.status !== 'cancelled'
+            ? 'hover:text-gray-800'
+            : ''
+        }`}
         ref={btnDropdownRef}
         onClick={(e) => {
-          e.preventDefault();
           e.stopPropagation();
           dropdownPopoverShow ? closeDropdownPopover() : openDropdownPopover();
         }}
       >
-        <i className="fas fa-ellipsis-v"></i>
+        {props.status === 'paid' ? (
+          <i className="fas fa-check"></i>
+        ) : props.status === 'cancelled' ? (
+          <i className="fas fa-ban "></i>
+        ) : (
+          <i className="fas fa-ellipsis-v"></i>
+        )}
       </a>
       <div
         ref={popoverDropdownRef}

@@ -39,6 +39,46 @@ export const getOrders = (authToken) => {
   };
 };
 
+export const searchOrders = (authToken, id) => {
+  return (dispatch, getState) => {
+    dispatch({ type: actionTypes.GET_ORDERS_START });
+
+    authInstance
+      .get(`/purchase_order/?order_number=${id}`, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      })
+      .then((res) => {
+        if (res.status === 200 && res.data) {
+          var array = [];
+          dispatch({
+            type: actionTypes.GET_ORDERS_SUCCESS,
+            payload: {
+              orders: res.data.results,
+              count: res.data.count,
+              offSet: 0,
+              page: 1,
+            },
+          });
+        } else if (res.response.status === 404) {
+          dispatch({
+            type: actionTypes.GET_ORDERS_SUCCESS,
+            payload: {
+              orders: [],
+              count: 0,
+              offSet: 0,
+              page: 1,
+            },
+          });
+        }
+      })
+      .catch(({ response }) => {
+        dispatch({ type: actionTypes.GET_ORDERS_FAIL });
+      });
+  };
+};
+
 export const getNextItems = (authToken, offSet, page) => {
   return (dispatch, getState) => {
     const orders = getState().orders;

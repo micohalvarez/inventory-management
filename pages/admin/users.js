@@ -14,20 +14,12 @@ import * as userActions from '../../redux/actions/userActions';
 import { getSession, useSession } from 'next-auth/client';
 
 const Users = (props) => {
-  const [authToken, setAuthToken] = useState(false);
   const [isClicked, setClicked] = useState(false);
   const [showSideBar, setShowSideBar] = useState(true);
   const [session, loading] = useSession();
 
   useEffect(() => {
-    const authCreds = localStorage.getLocalStorage('authCreds');
-
-    if (!authCreds) {
-      Router.push('/');
-    } else {
-      setAuthToken(authCreds.authToken);
-      props.getUsers(authCreds.authToken);
-    }
+    props.getUsers(session.user.auth_token);
   }, []);
 
   return (
@@ -38,6 +30,8 @@ const Users = (props) => {
         getItems={props.getItems}
         setShowSideBar={setShowSideBar}
         showSideBar={showSideBar}
+        searchItem={props.searchUsers}
+        resetData={props.getUsers}
       />
       <div
         onClick={(e) => {
@@ -45,7 +39,7 @@ const Users = (props) => {
         }}
         className=" flex flex-col flex-1 px-4 mt-24  "
       >
-        <UsersTable users={props.users} />
+        <UsersTable isClicked={!isClicked} />
       </div>
     </Admin>
   );
@@ -57,6 +51,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getUsers: (authToken) => dispatch(userActions.getUsers(authToken)),
+  searchUsers: (authToken, id) =>
+    dispatch(userActions.searchUsers(authToken, id)),
 });
 
 export async function getServerSideProps(context) {

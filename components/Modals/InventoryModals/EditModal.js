@@ -3,8 +3,6 @@ import imageCompression from 'browser-image-compression';
 import { useSession } from 'next-auth/client';
 
 const EditModal = (props) => {
-  console.log(props.selectedItem);
-
   useEffect(() => {
     if (props.selectedItem) {
       setCode(props.selectedItem.code);

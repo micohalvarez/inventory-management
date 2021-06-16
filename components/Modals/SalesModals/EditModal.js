@@ -1,138 +1,56 @@
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
+import { withRouter } from 'next/router';
+import { connect } from 'react-redux';
+import * as salesActions from '../../../redux/actions/salesActions';
+import { Alert } from 'reactstrap';
+import { useSession } from 'next-auth/client';
+import SuccessModal from '../SuccessModal';
 const EditModal = (props) => {
-  const [newItems, setNewitems] = useState([
-    <>
-      <tr className="mt-1 justify-center align-center text-gray-800 border-gray-200 ">
-        <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap ">
-          <select
-            id="item_type"
-            placeholder="Item Type/Category"
-            name="item_type"
-            autocomplete="item_type"
-            class="px-2 mt-1 w-64 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          >
-            <option class="text-color-gray-300" value="" disabled hidden>
-              Item Code
-            </option>
-            <option selected>Type 1</option>
-            <option>Type 2</option>
-            <option>Type 3</option>
-          </select>
-        </td>
-        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-          <input
-            type="text"
-            value="50"
-            placeholder="Quantity"
-            name="quantity"
-            id="quantity"
-            autocomplete="quantity"
-            class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </td>
-        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-          <span> ₱400 PHP</span>
-        </td>
-        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-          <select
-            id="item_type"
-            placeholder="Item Type/Category"
-            name="item_type"
-            autocomplete="item_type"
-            class="px-2 mt-1 w-32 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          >
-            <option class="text-color-gray-300" value="" disabled hidden>
-              No Discount
-            </option>
-            <option selected>Type 1</option>
-            <option>Type 2</option>
-            <option>Type 3</option>
-          </select>
-        </td>
-        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-          <span> ₱5,000 PHP</span>
-        </td>
-        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-          <i className="fas fa-trash-alt mr-2 text-red-500 hover:text-red-600 cursor-pointer"></i>
-        </td>
-      </tr>
-      <tr className="mt-1 justify-center align-center text-gray-800 border-gray-200 ">
-        <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap ">
-          <select
-            id="item_type"
-            placeholder="Item Type/Category"
-            name="item_type"
-            autocomplete="item_type"
-            class="px-2 mt-1 w-64 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          >
-            <option class="text-color-gray-300" value="" disabled hidden>
-              Item Code
-            </option>
-            <option selected>Type 1</option>
-            <option>Type 2</option>
-            <option>Type 3</option>
-          </select>
-        </td>
-        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-          <input
-            type="text"
-            placeholder="Quantity"
-            name="quantity"
-            id="quantity"
-            value="50"
-            autocomplete="quantity"
-            class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </td>
-        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-          <span> ₱400 PHP</span>
-        </td>
-        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-          <select
-            id="item_type"
-            placeholder="Item Type/Category"
-            name="item_type"
-            autocomplete="item_type"
-            class="px-2 mt-1 w-32 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          >
-            <option
-              class="text-color-gray-300"
-              value=""
-              disabled
-              hidden
-              selected
-            >
-              No Discount
-            </option>
-            <option>Type 1</option>
-            <option>Type 2</option>
-            <option>Type 3</option>
-          </select>
-        </td>
-        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-          <span> ₱5,000 PHP</span>
-        </td>
-        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-          <i className="fas fa-trash-alt mr-2 text-red-500 hover:text-red-600 cursor-pointer"></i>
-        </td>
-      </tr>
-      <tr
-        onClick={() => {
-          addNewItem();
-        }}
-        className="hover:bg-green-500 hover:text-white cursor-pointer  bg-gray-200 justify-center align-center text-gray-800 border-gray-200 "
-      >
-        <td colSpan="6" align="center" className="py-3">
-          <span className="ml-3  font-bold align-center text-center">
-            <i className="fas fa-plus mr-2"></i> Add Item
-          </span>
-        </td>
-      </tr>
-    </>,
+  console.log(props.selectedItem);
+  const [session, loading] = useSession();
+
+  const [modalError, setModalError] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [successModal, setSuccessModal] = useState(false);
+
+  const [items, setItems] = useState([
+    { type: null, product: null, price: 0, quantity: 1 },
   ]);
 
+  const [submitItems, setSubmitItems] = useState([
+    { product: null, quantity: 1 },
+  ]);
+
+  const [totalDiscount, setTotalDiscount] = useState(0);
+  const [totalDiscountAmount, setTotalDiscountAmount] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+
+  const [quantity, setQuantity] = useState([0]);
+  const [choices, setChoices] = useState(props.items);
   const [isContinue, setContinue] = useState(false);
+
+  const [newItems, setNewitems] = useState([]);
+
+  useEffect(() => {
+    if (props.selectedItem) {
+      console.log('hi');
+      setTotalAmount(props.selectedItem.total);
+
+      setTotalDiscount(props.selectedItem.total_discount * 10);
+
+      var newItems = [];
+      props.selectedItem.items.map((item, index) => {
+        console.log(item);
+        newItems.push([{ type: null, product: null, price: 0, quantity: 1 }]);
+        newItems[index].type = item.product.category.id;
+        newItems[index].product = item.product.id;
+        newItems[index].quantity = item.quantity;
+        newItems[index].price = item.quantity * item.unit_price;
+      });
+      setItems(newItems);
+    }
+  }, [props.selectedItem]);
+
   const [finalItems, setFinalItems] = useState([
     <>
       <tr className="mt-1 justify-center align-center text-gray-800 border-gray-200 ">
@@ -171,100 +89,202 @@ const EditModal = (props) => {
       </tr>
     </>,
   ]);
+
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
   const addNewItem = () => {
-    newItems.splice(
-      0,
-      0,
-      <>
-        <tr className="mt-1 justify-center align-center text-gray-800 border-gray-200 ">
-          <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap ">
-            <select
-              id="item_type"
-              placeholder="Item Type/Category"
-              name="item_type"
-              autocomplete="item_type"
-              class="px-2 mt-1 w-64 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            >
-              <option
-                class="text-color-gray-300"
-                value=""
-                disabled
-                hidden
-                selected
-              >
-                Item Code
-              </option>
-              <option>Type 1</option>
-              <option>Type 2</option>
-              <option>Type 3</option>
-            </select>
-          </td>
-          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-            <input
-              type="text"
-              placeholder="Quantity"
-              name="price"
-              id="price"
-              autocomplete="price"
-              class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md"
-            />
-          </td>
-          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-            <span> ₱400 PHP</span>
-          </td>
-          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-            <select
-              id="item_type"
-              placeholder="Item Type/Category"
-              name="item_type"
-              autocomplete="item_type"
-              class="px-2 mt-1 w-32 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            >
-              <option
-                class="text-color-gray-300"
-                value=""
-                disabled
-                hidden
-                selected
-              >
-                No Discount
-              </option>
-              <option>Type 1</option>
-              <option>Type 2</option>
-              <option>Type 3</option>
-            </select>
-          </td>
-          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-            <span> ₱5,000 PHP</span>
-          </td>
-          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-            <i className="fas fa-trash-alt mr-2 text-red-500 hover:text-red-600 cursor-pointer"></i>
-          </td>
-        </tr>
-      </>
-    );
-    setNewitems([...newItems]);
+    let testItems = [...items];
+    let subItems = [...submitItems];
+
+    testItems.push({
+      type: null,
+      product: null,
+      quantity: 1,
+      price: 0,
+    });
+    subItems.push({ product: null, quantity: 1 });
+
+    setSubmitItems(subItems);
+
+    setItems(testItems);
   };
 
+  const removeItem = (event, indexItem) => {
+    event.preventDefault();
+    if (items.length === 1) {
+      setModalError(true);
+      setSuccessModal(true);
+      setModalMessage('Cannot delete anymore items.');
+    } else {
+      setItems(items.filter((item, index) => index !== indexItem));
+
+      setSubmitItems(submitItems.filter((item, index) => index !== indexItem));
+    }
+  };
+
+  const [discountError, setDiscountError] = useState(false);
+
+  const handleDiscount = (event) => {
+    event.preventDefault();
+    setDiscountError('');
+    if (!(event.target.value > 100 || event.target.value < 0)) {
+      setTotalDiscount(event.target.value);
+      console.log(totalDiscount);
+    }
+  };
+
+  const handleQuantity = (event, index) => {
+    event.preventDefault();
+    let testItems = [...items];
+    let subItems = [...submitItems];
+
+    if (!(event.target.value > 10000 || event.target.value < 0)) {
+      testItems[index].quantity = event.target.value;
+
+      subItems[index].quantity = event.target.value;
+
+      handleTotalAmount();
+      setSubmitItems(subItems);
+      setItems(testItems);
+    }
+  };
+
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  const handleTotalAmount = () => {
+    let totalAmount = 0;
+    items.map((item) => {
+      totalAmount += item.price * item.quantity;
+    });
+
+    setTotalAmount(totalAmount);
+  };
+
+  const handleName = (event) => {
+    event.preventDefault();
+    setNameError('');
+    setName(event.target.value);
+  };
+
+  const handleType = (event, index, id) => {
+    event.preventDefault();
+    setType(event.target.value);
+    let testItems = [...items];
+
+    let subItems = [...submitItems];
+    testItems[index].price = props.items[event.target.value].unit_price;
+    testItems[index].type = event.target.value;
+
+    subItems[index].product = id;
+    subItems[index].quantity = testItems[index].quantity;
+
+    setSubmitItems(subItems);
+    setItems(testItems);
+    handleTotalAmount();
+  };
+
+  const [paymentType, setPaymentType] = useState(null);
+  const [bankName, setBankName] = useState(null);
+  const [accountNum, setAccountNum] = useState(null);
+  const [accountName, setAccountName] = useState(null);
+
+  const handlePaymentType = (event) => {
+    event.preventDefault();
+    setType(event.target.value);
+    setPaymentType(event.target.value);
+  };
+  const handleAccountNum = (event) => {
+    event.preventDefault();
+    setAccountNum(event.target.value);
+  };
+  const handleAccountName = (event) => {
+    event.preventDefault();
+    setAccountName(event.target.value);
+  };
+  const handleBankName = (event) => {
+    event.preventDefault();
+    setBankName(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    var hasError = false;
+    submitItems.map((item) => {
+      console.log(item);
+      if (item.quantity <= 0) {
+        hasError = true;
+        setModalMessage('Quantities must be greater than 0.');
+      }
+      if (item.product === null) {
+        hasError = true;
+        setModalMessage('Order Form has no products added.');
+      }
+    });
+
+    if (hasError) {
+      setModalError(true);
+      setSuccessModal(true);
+      return false;
+    } else {
+      props
+        .createSalesOrder(
+          session.user.auth_token,
+          submitItems,
+
+          totalDiscount
+        )
+        .then((res) => {
+          console.log(res);
+          if (res.status === 200) {
+            props.setModalMessage(
+              'You have successfully added a new sales order.'
+            );
+            props.setModalError(false);
+            props.setSuccessModal(true);
+            props.getSales(session.user.auth_token);
+          } else {
+            props.setModalMessage('One of the items you added is out of stock');
+            props.setModalError(true);
+            props.setSuccessModal(true);
+          }
+        })
+        .catch((error) => {
+          props.setModalMessage(
+            'A server error has occurred. Please try again later'
+          );
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        });
+      clearState();
+    }
+  };
+
+  const handlePaymentSubmit = (event) => {
+    event.preventDefault();
+    const payload = {
+      order: props.newOrder.id,
+      type: paymentType,
+      bank_name: bankName,
+      account_name: accountName,
+      accountNum: accountNum,
+    };
+
+    props.addPaymentMethod(session.user.auth_token, payload);
+  };
   const clearState = () => {
     props.closeModal();
     setContinue(false);
-    setNewitems([
-      <>
-        <tr
-          onClick={() => {
-            addNewItem();
-          }}
-          className="hover:bg-green-500 hover:text-white cursor-pointer  bg-gray-200 justify-center align-center text-gray-800 border-gray-200 "
-        >
-          <td colSpan="6" align="center" className="py-3">
-            <span className="ml-3  font-bold align-center text-center">
-              <i className="fas fa-plus mr-2"></i> Add Item
-            </span>
-          </td>
-        </tr>
-      </>,
-    ]);
+    setItems([{ type: null, product: null, price: 0, quantity: 1 }]);
+    setTotalAmount(0);
+    setTotalDiscount(0);
+    setTotalDiscountAmount(0);
+    setSuccessModal(false);
+    setSubmitItems([{ product: null, quantity: 0 }]);
   };
 
   return (
@@ -291,7 +311,13 @@ const EditModal = (props) => {
                     </span>
                   </button>
                 </div>
-                {!isContinue ? (
+                <SuccessModal
+                  showModal={successModal}
+                  closeModal={() => setSuccessModal(false)}
+                  message={modalMessage}
+                  hasError={modalError}
+                />
+                {true ? (
                   <div className="p-6 flex-auto mt-10 sm:mt-0">
                     <div className="md:grid md:grid-cols-2 md:gap-6">
                       <div className="md:col-span-1">
@@ -307,106 +333,7 @@ const EditModal = (props) => {
                       <div className="mt-5 md:mt-0 md:col-span-2">
                         <form action="#" method="POST">
                           <div className="shadow overflow-hidden sm:rounded-md bg-">
-                            <div className="px-4 py-5 bg-white sm:p-6">
-                              <div className="grid grid-cols-6 gap-6">
-                                <div className="col-span-8 sm:col-span-3">
-                                  <label
-                                    for="sales_number"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Sales Order Number
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value="00001"
-                                    placeholder="Sales Order Number"
-                                    name="sales_number"
-                                    id="sales_number"
-                                    autocomplete="given-name"
-                                    className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                  />
-                                </div>
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="customer_name"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Customer Name
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value="Customer 5"
-                                    placeholder="Customer Name"
-                                    name="customer_name"
-                                    id="customer_name"
-                                    autocomplete="given-name"
-                                    className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                  />
-                                </div>
-
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="sales_date"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Sales Order Date
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="Sales Order Date"
-                                    value="03/01/2021"
-                                    name="sales_date"
-                                    id="sales_date"
-                                    autocomplete="given-name"
-                                    className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                  />
-                                </div>
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="shipment_date"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Shipment Date
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="Shipment Date"
-                                    name="shipment_date"
-                                    value="03/05/2021"
-                                    id="shipment_date"
-                                    autocomplete="given-name"
-                                    className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                  />
-                                </div>
-                                <div className="col-span-6 sm:col-span-3">
-                                  <label
-                                    for="payment_type"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Payment Type
-                                  </label>
-                                  <select
-                                    id="item_type"
-                                    name="item_type"
-                                    autocomplete="item_type"
-                                    class="text-color-gray-300 mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                  >
-                                    <option
-                                      class="text-color-gray-300"
-                                      value=""
-                                      disabled
-                                      hidden
-                                    >
-                                      Payment Type
-                                    </option>
-                                    <option selected>Cash</option>
-                                    <option>Card</option>
-                                    <option>Cheque</option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="p-6 h-2/5 overflow-y-auto">
+                            <div className="p-6 h-2/5 max-h-80 overflow-y-auto">
                               <table className="items-center w-full bg-transparent border-collapse">
                                 <thead className="bg-gray-100 ">
                                   <tr>
@@ -431,19 +358,13 @@ const EditModal = (props) => {
                                     >
                                       Price
                                     </th>
+
                                     <th
                                       className={
                                         'px-6 align-middle border border-l-0 border-r-0 border-solid py-3 text-sm uppercase whitespace-no-wrap font-semibold text-left'
                                       }
                                     >
-                                      Discount
-                                    </th>
-                                    <th
-                                      className={
-                                        'px-6 align-middle border border-l-0 border-r-0 border-solid py-3 text-sm uppercase whitespace-no-wrap font-semibold text-left'
-                                      }
-                                    >
-                                      Total Amount
+                                      Amount
                                     </th>
                                     <th
                                       className={
@@ -452,7 +373,186 @@ const EditModal = (props) => {
                                     ></th>
                                   </tr>
                                 </thead>
-                                <tbody>{newItems}</tbody>
+                                <tbody>
+                                  {items.map((item, index) => (
+                                    <>
+                                      <tr className="mt-1 justify-center align-center text-gray-800 border-gray-200 ">
+                                        <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap ">
+                                          <select
+                                            onChange={(event) => {
+                                              handleType(
+                                                event,
+                                                index,
+                                                props.items[event.target.value]
+                                                  .id
+                                              );
+                                            }}
+                                            id="item_type"
+                                            placeholder="Item Type/Category"
+                                            name="item_type"
+                                            autocomplete="item_type"
+                                            value={item.type}
+                                            class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                          >
+                                            <option
+                                              class="text-color-gray-300"
+                                              value=""
+                                              disabled
+                                              hidden
+                                              selected
+                                            >
+                                              Item Type/Brand
+                                            </option>
+
+                                            {props.items.map((test, index) => (
+                                              <option
+                                                key={test.id}
+                                                value={index}
+                                              >
+                                                {test.name}
+                                              </option>
+                                            ))}
+                                          </select>
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                          <input
+                                            type="number"
+                                            disabled={
+                                              item.type === null ? true : false
+                                            }
+                                            value={item.quantity}
+                                            onChange={(event) =>
+                                              handleQuantity(event, index)
+                                            }
+                                            placeholder="Quantity"
+                                            name="quantity"
+                                            id="quantity"
+                                            autocomplete="quantity"
+                                            class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                          />
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                          <span>
+                                            {numberWithCommas(item.price)}
+                                          </span>
+                                        </td>
+
+                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                          <span>
+                                            {numberWithCommas(
+                                              item.price * item.quantity
+                                            )}
+                                          </span>
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                          <i
+                                            onClick={(event) =>
+                                              removeItem(event, index)
+                                            }
+                                            className="fas fa-trash-alt mr-2 text-red-500 hover:text-red-600 cursor-pointer"
+                                          ></i>
+                                        </td>
+                                      </tr>
+                                    </>
+                                  ))}
+                                  <tr>
+                                    <th
+                                      className={
+                                        'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                      }
+                                      align="end"
+                                    >
+                                      <span>Total Discount (%)</span>
+                                    </th>
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                      <input
+                                        min="1"
+                                        max="100"
+                                        disabled={
+                                          items[0].type === null ? true : false
+                                        }
+                                        maxLength="100"
+                                        type="number"
+                                        value={totalDiscount}
+                                        onChange={(event) =>
+                                          handleDiscount(event)
+                                        }
+                                        placeholder="Discount"
+                                        name="discount"
+                                        id="discount"
+                                        autocomplete="discount"
+                                        class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                      />
+                                      {discountError ? (
+                                        <span className="text-red-500">
+                                          {discountError}
+                                        </span>
+                                      ) : null}
+                                    </td>
+                                    <th
+                                      className={
+                                        'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                      }
+                                      align="end"
+                                    >
+                                      <span>Total Discount</span>
+                                    </th>
+                                    <td
+                                      className={
+                                        ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                      }
+                                    >
+                                      <span>{`₱ ${
+                                        totalDiscount > 0
+                                          ? numberWithCommas(
+                                              totalAmount *
+                                                (totalDiscount / 100)
+                                            )
+                                          : 0
+                                      } PHP`}</span>
+                                    </td>
+                                  </tr>
+                                </tbody>
+
+                                <tfoot>
+                                  <th
+                                    className={
+                                      'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                    }
+                                    align="end"
+                                  >
+                                    <span>SubTotal</span>
+                                  </th>
+                                  <td
+                                    className={
+                                      ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                    }
+                                  >
+                                    <span>{`₱ ${numberWithCommas(
+                                      totalAmount
+                                    )} PHP`}</span>
+                                  </td>
+                                  <th
+                                    className={
+                                      'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                    }
+                                    align="end"
+                                  >
+                                    <span>Total Amount</span>
+                                  </th>
+                                  <td
+                                    className={
+                                      ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
+                                    }
+                                  >
+                                    <span>{`₱ ${
+                                      totalDiscount
+                                        ? totalAmount -
+                                          totalAmount * (totalDiscount / 100)
+                                        : totalAmount
+                                    } PHP`}</span>
+                                  </td>
+                                </tfoot>
                               </table>
                             </div>
 
@@ -467,7 +567,7 @@ const EditModal = (props) => {
                               <button
                                 className="bg-gray-600 text-white hover:bg-gray-800 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                                 type="button"
-                                onClick={() => setContinue(true)}
+                                onClick={(event) => handleSubmit(event)}
                               >
                                 Continue
                               </button>
@@ -490,7 +590,7 @@ const EditModal = (props) => {
                               Sales Order Number
                             </label>
                             <p className="block text-base font-medium">
-                              #00001
+                              {props.newOrder.order_number}
                             </p>
                           </div>
                           <div className="col-span-6 sm:col-span-3">
@@ -498,13 +598,13 @@ const EditModal = (props) => {
                               for="customer_name"
                               className="block text-sm font-medium text-gray-700"
                             >
-                              Customer Name
+                              Status
                             </label>
                             <p className="block text-base font-medium">
-                              Customer
+                              {props.newOrder.status}
                             </p>
                           </div>
-                          <div className="col-span-6 sm:col-span-3">
+                          <div className="col-span-6 sm:col-span-6">
                             <label
                               for="sales_date"
                               className="block text-sm font-medium text-gray-700"
@@ -512,92 +612,116 @@ const EditModal = (props) => {
                               Sales Order Date
                             </label>
                             <p className="block text-base font-medium ">
-                              03/10/2021
+                              {new Date(props.newOrder.created).toDateString}
                             </p>
                           </div>
+
                           <div className="col-span-6 sm:col-span-3">
                             <label
-                              for="shipment_date"
-                              className="block text-sm font-medium text-gray-700"
-                            >
-                              Shipment Date
-                            </label>
-                            <p className="block text-base font-medium ">
-                              03/15/2021
-                            </p>
-                          </div>
-                          <div className="col-span-6 sm:col-span-3">
-                            <label
-                              for="payment_type"
+                              for="sales_date"
                               className="block text-sm font-medium text-gray-700"
                             >
                               Payment Type
                             </label>
-                            <p className="block text-base font-medium ">Cash</p>
+                            <select
+                              onChange={(event) => {
+                                handlePaymentType(event);
+                              }}
+                              id="item_type"
+                              placeholder="Item Type/Category"
+                              name="item_type"
+                              autocomplete="item_type"
+                              class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            >
+                              <option
+                                class="text-color-gray-300"
+                                value=""
+                                disabled
+                                hidden
+                                selected
+                              >
+                                Item Type/Category
+                              </option>
+
+                              {props.paymentTypes.map((test) => (
+                                <option key={test.id} value={test.id}>
+                                  {test.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div className="col-span-6 sm:col-span-3">
+                            <label
+                              for="sales_date"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              Account Number
+                            </label>
+                            <input
+                              value={accountNum}
+                              onChange={handleAccountNum}
+                              disabled={
+                                paymentType === null || paymentType < 2
+                                  ? true
+                                  : false
+                              }
+                              type="text"
+                              placeholder="Account Number"
+                              name="account_number"
+                              id="account_number"
+                              autocomplete="given-name"
+                              className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                            />
+                          </div>
+                          <div className="col-span-6 sm:col-span-3">
+                            <label
+                              for="sales_date"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              Bank Name
+                            </label>
+                            <input
+                              value={bankName}
+                              onChange={handleBankName}
+                              disabled={
+                                paymentType === null || paymentType < 2
+                                  ? true
+                                  : false
+                              }
+                              type="text"
+                              placeholder="Bank Name"
+                              name="bank_name"
+                              id="bank_name"
+                              autocomplete="given-name"
+                              className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                            />
+                          </div>
+                          <div className="col-span-6 sm:col-span-3">
+                            <label
+                              for="sales_date"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              Amount Date
+                            </label>
+                            <input
+                              value={accountName}
+                              onChange={handleAccountName}
+                              disabled={
+                                paymentType === null || paymentType < 2
+                                  ? true
+                                  : false
+                              }
+                              type="text"
+                              placeholder="Amount Date"
+                              name="bank_name"
+                              id="bank_name"
+                              autocomplete="given-name"
+                              className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                            />
                           </div>
                         </div>
-                        <div className="mt-4">
-                          <table className="items-center w-full bg-transparent border-collapse">
-                            <thead className="bg-gray-100 ">
-                              <tr>
-                                <th
-                                  className={
-                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                  }
-                                >
-                                  Sales Order Number
-                                </th>
-                                <th
-                                  className={
-                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                  }
-                                >
-                                  Quantity
-                                </th>
-                                <th
-                                  className={
-                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                  }
-                                >
-                                  Price
-                                </th>
-                                <th
-                                  className={
-                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                  }
-                                >
-                                  Discount
-                                </th>
-                                <th
-                                  className={
-                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
-                                  }
-                                >
-                                  Amount
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>{finalItems}</tbody>
-                            <tfoot>
-                              <th
-                                className={
-                                  'px-6  py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
-                                }
-                                colSpan="4"
-                                align="end"
-                              >
-                                <span>Total Amount</span>
-                              </th>
-                              <td
-                                className={
-                                  ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold  text-black border-gray-200'
-                                }
-                              >
-                                <span>₱10,000 PHP</span>
-                              </td>
-                            </tfoot>
-                          </table>
-                        </div>
+
                         <div className="mt-4 text-right ">
                           <button
                             className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -609,7 +733,7 @@ const EditModal = (props) => {
                           <button
                             className="bg-gray-600 text-white hover:bg-gray-800 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                             type="button"
-                            onClick={() => props.closemodal()}
+                            onClick={(event) => handlePaymentSubmit(event)}
                           >
                             Continue
                           </button>
@@ -628,4 +752,26 @@ const EditModal = (props) => {
   );
 };
 
-export default EditModal;
+const mapStateToProps = (state) => ({
+  items: state.inventory.items,
+  newOrder: state.sales.newOrder,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  getSales: (authToken) => dispatch(salesActions.getSales(authToken)),
+  createSalesOrder: (authToken, payload, totalDiscount) =>
+    dispatch(
+      salesActions.createSalesOrder(
+        authToken,
+        payload,
+
+        totalDiscount
+      )
+    ),
+  addPaymentMethod: (authToken, payload) =>
+    dispatch(salesActions.addPaymentMethod(authToken, payload)),
+});
+
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(EditModal)
+);

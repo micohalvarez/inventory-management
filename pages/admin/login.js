@@ -47,6 +47,7 @@ const Login = (props) => {
   };
 
   const handleSubmit = (event) => {
+    event.stopPropagation();
     event.preventDefault();
 
     clearErrors();
@@ -76,13 +77,7 @@ const Login = (props) => {
       props.loginNextAuth(payload);
     }
   };
-  const _handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      console.log('do validate');
-    }
-  };
 
-  console.log(props);
   return (
     <>
       <div className="container flex flex-col bg-gray-700 min-w-full min-h-screen justify-center">
@@ -90,10 +85,15 @@ const Login = (props) => {
           <div className="w-full lg:w-4/12 px-4">
             <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-gray-300 border-0">
               <div className="rounded-t mb-0 px-6 py-6"></div>
-              <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
+
+              <form
+                onSubmit={handleSubmit}
+                className="flex-auto px-4 lg:px-10 py-10 pt-0"
+              >
                 <div className="text-gray-500 text-center mb-3 font-bold">
                   <medium>Sign in with credentials</medium>
                 </div>
+
                 <div className="relative w-full mb-3">
                   <label
                     className="block uppercase text-gray-700 text-xs font-bold mb-2"
@@ -137,25 +137,15 @@ const Login = (props) => {
                 <div className="text-center mt-6">
                   {/* <button type="button">Sign In</button> */}
 
-                  {/* <input
-                                            className="cursor-pointer bg-gray-900 hover:bg-gray-600 text-white active:bg-gray-700 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
-                                            type="submit"
-                                            value="Submit"
-                                        /> */}
                   <div className="text-center mt-6">
-                    <button
-                      type="button"
-                      className="flex justify-center cursor-pointer bg-gray-900 hover:bg-gray-600 text-white active:bg-gray-700 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
-                      onClick={handleSubmit}
-                    >
-                      Login
-                      {loading ? (
-                        <div class="rounded-lg animate-spin ease duration-300 w-5 h-5 ml-2 border-2 border-white"></div>
-                      ) : null}
-                    </button>
+                    <input
+                      className="cursor-pointer bg-gray-900 hover:bg-gray-600 text-white active:bg-gray-700 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
+                      type="submit"
+                      value="Submit"
+                    ></input>
                   </div>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>

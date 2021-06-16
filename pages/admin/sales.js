@@ -32,9 +32,10 @@ const Sales = (props) => {
       <AdminNavbar
         isClicked={!isClicked}
         user={session.user}
-        getItems={props.getItems}
         setShowSideBar={setShowSideBar}
         showSideBar={showSideBar}
+        searchItem={props.searchSales}
+        resetData={props.getSales}
       />
       <div
         onClick={(e) => {
@@ -42,17 +43,13 @@ const Sales = (props) => {
         }}
         className=" flex flex-col flex-1 px-4 mt-24  "
       >
-        <SalesTable sales={props.sales} authToken={session.user.auth_token} />
+        <SalesTable isClicked={!isClicked} />
       </div>
     </Admin>
   );
 };
 
-const mapStateToProps = (state) => ({
-  sales: state.sales.sales,
-  items: state.inventory.items,
-  allItems: state.inventory.allItems,
-});
+const mapStateToProps = (state) => ({});
 
 const mapDispatchToProps = (dispatch) => ({
   getSales: (authToken) => dispatch(salesActions.getSales(authToken)),
@@ -62,6 +59,8 @@ const mapDispatchToProps = (dispatch) => ({
   getAllItems: (authToken) => dispatch(inventoryActions.getAllItems(authToken)),
   getPaymentTypes: (authToken) =>
     dispatch(salesActions.getPaymentTypes(authToken)),
+  searchSales: (authToken, id) =>
+    dispatch(salesActions.searchSales(authToken, id)),
 });
 
 export async function getServerSideProps(context) {

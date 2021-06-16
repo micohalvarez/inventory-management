@@ -1,6 +1,121 @@
-import React from 'react';
+import { useSession } from 'next-auth/client';
+import React, { useState } from 'react';
 
 const FormModal = (props) => {
+  const [username, setUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [firstNameError, setFirstNameError] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
+  const [city, setCity] = useState('');
+  const [cityError, setCityError] = useState('');
+  const [userType, setUserType] = useState('');
+  const [userTypeError, setUserTypeError] = useState('');
+  const [session, loading] = useSession();
+  const [passwordSeen, setPasswordSeen] = useState(false);
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    let error = false;
+    removeErrors();
+    if (username == '') {
+      setUsernameError('Field Required');
+      error = true;
+    }
+    if (password == '') {
+      setPasswordError('Field Required');
+      error = true;
+    }
+    if (firstName == '') {
+      setFirstNameError('Field Required');
+      error = true;
+    }
+    if (lastName == '') {
+      setLastNameError('Field Required');
+      error = true;
+    }
+    if (city == '') {
+      setCityError('Field Required');
+      error = true;
+    }
+
+    if (userType == '') {
+      setUserTypeError('Field Required');
+      error = true;
+    }
+
+    if (!error) {
+      const payload = {
+        username: username,
+        password1: password,
+        city: city,
+        first_name: firstName,
+        last_name: lastName,
+        is_staff: true,
+        ...(userType === 1 && { groups: [1] }),
+      };
+
+      console.log(payload);
+      props
+        .createUser(session.user.auth_token, payload)
+        .then((res) => {
+          console.log(res);
+          if (res.status === 201) {
+            props.setModalMessage('You have successfully added a new user.');
+            props.setModalError(false);
+            props.setSuccessModal(true);
+            props.getUsers(session.user.auth_token);
+          } else {
+            for (var key in res.data) {
+              var value = res.data[key];
+            }
+            props.setModalMessage(value[0]);
+            props.setModalError(true);
+            props.setSuccessModal(true);
+          }
+        })
+        .catch((error) => {
+          props.setModalMessage(
+            'A server error has occurred. Please try again later'
+          );
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        });
+      clearState();
+    }
+  };
+
+  const removeErrors = () => {
+    setPasswordError('');
+
+    setUsernameError('');
+
+    setUserTypeError('');
+    setPasswordError('');
+
+    setCityError('');
+    setFirstNameError('');
+    setLastNameError('');
+  };
+  const clearState = () => {
+    setPassword('');
+    setPasswordError('');
+    setUsername('');
+    setUsernameError('');
+    setUserType('');
+    setUserTypeError('');
+    setPasswordError('');
+    setPassword('');
+    setCity('');
+    setCityError('');
+    setFirstName('');
+    setFirstNameError('');
+    setLastName('');
+    setLastNameError('');
+    props.closeModal();
+  };
   return (
     <>
       {props.showModal ? (
@@ -11,10 +126,10 @@ const FormModal = (props) => {
               <div class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/*header*/}
                 <div class="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
-                  <h3 class="text-3xl font-semibold">Add New Item</h3>
+                  <h3 class="text-3xl font-semibold">Add New User</h3>
                   <button
                     class="p-1 ml-auto bg-transparent border-0 text-black float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                    onClick={() => props.closeModal()}
+                    onClick={() => clearState()}
                   >
                     <span class="bg-transparent text-black h-6 w-6 text-2xl block outline-none focus:outline-none">
                       ×
@@ -26,10 +141,10 @@ const FormModal = (props) => {
                     <div class="md:col-span-1">
                       <div class="px-4 sm:px-0">
                         <h3 class="text-lg font-medium leading-6 text-gray-900">
-                          Item Information
+                          New User Information
                         </h3>
                         <p class="mt-1 text-sm text-gray-600">
-                          Input the item information required.
+                          Input the user information required.
                         </p>
                       </div>
                     </div>
@@ -40,35 +155,144 @@ const FormModal = (props) => {
                             <div class="grid grid-cols-6 gap-6">
                               <div class="col-span-6 sm:col-span-3">
                                 <label
-                                  for="item_code"
+                                  for="username"
                                   class="block text-sm font-medium text-gray-700"
                                 >
-                                  Item Code
+                                  Username
                                 </label>
                                 <input
                                   type="text"
-                                  placeholder="Item Code"
-                                  name="item_code"
-                                  id="item_code"
-                                  autocomplete="given-name"
+                                  onChange={(event) =>
+                                    setUsername(event.target.value)
+                                  }
+                                  placeholder="Username"
+                                  value={username}
+                                  name="username"
+                                  id="username"
+                                  autocomplete="username"
                                   class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                                 />
+                                {usernameError ? (
+                                  <span className="text-red-500">
+                                    {usernameError}
+                                  </span>
+                                ) : null}
+                              </div>
+                              <div class="col-span-6 sm:col-span-3">
+                                <label
+                                  for="password"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                  Password
+                                </label>
+                                <div className="relative flex w-full flex-wrap items-stretch">
+                                  <span
+                                    onClick={() =>
+                                      setPasswordSeen(!passwordSeen)
+                                    }
+                                    className="z-10 h-full text-gray-600 hover:text-gray-800 cursor-pointer leading-snug font-normal absolute right-0 pr-2 py-3"
+                                  >
+                                    {passwordSeen ? (
+                                      <i className="fas fa-eye-slash"></i>
+                                    ) : (
+                                      <i className="fas fa-eye"></i>
+                                    )}
+                                  </span>
+                                  <input
+                                    type={`${
+                                      passwordSeen ? 'text' : 'password'
+                                    }`}
+                                    onChange={(event) =>
+                                      setPassword(event.target.value)
+                                    }
+                                    value={password}
+                                    placeholder="Password"
+                                    name="password"
+                                    id="password"
+                                    autocomplete="given-name"
+                                    class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                {passwordError ? (
+                                  <span className="text-red-500">
+                                    {passwordError}
+                                  </span>
+                                ) : null}
+                              </div>
+
+                              <div class="col-span-6 sm:col-span-3">
+                                <label
+                                  for="item_code"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                  First Name
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="First Name"
+                                  name="first_name"
+                                  onChange={(event) =>
+                                    setFirstName(event.target.value)
+                                  }
+                                  value={firstName}
+                                  id="first_name"
+                                  autocomplete="first_name"
+                                  class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                />
+                                {firstNameError ? (
+                                  <span className="text-red-500">
+                                    {firstNameError}
+                                  </span>
+                                ) : null}
                               </div>
                               <div class="col-span-6 sm:col-span-3">
                                 <label
                                   for="item_name"
                                   class="block text-sm font-medium text-gray-700"
                                 >
-                                  Item Name
+                                  Last Name
                                 </label>
                                 <input
                                   type="text"
-                                  placeholder="Item Name"
-                                  name="item_name"
-                                  id="item_name"
-                                  autocomplete="given-name"
+                                  placeholder="Last Name"
+                                  onChange={(event) =>
+                                    setLastName(event.target.value)
+                                  }
+                                  value={lastName}
+                                  name="last_name"
+                                  id="last_name"
+                                  autocomplete="last_name"
                                   class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                                 />
+                                {lastNameError ? (
+                                  <span className="text-red-500">
+                                    {lastNameError}
+                                  </span>
+                                ) : null}
+                              </div>
+                              <div class="col-span-6 sm:col-span-3">
+                                <label
+                                  for="item_name"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                  City
+                                </label>
+                                <input
+                                  type="text"
+                                  onChange={(event) =>
+                                    setCity(event.target.value)
+                                  }
+                                  value={city}
+                                  placeholder="City"
+                                  name="city"
+                                  id="city"
+                                  class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                />
+                                {cityError ? (
+                                  <span className="text-red-500">
+                                    {cityError}
+                                  </span>
+                                ) : null}
                               </div>
 
                               <div class="col-span-6 sm:col-span-3">
@@ -76,13 +300,13 @@ const FormModal = (props) => {
                                   for="item_type"
                                   class="block text-sm font-medium text-gray-700"
                                 >
-                                  Item Type/Category
+                                  User Role
                                 </label>
                                 <select
-                                  id="item_type"
-                                  placeholder="Item Type/Category"
-                                  name="item_type"
-                                  autocomplete="item_type"
+                                  onChange={(event) => {
+                                    console.log(event.target.value);
+                                    setUserType(event.target.value);
+                                  }}
                                   class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 >
                                   <option
@@ -92,176 +316,16 @@ const FormModal = (props) => {
                                     hidden
                                     selected
                                   >
-                                    Item Type/Category
+                                    User Role
                                   </option>
-                                  <option>Type 1</option>
-                                  <option>Type 2</option>
-                                  <option>Type 3</option>
+                                  <option value={0}>Staff</option>
+                                  <option value={1}>Admin</option>
                                 </select>
-                              </div>
-                              <div class="col-span-6 sm:col-span-3">
-                                <label
-                                  for="price"
-                                  class="block text-sm font-medium text-gray-700"
-                                >
-                                  Price {'(₱)'}
-                                </label>
-                                <input
-                                  type="text"
-                                  placeholder="Price (₱)"
-                                  name="price"
-                                  id="price"
-                                  autocomplete="price"
-                                  class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                />
-                              </div>
-                              <div class="col-span-6 sm:col-span-3">
-                                <label
-                                  for="quantity"
-                                  class="block text-sm font-medium text-gray-700"
-                                >
-                                  Quantity
-                                </label>
-                                <input
-                                  type="text"
-                                  placeholder="Quantity"
-                                  name="quantity"
-                                  id="quantity"
-                                  autocomplete="given-name"
-                                  class="mt-1 px-2 py-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                />
-                              </div>
-                              <div class="col-span-6 sm:col-span-3">
-                                <label
-                                  for="supplier_name"
-                                  class="block text-sm font-medium text-gray-700"
-                                >
-                                  Supplier Name
-                                </label>
-                                <input
-                                  type="text"
-                                  placeholder="Supplier Name"
-                                  name="supplier_name"
-                                  id="supplier_name"
-                                  autocomplete="given-name"
-                                  class="mt-1 px-2 py-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                />
-                              </div>
-
-                              <div class="col-span-6">
-                                <label class="block text-sm font-medium text-gray-700">
-                                  Item photo/s
-                                </label>
-                                <div class="flex">
-                                  <div class="mt-1 mr-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                                    <div class="space-y-1 text-center">
-                                      <svg
-                                        class="mx-auto h-12 w-12 text-gray-400"
-                                        stroke="currentColor"
-                                        fill="none"
-                                        viewBox="0 0 48 48"
-                                        aria-hidden="true"
-                                      >
-                                        <path
-                                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                          stroke-width="2"
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round"
-                                        />
-                                      </svg>
-                                      <div class="flex text-sm text-gray-600">
-                                        <label
-                                          for="file-upload"
-                                          class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                                        >
-                                          <span>Upload a file </span>
-                                          <input
-                                            id="file-upload"
-                                            name="file-upload"
-                                            type="file"
-                                            class="sr-only"
-                                          />
-                                        </label>
-                                        <p class="pl-1"> or drag and drop</p>
-                                      </div>
-                                      <p class="text-xs text-gray-500">
-                                        PNG, JPG, GIF up to 10MB
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                                    <div class="space-y-1 text-center">
-                                      <svg
-                                        class="mx-auto h-12 w-12 text-gray-400"
-                                        stroke="currentColor"
-                                        fill="none"
-                                        viewBox="0 0 48 48"
-                                        aria-hidden="true"
-                                      >
-                                        <path
-                                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                          stroke-width="2"
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round"
-                                        />
-                                      </svg>
-                                      <div class="flex text-sm text-gray-600">
-                                        <label
-                                          for="file-upload"
-                                          class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                                        >
-                                          <span>Upload a file </span>
-                                          <input
-                                            id="file-upload"
-                                            name="file-upload"
-                                            type="file"
-                                            class="sr-only"
-                                          />
-                                        </label>
-                                        <p class="pl-1"> or drag and drop</p>
-                                      </div>
-                                      <p class="text-xs text-gray-500">
-                                        PNG, JPG, GIF up to 10MB
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div class="mt-1 ml-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                                    <div class="space-y-1 text-center">
-                                      <svg
-                                        class="mx-auto h-12 w-12 text-gray-400"
-                                        stroke="currentColor"
-                                        fill="none"
-                                        viewBox="0 0 48 48"
-                                        aria-hidden="true"
-                                      >
-                                        <path
-                                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                          stroke-width="2"
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round"
-                                        />
-                                      </svg>
-                                      <div class="flex text-sm text-gray-600">
-                                        <label
-                                          for="file-upload"
-                                          class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                                        >
-                                          <span>Upload a file </span>
-                                          <input
-                                            id="file-upload"
-                                            name="file-upload"
-                                            type="file"
-                                            class="sr-only"
-                                          />
-                                        </label>
-                                        <p class="pl-1"> or drag and drop</p>
-                                      </div>
-                                      <p class="text-xs text-gray-500">
-                                        PNG, JPG, GIF up to 10MB
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
+                                {userTypeError ? (
+                                  <span className="text-red-500">
+                                    {userTypeError}
+                                  </span>
+                                ) : null}
                               </div>
                             </div>
                           </div>
@@ -269,14 +333,14 @@ const FormModal = (props) => {
                             <button
                               className="bg-red-600 text-white hover:bg-red-800 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
-                              onClick={() => props.closeModal()}
+                              onClick={() => clearState()}
                             >
                               Cancel
                             </button>
                             <button
                               className="bg-gray-600 text-white hover:bg-gray-800 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
-                              onClick={() => props.closeModal()}
+                              onClick={(event) => handleSubmit(event)}
                             >
                               Save
                             </button>

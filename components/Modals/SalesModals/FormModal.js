@@ -523,8 +523,10 @@ const FormModal = (props) => {
                                       <span>{`₱ ${
                                         totalDiscount > 0
                                           ? numberWithCommas(
-                                              totalAmount *
-                                                (totalDiscount / 100)
+                                              parseFloat(
+                                                totalAmount *
+                                                  (totalDiscount / 100)
+                                              ).toFixed(2)
                                             )
                                           : 0
                                       } PHP`}</span>

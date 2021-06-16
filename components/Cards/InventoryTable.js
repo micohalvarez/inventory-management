@@ -33,7 +33,7 @@ const InventoryTable = (props) => {
     setSelectedItem(item);
     setShowDetailsModal(true);
   };
-  const onPressNumber = (event, maxCount) => {
+  const onPressNumber = (event) => {
     if (parseInt(event.target.innerText) === 1) {
       props.getNextItems(session.user.auth_token, 0, 0);
     } else {
@@ -41,8 +41,8 @@ const InventoryTable = (props) => {
 
       props.getNextItems(
         session.user.auth_token,
-        props.offSet + multiplier,
-        props.page + parseInt(event.target.innerText)
+        multiplier,
+        parseInt(event.target.innerText)
       );
     }
   };

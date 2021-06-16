@@ -134,6 +134,28 @@ export const getPaymentTypes = (authToken, filter) => {
 export const createSalesOrder = (authToken, payload, totalDiscount) => {
   return (dispatch) => {
     var data;
+
+    if (totalDiscount > 0)
+      data = {
+        items: payload,
+        total_discount: totalDiscount / 100,
+      };
+    else
+      data = {
+        items: payload,
+      };
+
+    return authInstance.post(`/sales_order/`, data, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+  };
+};
+
+export const editSalesOrder = (authToken, payload, totalDiscount) => {
+  return (dispatch) => {
+    var data;
     console.log(totalDiscount);
     if (totalDiscount > 0)
       data = {
@@ -147,7 +169,7 @@ export const createSalesOrder = (authToken, payload, totalDiscount) => {
 
     console.log(data);
 
-    return authInstance.post(`/sales_order/`, data, {
+    return authInstance.patch(`/sales_order/`, data, {
       headers: {
         Authorization: `Token ${authToken}`,
       },
@@ -179,6 +201,47 @@ export const approveDiscount = (authToken, uuid, discount) => {
         },
       }
     );
+  };
+};
+
+export const searchSales = (authToken, id) => {
+  return (dispatch, getState) => {
+    dispatch({ type: actionTypes.GET_SALES_START });
+
+    authInstance
+      .get(`/sales_order/?order_number=${id}`, {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        if (res.status === 200 && res.data) {
+          var array = [];
+          dispatch({
+            type: actionTypes.GET_SALES_SUCCESS,
+            payload: {
+              sales: res.data.results,
+              count: res.data.count,
+              offSet: 0,
+              page: 1,
+            },
+          });
+        } else if (res.response.status === 404) {
+          dispatch({
+            type: actionTypes.GET_SALES_SUCCESS,
+            payload: {
+              sales: [],
+              count: 0,
+              offSet: 0,
+              page: 1,
+            },
+          });
+        }
+      })
+      .catch(({ response }) => {
+        dispatch({ type: actionTypes.GET_SALES_FAIL });
+      });
   };
 };
 
@@ -236,5 +299,19 @@ export const addDiscount = () => {
 export const clearDiscount = () => {
   return (dispatch) => {
     dispatch({ type: actionTypes.CLEAR_DISCOUNT });
+  };
+};
+
+export const addSearch = () => {
+  return (dispatch) => {
+    dispatch({
+      type: actionTypes.ADD_SEARCH_SALES,
+    });
+  };
+};
+
+export const clearSearch = () => {
+  return (dispatch) => {
+    dispatch({ type: actionTypes.CLEAR_SEARCH_SALES });
   };
 };
