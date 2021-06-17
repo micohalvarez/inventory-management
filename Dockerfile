@@ -2,7 +2,7 @@ FROM node:alpine
 
 WORKDIR /app
 
-RUN npm install --global pm2
+RUN npm install -g npm@7.17.0 --global pm2
 
 COPY ./package.json ./
 RUN npm install --production
