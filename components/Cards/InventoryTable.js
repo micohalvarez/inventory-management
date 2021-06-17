@@ -9,10 +9,10 @@ import TableDropdown from '../Dropdowns/TableDropdown.js';
 import InventoryType from '../Dropdowns/InventoryType';
 import InventoryFilter from '../Dropdowns/InventoryFilter';
 
-import FormModal from '../Modals/Inventorymodals/FormModal';
-import ReportsModal from '../Modals/Inventorymodals/ReportModal';
-import DetailsModal from '../Modals/Inventorymodals/DetailsModal';
-import EditModal from '../Modals/Inventorymodals/EditModal';
+import FormModal from '../Modals/InventodyModals/FormModal';
+import ReportsModal from '../Modals/InventodyModals/ReportModal';
+import DetailsModal from '../Modals/InventodyModals/DetailsModal';
+import EditModal from '../Modals/InventodyModals/EditModal';
 import Router, { withRouter } from 'next/router';
 
 import moment from 'moment';
