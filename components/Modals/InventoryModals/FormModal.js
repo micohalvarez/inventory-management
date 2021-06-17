@@ -379,7 +379,7 @@ const FormModal = (props) => {
                                   Quantity
                                 </label>
                                 <input
-                                  type="text"
+                                  type="number"
                                   value={quantity}
                                   onChange={handleQuantity}
                                   placeholder="Quantity"
@@ -401,11 +401,7 @@ const FormModal = (props) => {
                                 >
                                   Description
                                 </label>
-                                {descriptionError ? (
-                                  <span className="text-red-500">
-                                    {descriptionError}
-                                  </span>
-                                ) : null}
+
                                 <input
                                   type="text"
                                   placeholder="Description"
@@ -416,6 +412,11 @@ const FormModal = (props) => {
                                   // autocomplete="given-name"
                                   class="mt-1 px-2 py-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                                 />
+                                {descriptionError ? (
+                                  <span className="text-red-500">
+                                    {descriptionError}
+                                  </span>
+                                ) : null}
                               </div>
                               <label class="block text-sm font-medium text-gray-700">
                                 Item photo/s

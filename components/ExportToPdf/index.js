@@ -158,7 +158,6 @@ class ExportWinnertoPDF extends Component {
     this.state = {
       pdf: null,
     };
-    console.log(props);
   }
 
   getPdfDocument() {
@@ -328,7 +327,7 @@ class ExportWinnertoPDF extends Component {
         {this.state.pdf ? (
           <PDFDownloadLink
             document={this.getPdfDocument()}
-            fileName={`test.pdf`}
+            fileName={`orders.pdf`}
           >
             {({ blob, url, loading, error }) =>
               loading ? (

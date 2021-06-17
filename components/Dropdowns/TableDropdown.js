@@ -65,7 +65,7 @@ const NotificationDropdown = (props) => {
           <i className="fas fa-edit text-base self-center mr-1" />
           Edit Item
         </button>
-        <button
+        {/* <button
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -75,7 +75,7 @@ const NotificationDropdown = (props) => {
         >
           <i className="fas fa-trash self-center text-base mr-1" />
           Delete Item
-        </button>
+        </button> */}
       </div>
     </>
   );

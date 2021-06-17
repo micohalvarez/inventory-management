@@ -166,14 +166,14 @@ const UsersTable = (props) => {
                     'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
                   }
                 >
-                  Staff
+                  Admin
                 </th>
 
-                <th
+                {/* <th
                   className={
                     'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
                   }
-                ></th>
+                ></th> */}
               </tr>
             </thead>
             <tbody>
@@ -207,12 +207,12 @@ const UsersTable = (props) => {
                         {item.is_staff ? 'TRUE' : 'FALSE'}
                       </td>
 
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-right">
+                      {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-right">
                         <TableDropdown
                           setShowEditModal={setShowEditModal}
                           showEditModal={showEditModal}
                         />
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </>
