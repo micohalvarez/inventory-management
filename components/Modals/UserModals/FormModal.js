@@ -54,6 +54,7 @@ const FormModal = (props) => {
         first_name: firstName,
         last_name: lastName,
         is_staff: true,
+        is_admin: true,
         ...(userType === 1 && { groups: [1] }),
       };
 
