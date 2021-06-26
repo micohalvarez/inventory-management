@@ -119,7 +119,6 @@ const ReportModal = (props) => {
   };
 
   const generateReport = () => {
-    console.log('HOy');
     setTimeout(
       function () {
         console.log(reportData);

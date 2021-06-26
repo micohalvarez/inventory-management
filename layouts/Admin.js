@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import AdminNavbar from '../components/Navbars/AdminNavbar';
 import Sidebar from '../components/Sidebar/Sidebar';
 import HeaderStats from '../components/Headers/HeaderStats';
-import FooterAdmin from '../components/Footers/FooterAdmin';
 
 export default function Admin(props) {
   const [showNav, setShowNav] = useState(false);

@@ -25,10 +25,6 @@ const Inventory = (props) => {
     props.getAllItems(session.user.auth_token);
   }, []);
 
-  const signOutClick = () => {
-    signOut();
-  };
-
   return (
     <Admin showSideBar={showSideBar}>
       <AdminNavbar
