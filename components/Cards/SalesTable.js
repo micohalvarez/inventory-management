@@ -19,7 +19,7 @@ import SalesTab from '../Tabs/SalesTab';
 import * as salesActions from '../../redux/actions/salesActions';
 import * as inventoryActions from '../../redux/actions/inventoryActions';
 import { withRouter } from 'next/router';
-
+import ReportsModal from '../Modals/InventoryModals/ReportModal';
 const SalesTable = (props) => {
   const [showFormModal, setFormShowModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -117,6 +117,7 @@ const SalesTable = (props) => {
         setModalMessage={setModalMessage}
         setModalError={setModalError}
       />
+
       <DetailsModal
         selectedItem={selectedItem}
         isPaid={
@@ -132,7 +133,7 @@ const SalesTable = (props) => {
         setModalMessage={setModalMessage}
         setModalError={setModalError}
       />
-      <EditModal
+      {/* <EditModal
         showModal={showEditModal}
         closeModal={() => setShowEditModal(false)}
         paymentTypes={props.paymentTypes}
@@ -141,7 +142,7 @@ const SalesTable = (props) => {
         setModalError={setModalError}
         selectedItem={selectedItem}
         setSelectedItem={setSelectedItem}
-      />
+      />  */}
       <SuccessModal
         showModal={successModal}
         setSuccessModal={setSuccessModal}
@@ -410,12 +411,9 @@ const mapStateToProps = (state) => ({
   sales: state.sales.sales,
   offSet: state.sales.salesOffset,
   totalCount: state.sales.salesCount,
-  items: state.inventory.items,
   page: state.sales.salesPage,
   discounted: state.sales.discounted,
   paymentTypes: state.sales.paymentTypes,
-  allItems: state.inventory.allItems,
-  itemOrders: state.inventory.itemOrders,
 });
 
 const mapDispatchToProps = (dispatch) => ({

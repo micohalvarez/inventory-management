@@ -3,10 +3,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import UserDropdown from '../Dropdowns/UserDropdown.js';
+import { useSession } from 'next-auth/client';
 
 const Sidebar = (props) => {
   const [collapseShow, setCollapseShow] = React.useState('hidden');
   const router = useRouter();
+  const [session, loading] = useSession();
 
   return (
     <nav
@@ -120,28 +122,30 @@ const Sidebar = (props) => {
               </Link>
             </li>
 
-            <li className="items-center">
-              <Link href="/admin/users">
-                <a
-                  className={
-                    'text-sm uppercase py-3 font-bold block ' +
-                    (router.pathname.indexOf('/admin/users') !== -1
-                      ? 'text-blue-500 hover:text-blue-600'
-                      : 'text-gray-800 hover:text-gray-600')
-                  }
-                >
-                  <i
+            {session.user.user.is_superuser ? (
+              <li className="items-center">
+                <Link href="/admin/users">
+                  <a
                     className={
-                      'fas fa-users mr-2 text-sm ' +
+                      'text-sm uppercase py-3 font-bold block ' +
                       (router.pathname.indexOf('/admin/users') !== -1
-                        ? 'opacity-75'
-                        : 'text-gray-400')
+                        ? 'text-blue-500 hover:text-blue-600'
+                        : 'text-gray-800 hover:text-gray-600')
                     }
-                  ></i>{' '}
-                  users
-                </a>
-              </Link>
-            </li>
+                  >
+                    <i
+                      className={
+                        'fas fa-users mr-2 text-sm ' +
+                        (router.pathname.indexOf('/admin/users') !== -1
+                          ? 'opacity-75'
+                          : 'text-gray-400')
+                      }
+                    ></i>{' '}
+                    users
+                  </a>
+                </Link>
+              </li>
+            ) : null}
           </ul>
         </div>
       </div>

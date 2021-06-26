@@ -58,7 +58,7 @@ const mapDispatchToProps = (dispatch) => ({
 export async function getServerSideProps(context) {
   const session = await getSession({ req: context.req });
 
-  if (!session) {
+  if (!session || !session.user.user.is_superuser) {
     return {
       redirect: {
         destination: '/',

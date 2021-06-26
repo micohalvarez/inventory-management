@@ -215,13 +215,15 @@ const InventoryTable = (props) => {
                 >
                   Date Created
                 </th>
-                <th
-                  className={
-                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left'
-                  }
-                >
-                  Cost
-                </th>
+                {session.user.user.is_superuser ? (
+                  <th
+                    className={
+                      'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left'
+                    }
+                  >
+                    Cost
+                  </th>
+                ) : null}
                 <th
                   className={
                     'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
@@ -280,9 +282,12 @@ const InventoryTable = (props) => {
                           .format('MMM DD, YYYY')
                           .toUpperCase()}
                       </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                        {item.cost}
-                      </td>
+                      {session.user.user.is_superuser ? (
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                          {item.cost}
+                        </td>
+                      ) : null}
+
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-right">
                         <TableDropdown
                           setShowEditModal={setShowEditModal}

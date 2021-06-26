@@ -5,6 +5,7 @@ import * as salesActions from '../../../redux/actions/salesActions';
 import { Alert } from 'reactstrap';
 import { useSession } from 'next-auth/client';
 import SuccessModal from '../SuccessModal';
+import Select from 'react-dropdown-select';
 const FormModal = (props) => {
   const [session, loading] = useSession();
 
@@ -21,7 +22,7 @@ const FormModal = (props) => {
   const [typeError, setTypeError] = useState('');
 
   const [items, setItems] = useState([
-    { type: null, product: null, price: 0, quantity: 1 },
+    { type: null, product: null, price: 0, quantity: 1, isOverride: false },
   ]);
 
   const [submitItems, setSubmitItems] = useState([
@@ -143,7 +144,6 @@ const FormModal = (props) => {
     setDiscountError('');
     if (!(event.target.value > 100 || event.target.value < 0)) {
       setTotalDiscount(event.target.value);
-      console.log(totalDiscount);
     }
   };
 
@@ -167,37 +167,44 @@ const FormModal = (props) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
+  const [price, setPrice] = useState(false);
+
   const handleTotalAmount = () => {
     let totalAmount = 0;
     items.map((item) => {
-      totalAmount += item.price * item.quantity;
+      totalAmount +=
+        (item.unit_price ? item.unit_price : item.price) * item.quantity;
     });
 
     setTotalAmount(totalAmount);
   };
 
-  const handleName = (event) => {
+  const handlePrice = (event, index) => {
     event.preventDefault();
-    setNameError('');
-    setName(event.target.value);
-  };
-
-  const addType = (index, id) => {
-    console.log(props.selectedId);
-    console.log(props.items);
-    console.log('hi');
-  };
-
-  const handleType = (event, index, id) => {
-    event.preventDefault();
-    setType(event.target.value);
     let testItems = [...items];
-
     let subItems = [...submitItems];
-    testItems[index].price = props.items[event.target.value].unit_price;
-    testItems[index].type = event.target.value;
+    console.log(event.target.value);
+    if (!(event.target.value < 0)) {
+      testItems[index].unit_price = event.target.value;
 
-    subItems[index].product = id;
+      subItems[index].unit_price = event.target.value;
+
+      handleTotalAmount();
+      setSubmitItems(subItems);
+      setItems(testItems);
+    }
+  };
+
+  const handleType = (index, item) => {
+    console.log(index);
+    let testItems = [...items];
+    console.log(item);
+    let subItems = [...submitItems];
+    testItems[index].price = item.unit_price;
+    testItems[index].type = item.id;
+
+    subItems[index].product = item.id;
+
     subItems[index].quantity = testItems[index].quantity;
 
     setSubmitItems(subItems);
@@ -250,12 +257,7 @@ const FormModal = (props) => {
       return false;
     } else {
       props
-        .createSalesOrder(
-          session.user.auth_token,
-          submitItems,
-
-          totalDiscount
-        )
+        .createSalesOrder(session.user.auth_token, submitItems, totalDiscount)
         .then((res) => {
           console.log(res);
           if (res.status === 200) {
@@ -297,7 +299,9 @@ const FormModal = (props) => {
   const clearState = () => {
     props.closeModal();
     setContinue(false);
-    setItems([{ type: null, product: null, price: 0, quantity: 1 }]);
+    setItems([
+      { type: null, product: null, price: 0, quantity: 1, isOverride: false },
+    ]);
     setTotalAmount(0);
     setTotalDiscount(0);
     setTotalDiscountAmount(0);
@@ -396,7 +400,7 @@ const FormModal = (props) => {
                                     <>
                                       <tr className="mt-1 justify-center align-center text-gray-800 border-gray-200 ">
                                         <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap ">
-                                          <select
+                                          {/* <select
                                             onChange={(event) => {
                                               handleType(
                                                 event,
@@ -430,7 +434,22 @@ const FormModal = (props) => {
                                                 {test.name}
                                               </option>
                                             ))}
-                                          </select>
+                                          </select> */}
+                                          <Select
+                                            options={props.allItems}
+                                            labelField={'name'}
+                                            valueField={'id'}
+                                            searchBy={'name'}
+                                            className="flex"
+                                            clearOnSelect={true}
+                                            onChange={(value) => {
+                                              if (value.length !== 0)
+                                                handleType(index, value[0]);
+                                            }}
+                                            onClearAll={() =>
+                                              setSelectedItem(null)
+                                            }
+                                          />
                                         </td>
                                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                           <input
@@ -446,19 +465,70 @@ const FormModal = (props) => {
                                             name="quantity"
                                             id="quantity"
                                             autocomplete="quantity"
-                                            class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                            className={`mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md ${
+                                              item.type === null
+                                                ? 'opacity-60 cursor-not-allowed'
+                                                : null
+                                            }`}
                                           />
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                          <span>
-                                            {numberWithCommas(item.price)}
-                                          </span>
-                                        </td>
+                                        {session.user.user.is_superuser ? (
+                                          <td className=" py-4 relative flex w-full flex-wrap items-stretch">
+                                            {item.type === null ? null : (
+                                              <span
+                                                onClick={() =>
+                                                  (item.isOverride =
+                                                    !item.isOverride)
+                                                }
+                                                className={`z-10 h-full  cursor-pointer leading-snug font-normal absolute right-0 pr-2 py-3 ${
+                                                  !item.isOverride
+                                                    ? 'text-gray-600 hover:text-gray-800'
+                                                    : 'text-gray-800 hover:text-gray-600'
+                                                }`}
+                                              >
+                                                <i className="fas fa-edit"></i>
+                                              </span>
+                                            )}
+
+                                            <input
+                                              type="number"
+                                              name="price"
+                                              disabled={
+                                                item.isOverride ? false : true
+                                              }
+                                              value={
+                                                item.isOverride
+                                                  ? item.unit_price
+                                                    ? item.unit_price
+                                                    : item.price
+                                                  : item.price
+                                              }
+                                              onChange={(event) =>
+                                                handlePrice(event, index)
+                                              }
+                                              id="price"
+                                              class={`mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md ${
+                                                item.type == null ||
+                                                !item.isOverride
+                                                  ? 'opacity-80 cursor-not-allowed'
+                                                  : null
+                                              }`}
+                                            />
+                                          </td>
+                                        ) : (
+                                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                            <span>
+                                              {numberWithCommas(item.price)}
+                                            </span>
+                                          </td>
+                                        )}
 
                                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                           <span>
                                             {numberWithCommas(
-                                              item.price * item.quantity
+                                              (item.unit_price
+                                                ? item.unit_price
+                                                : item.price) * item.quantity
                                             )}
                                           </span>
                                         </td>
@@ -781,6 +851,7 @@ const FormModal = (props) => {
 
 const mapStateToProps = (state) => ({
   items: state.inventory.items,
+  allItems: state.inventory.allItems,
   newOrder: state.sales.newOrder,
 });
 

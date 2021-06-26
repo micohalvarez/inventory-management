@@ -85,16 +85,6 @@ const FormModal = (props) => {
     };
     setSecondPhoto(file);
 
-    // imageCompression(file, options)
-    //   .then(function (compressedFile) {
-    //     compressed = compressedFile;
-
-    //     setSecondPhoto(compressed);
-    //   })
-    //   .catch(function (error) {
-    //     // console.log(error.message);
-    //   });
-
     event.target.value = '';
   };
 
@@ -348,29 +338,33 @@ const FormModal = (props) => {
                                   </span>
                                 ) : null}
                               </div>
-                              <div class="col-span-6 sm:col-span-3">
-                                <label
-                                  for="price"
-                                  class="block text-sm font-medium text-gray-700"
-                                >
-                                  Cost {'(₱)'}
-                                </label>
-                                <input
-                                  type="number"
-                                  value={cost}
-                                  onChange={handleCost}
-                                  placeholder="Cost (₱)"
-                                  name="cost"
-                                  id="cost"
-                                  autocomplete="cost"
-                                  class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                />
-                                {costError ? (
-                                  <span className="text-red-500">
-                                    {costError}
-                                  </span>
-                                ) : null}
-                              </div>
+
+                              {session.user.user.is_superuser ? (
+                                <div class="col-span-6 sm:col-span-3">
+                                  <label
+                                    for="price"
+                                    class="block text-sm font-medium text-gray-700"
+                                  >
+                                    Cost {'(₱)'}
+                                  </label>
+                                  <input
+                                    type="number"
+                                    value={cost}
+                                    onChange={handleCost}
+                                    placeholder="Cost (₱)"
+                                    name="cost"
+                                    id="cost"
+                                    autocomplete="cost"
+                                    class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                  />
+                                  {costError ? (
+                                    <span className="text-red-500">
+                                      {costError}
+                                    </span>
+                                  ) : null}
+                                </div>
+                              ) : null}
+
                               <div class="col-span-6 sm:col-span-3">
                                 <label
                                   for="quantity"

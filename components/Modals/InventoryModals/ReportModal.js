@@ -52,13 +52,12 @@ const ReportModal = (props) => {
     props
       .getOrdersPerItem(session.user.auth_token, selectedItem, date)
       .then((res) => {
-        console.log(res);
         if (res.status === 200 && res.data.results) {
           let totalAmount = 0,
             totalQuantity = 0,
             totalSub = 0,
             totalDisc = 0;
-          console.log('WHUTT');
+
           res.data.results.map((item, index) => {
             finalReport.push({
               order_number: '',
@@ -70,7 +69,7 @@ const ReportModal = (props) => {
               total_discount: '',
               sub_total: '',
             });
-            console.log('WHUTT');
+
             var curItem = getKeyByValue(item.items, selectedItem);
 
             finalReport[index].order_number = item.order_number;
@@ -128,6 +127,9 @@ const ReportModal = (props) => {
       2000
     );
   };
+  const onSearch = (event) => {
+    console.log(event);
+  };
   return (
     <>
       <CSVLink
@@ -180,10 +182,13 @@ const ReportModal = (props) => {
                       valueField={'id'}
                       searchBy={'name'}
                       className="flex"
+                      clearOnSelect={true}
                       onChange={(value) => {
                         setItemError(null);
-                        setSelectedItem(value[0].slug);
+
+                        if (value.length !== 0) setSelectedItem(value[0].slug);
                       }}
+                      onClearAll={() => setSelectedItem(null)}
                     />
                     {itemError ? (
                       <span className="text-red-500">{itemError}</span>
