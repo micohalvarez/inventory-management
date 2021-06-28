@@ -115,22 +115,12 @@ const EditModal = (props) => {
     };
     setSecondPhoto(file);
     setDisplaySecond(URL.createObjectURL(file));
-    // imageCompression(file, options)
-    //   .then(function (compressedFile) {
-    //     compressed = compressedFile;
-
-    //     setSecondPhoto(compressed);
-    //   })
-    //   .catch(function (error) {
-    //     // console.log(error.message);
-    //   });
 
     event.target.value = '';
   };
 
   const onSetThirdPhoto = (event) => {
     var file = event.target.files[0];
-    var compressed;
 
     const options = {
       maxSizeMB: 1,
@@ -139,22 +129,13 @@ const EditModal = (props) => {
     };
     setThirdPhoto(file);
     setDisplayThird(URL.createObjectURL(file));
-    // imageCompression(file, options)
-    //   .then(function (compressedFile) {
-    //     console.log(compressedFile, 'compressedFile');
-    //     compressed = compressedFile;
-
-    //   })
-    //   .catch(function (error) {
-    //     // console.log(error.message);
-    //   });
 
     event.target.value = '';
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log('hehe');
+
     let error = false;
     if (code === '') {
       setCodeError('Please up field');
@@ -173,15 +154,12 @@ const EditModal = (props) => {
       setPriceError('Please up field');
       error = true;
     }
-    if (quantity === '') {
-      setQuantityError('Please up field');
-      error = true;
-    }
 
-    if (cost === '') {
-      setCostError('Please up field');
-      error = true;
-    }
+    if (session.user.user.is_superuser)
+      if (cost === '') {
+        setCostError('Please up field');
+        error = true;
+      }
 
     if (description === '') {
       console.log('hehe');
@@ -207,8 +185,8 @@ const EditModal = (props) => {
       form_data.append('unit_price', price);
       form_data.append('name', name);
       form_data.append('code', code);
-      form_data.append('stock', quantity);
-      form_data.append('cost', cost);
+
+      if (session.user.user.is_superuser) form_data.append('cost', cost);
       form_data.append('category', type);
       form_data.append('description', description);
 
@@ -413,29 +391,31 @@ const EditModal = (props) => {
                                   </span>
                                 ) : null}
                               </div>
-                              <div class="col-span-6 sm:col-span-3">
-                                <label
-                                  for="price"
-                                  class="block text-sm font-medium text-gray-700"
-                                >
-                                  Cost {'(₱)'}
-                                </label>
-                                <input
-                                  type="number"
-                                  value={cost}
-                                  onChange={handleCost}
-                                  placeholder="Cost (₱)"
-                                  name="cost"
-                                  id="cost"
-                                  autocomplete="cost"
-                                  class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                                />
-                                {costError ? (
-                                  <span className="text-red-500">
-                                    {costError}
-                                  </span>
-                                ) : null}
-                              </div>
+                              {session.user.user.is_superuser ? (
+                                <div class="col-span-6 sm:col-span-3">
+                                  <label
+                                    for="price"
+                                    class="block text-sm font-medium text-gray-700"
+                                  >
+                                    Cost {'(₱)'}
+                                  </label>
+                                  <input
+                                    type="number"
+                                    value={cost}
+                                    onChange={handleCost}
+                                    placeholder="Cost (₱)"
+                                    name="cost"
+                                    id="cost"
+                                    autocomplete="cost"
+                                    class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                  />
+                                  {costError ? (
+                                    <span className="text-red-500">
+                                      {costError}
+                                    </span>
+                                  ) : null}
+                                </div>
+                              ) : null}
 
                               <div class="col-span-6">
                                 <label

@@ -126,6 +126,7 @@ const SalesTable = (props) => {
             selectedItem.status === 'cancelled'
           )
         }
+        forDelete={selectedItem.for_delete}
         showModal={showDetailsModal}
         closeModal={() => setShowDetailsModal(false)}
         paymentTypes={props.paymentTypes}
@@ -158,7 +159,8 @@ const SalesTable = (props) => {
           clearFilter={props.clearFilter}
           addDiscount={props.addDiscount}
           clearDiscount={props.clearDiscount}
-          discounted={props.discounted}
+          addDelete={props.addDelete}
+          clearDelete={props.clearDelete}
         />
         <button
           className="hover:bg-gray-800 bg-gray-700 self-end flex text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -428,6 +430,8 @@ const mapDispatchToProps = (dispatch) => ({
   clearFilter: () => dispatch(salesActions.clearFilter()),
   addDiscount: () => dispatch(salesActions.addDiscount()),
   clearDiscount: () => dispatch(salesActions.clearDiscount()),
+  addDelete: () => dispatch(salesActions.addDelete()),
+  clearDelete: () => dispatch(salesActions.clearDelete()),
 });
 
 export default withRouter(

@@ -9,6 +9,7 @@ const initialState = {
   paymentTypes: [],
   filter: null,
   discounted: null,
+  delete: null,
   search: null,
   gettingPayment: false,
   loadingMore: false,
@@ -89,6 +90,16 @@ const data = (state = initialState, action) => {
       return {
         ...state,
         discounted: null,
+      };
+    case actionTypes.ADD_DELETE:
+      return {
+        ...state,
+        delete: 'True',
+      };
+    case actionTypes.CLEAR_DELETE:
+      return {
+        ...state,
+        delete: null,
       };
     default:
       return state;

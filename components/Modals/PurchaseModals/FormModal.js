@@ -5,12 +5,13 @@ import * as orderActions from '../../../redux/actions/orderActions';
 import { Alert } from 'reactstrap';
 import { useSession } from 'next-auth/client';
 import SuccessModal from '../SuccessModal';
+import Select from 'react-dropdown-select';
 const FormModal = (props) => {
   console.log(props.selectedItem);
   const [modalError, setModalError] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [successModal, setSuccessModal] = useState(false);
-
+  console.log(props.allItems);
   const [type, setType] = useState('');
 
   const [total, setTotal] = useState(0);
@@ -33,7 +34,7 @@ const FormModal = (props) => {
   const [session, loading] = useSession();
 
   useEffect(() => {
-    if (newItems.length === 0 && props.items.length > 0) {
+    if (newItems.length === 0) {
       newItems.splice(
         0,
         0,
@@ -65,7 +66,7 @@ const FormModal = (props) => {
       setSubmitItems([{ product: props.selectedItem.id, quantity: 1 }]);
       setTotal(props.selectedItem.unit_price);
     }
-  }, [props.items, newItems, props.selectedItem]);
+  }, [newItems, props.selectedItem]);
 
   const [finalItems, setFinalItems] = useState([
     <>
@@ -150,22 +151,29 @@ const FormModal = (props) => {
     setItems(testItems);
   };
 
-  const handleType = (event, index, id) => {
-    event.preventDefault();
-    setType(event.target.value);
-
+  const handleType = (index, item) => {
     let testItems = [...items];
     let subItems = [...submitItems];
 
-    testItems[index].price = props.items[event.target.value].unit_price;
-    testItems[index].type = event.target.value;
+    if (item != null) {
+      testItems[index].price = item.unit_price;
+      testItems[index].type = item.id;
+      testItems[index].images = item.images;
+      subItems[index].product = item.id;
+    } else {
+      testItems[index].price = 0;
+      testItems[index].type = null;
+      testItems[index].quantity = 1;
+      testItems[index].isOverride = false;
+      delete testItems[index].images;
+      subItems[index].product = null;
+    }
 
-    subItems[index].product = id;
     subItems[index].quantity = testItems[index].quantity;
-    handleTotal();
 
     setSubmitItems(subItems);
     setItems(testItems);
+    handleTotal();
   };
 
   const [paymentType, setPaymentType] = useState(null);
@@ -361,46 +369,46 @@ const FormModal = (props) => {
                                   {items.map((item, index) => (
                                     <>
                                       <tr className="mt-1 justify-center align-center text-gray-800 border-gray-200 ">
-                                        <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap ">
-                                          <select
-                                            onChange={(event) => {
-                                              console.log(event.target.value);
-                                              handleType(
-                                                event,
-                                                index,
-                                                props.items[event.target.value]
-                                                  .id
-                                              );
-                                            }}
-                                            disabled={
-                                              props.selectedItem ? true : false
-                                            }
-                                            id="item_type"
-                                            placeholder="Item Type/Category"
-                                            name="item_type"
-                                            autocomplete="item_type"
-                                            value={item.type}
-                                            class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                          >
-                                            <option
-                                              class="text-color-gray-300"
-                                              value=""
-                                              disabled
-                                              hidden
-                                              selected
-                                            >
-                                              Item Type/Brand
-                                            </option>
+                                        <td className="py-6 p-4 border-t-0 align-middle border-l-0 border-r-0  flex flex-row ">
+                                          {item.type === null ? (
+                                            <div className="h-8 w-8  bg-white rounded-full border justify-center flex">
+                                              <img
+                                                src={'/img/sketch.jpg'}
+                                                className="h-full overflow-hidden bg-white rounded-full  object-fit"
+                                                alt="..."
+                                              ></img>
+                                            </div>
+                                          ) : (
+                                            <div className="h-8 w-8  bg-white rounded-full border justify-center flex">
+                                              <img
+                                                src={
+                                                  item.images[0]
+                                                    ? item.images[0].image
+                                                    : '/img/sketch.jpg'
+                                                }
+                                                className="h-full overflow-hidden bg-white rounded-full  object-fit"
+                                                alt="..."
+                                              ></img>
+                                            </div>
+                                          )}
 
-                                            {props.items.map((test, index) => (
-                                              <option
-                                                key={test.id}
-                                                value={index}
-                                              >
-                                                {test.name}
-                                              </option>
-                                            ))}
-                                          </select>
+                                          <div className="bg-white flex-1">
+                                            <Select
+                                              options={props.allItems}
+                                              labelField={'name'}
+                                              valueField={'id'}
+                                              searchBy={'name'}
+                                              className="ml-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md "
+                                              clearOnSelect={true}
+                                              onChange={(value) => {
+                                                if (value.length !== 0)
+                                                  handleType(index, value[0]);
+                                                else {
+                                                  handleType(index, null);
+                                                }
+                                              }}
+                                            />
+                                          </div>
                                         </td>
                                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                           <input
@@ -666,7 +674,7 @@ const FormModal = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-  items: state.inventory.items,
+  allItems: state.inventory.allItems,
   newOrder: state.sales.newOrder,
 });
 

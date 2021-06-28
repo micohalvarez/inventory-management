@@ -1,9 +1,9 @@
 const ConfirmModal = (props) => {
   return (
     <>
-      {true ? (
+      {props.isVisible ? (
         <>
-          <div class="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50">
+          <div class="justify-center items-center bg-gray-500 bg-opacity-75 flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50">
             <div class="relative my-6 mx-auto w-full max-w-md">
               {/*content*/}
               <div class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
@@ -30,14 +30,16 @@ const ConfirmModal = (props) => {
 
                   <div className="flex flex-row">
                     <button
-                      className="mt-3 hover:bg-gray-800 bg-gray-700 self-end flex text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                      className="mt-3 hover:bg-red-800 bg-red-700 self-end flex text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                       type="button"
+                      onClick={() => props.closeModal()}
                     >
-                      Back
+                      Cancel
                     </button>
                     <button
                       className="mt-3 hover:bg-gray-800 bg-gray-700 self-end flex text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                       type="button"
+                      onClick={props.onConfirm}
                     >
                       Ok
                     </button>

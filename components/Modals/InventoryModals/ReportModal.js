@@ -184,11 +184,11 @@ const ReportModal = (props) => {
                       className="flex"
                       clearOnSelect={true}
                       onChange={(value) => {
-                        setItemError(null);
-
-                        if (value.length !== 0) setSelectedItem(value[0].slug);
+                        if (value.length !== 0) handleType(index, value[0]);
+                        else {
+                          handleType(index, null);
+                        }
                       }}
-                      onClearAll={() => setSelectedItem(null)}
                     />
                     {itemError ? (
                       <span className="text-red-500">{itemError}</span>

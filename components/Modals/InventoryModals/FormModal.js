@@ -69,7 +69,7 @@ const FormModal = (props) => {
       maxWidthOrHeight: 1920,
       useWebWorker: true,
     };
-    console.log(file);
+
     setFirstPhoto(file);
     event.target.value = '';
   };
@@ -137,10 +137,11 @@ const FormModal = (props) => {
       error = true;
     }
 
-    if (cost === '') {
-      setCostError('Please up field');
-      error = true;
-    }
+    if (session.user.user.is_superuser)
+      if (cost === '') {
+        setCostError('Please up field');
+        error = true;
+      }
 
     if (description === '') {
       setDescriptionError('Please up field');

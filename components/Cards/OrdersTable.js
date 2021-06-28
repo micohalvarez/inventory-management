@@ -119,6 +119,7 @@ const OrdersTable = (props) => {
             selectedItem.status === 'cancelled'
           )
         }
+        forDelete={selectedItem.for_delete}
         showModal={showDetailsModal}
         closeModal={() => setShowDetailsModal(false)}
         paymentTypes={props.paymentTypes}
@@ -143,6 +144,8 @@ const OrdersTable = (props) => {
           getSalesWithFilter={props.getOrders}
           addFilter={props.addFilter}
           clearFilter={props.clearFilter}
+          addDelete={props.addDelete}
+          clearDelete={props.clearDelete}
         />
         <button
           className="hover:bg-gray-800 bg-gray-700 self-end flex text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -407,6 +410,8 @@ const mapDispatchToProps = (dispatch) => ({
   getOrders: (authToken) => dispatch(ordersActions.getOrders(authToken)),
   addFilter: (filter) => dispatch(ordersActions.addFilter(filter)),
   clearFilter: () => dispatch(ordersActions.clearFilter()),
+  addDelete: () => dispatch(ordersActions.addDelete()),
+  clearDelete: () => dispatch(ordersActions.clearDelete()),
 });
 
 export default withRouter(

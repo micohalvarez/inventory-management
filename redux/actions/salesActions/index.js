@@ -13,7 +13,8 @@ export const getSales = (authToken) => {
       .get(
         `/sales_order/?limit=${SALES_LIMIT}&offset=0` +
           (sales.filter ? `&status=${sales.filter}` : '') +
-          (sales.discounted ? `&discount_approved=${sales.discounted}` : ''),
+          (sales.discounted ? `&discount_approved=${sales.discounted}` : '') +
+          (sales.delete ? `&for_delete=${sales.delete}` : ''),
         {
           headers: {
             Authorization: `Token ${authToken}`,
@@ -273,6 +274,34 @@ export const cancelOrder = (authToken, uuid) => {
   };
 };
 
+export const deleteOrder = (authToken, uuid) => {
+  return (dispatch) => {
+    return authInstance.delete(
+      `/sales_order/${uuid}/`,
+
+      {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      }
+    );
+  };
+};
+
+export const declineDelete = (authToken, uuid) => {
+  return (dispatch) => {
+    return authInstance.post(
+      `/sales_order/${uuid}/decline_delete/`,
+      {},
+      {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      }
+    );
+  };
+};
+
 export const addFilter = (filter) => {
   return (dispatch) => {
     dispatch({
@@ -299,6 +328,20 @@ export const addDiscount = () => {
 export const clearDiscount = () => {
   return (dispatch) => {
     dispatch({ type: actionTypes.CLEAR_DISCOUNT });
+  };
+};
+
+export const addDelete = () => {
+  return (dispatch) => {
+    dispatch({
+      type: actionTypes.ADD_DELETE,
+    });
+  };
+};
+
+export const clearDelete = () => {
+  return (dispatch) => {
+    dispatch({ type: actionTypes.CLEAR_DELETE });
   };
 };
 

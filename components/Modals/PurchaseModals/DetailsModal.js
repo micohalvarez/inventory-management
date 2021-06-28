@@ -6,8 +6,14 @@ import * as orderActions from '../../../redux/actions/orderActions';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
+import ConfirmModal from '../ConfirmModal';
 import { useSession } from 'next-auth/client';
 const DetailsModal = (props) => {
+  console.log(props);
+  const [isVisible, setVisible] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [onConfirm, setOnConfirm] = useState(null);
+
   const [session, loading] = useSession();
   const [newItems, setNewitems] = useState([
     <>
@@ -150,6 +156,69 @@ const DetailsModal = (props) => {
         </tr>
       </>,
     ]);
+  };
+
+  const onDelete = () => {
+    props
+      .deleteOrder(session.user.auth_token, props.selectedItem.uuid)
+      .then((res) => {
+        console.log(res);
+        if (res.status === 204) {
+          props.setModalMessage('Purchase order has been deleted.');
+          props.setModalError(false);
+          props.setSuccessModal(true);
+          props.getOrders(session.user.auth_token);
+        } else if (res.status === 200) {
+          props.setModalMessage('Purchase order will be checked for deletion');
+          props.setModalError(false);
+          props.setSuccessModal(true);
+          props.getOrders(session.user.auth_token);
+        } else {
+          props.setModalMessage('Purchase order cannot be deleted.');
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        }
+      })
+      .catch((error) => {
+        props.setModalMessage(
+          'A server error has occurred. Please try again later'
+        );
+        props.setModalError(true);
+        props.setSuccessModal(true);
+      });
+    clearState();
+  };
+
+  const cancelDelete = () => {
+    props
+      .declineDelete(session.user.auth_token, props.selectedItem.uuid)
+      .then((res) => {
+        if (res.status === 200) {
+          props.setModalMessage('Purchase order deletion has been cancelled.');
+          props.setModalError(false);
+          props.setSuccessModal(true);
+          props.getOrders(session.user.auth_token);
+        } else {
+          props.setModalMessage('Purchase order deletion cannot be cancelled.');
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        }
+      })
+      .catch((error) => {
+        props.setModalMessage(
+          'A server error has occurred. Please try again later'
+        );
+        props.setModalError(true);
+        props.setSuccessModal(true);
+      });
+    clearState();
+  };
+
+  const confirm = (message, method) => {
+    setVisible(true);
+    setConfirmMessage(message);
+
+    setOnConfirm(method);
   };
 
   return (
@@ -311,6 +380,20 @@ const DetailsModal = (props) => {
                                   (name, index) => (
                                     <tr className="mt-1 justify-center align-center text-gray-800 border-gray-200 ">
                                       <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
+                                        <div className="h-8 w-8  bg-white rounded-full border justify-center flex">
+                                          <img
+                                            src={
+                                              props.selectedItem.items[index]
+                                                .product.images[0]
+                                                ? props.selectedItem.items[
+                                                    index
+                                                  ].product.images[0].image
+                                                : '/img/sketch.jpg'
+                                            }
+                                            className="h-full overflow-hidden bg-white rounded-full  object-fit"
+                                            alt="..."
+                                          ></img>
+                                        </div>
                                         <span className={'ml-3 font-bold '}>
                                           {
                                             props.selectedItem.items[index]
@@ -583,7 +666,57 @@ const DetailsModal = (props) => {
                       )}
 
                       <div className="mt-4 text-right ">
-                        {props.isPaid ? (
+                        {props.forDelete ? (
+                          <>
+                            <button
+                              className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                              type="button"
+                              onClick={() => props.closeModal()}
+                            >
+                              Close
+                            </button>
+                            <button
+                              disabled={
+                                session.user.user.is_superuser ? false : true
+                              }
+                              className={`bg-red-600 text-white  font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 
+                              ${
+                                session.user.user.is_superuser
+                                  ? 'hover:bg-red-700'
+                                  : 'opacity-60 cursor-not-allowed'
+                              }`}
+                              type="button"
+                              onClick={(event) => {
+                                confirm(
+                                  'Are you sure you want to cancel deletion?',
+                                  'cancel_delete'
+                                );
+                              }}
+                            >
+                              {'Cancel Deletion'}
+                            </button>
+                            <button
+                              disabled={
+                                session.user.user.is_superuser ? false : true
+                              }
+                              className={`bg-green-600 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150
+                              ${
+                                session.user.user.is_superuser
+                                  ? 'hover:bg-green-700'
+                                  : 'opacity-60 cursor-not-allowed'
+                              }`}
+                              type="button"
+                              onClick={(event) => {
+                                confirm(
+                                  'Are you sure you want to delete the order?',
+                                  'delete'
+                                );
+                              }}
+                            >
+                              Delete Purchase Order
+                            </button>
+                          </>
+                        ) : props.isPaid ? (
                           <button
                             className="bg-red-600 text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                             type="button"
@@ -624,6 +757,18 @@ const DetailsModal = (props) => {
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
                               onClick={(event) => {
+                                confirm(
+                                  'Are you sure you want to delete the Order?',
+                                  'delete'
+                                );
+                              }}
+                            >
+                              Delete
+                            </button>
+                            <button
+                              className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                              type="button"
+                              onClick={(event) => {
                                 markCancel(event);
                               }}
                             >
@@ -652,6 +797,19 @@ const DetailsModal = (props) => {
           <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
         </>
       ) : null}
+      <ConfirmModal
+        isVisible={isVisible}
+        closeModal={() => setVisible(false)}
+        message={confirmMessage}
+        onConfirm={() => {
+          onConfirm === 'delete'
+            ? onDelete()
+            : 'cance_delete'
+            ? cancelDelete()
+            : null;
+          setVisible(false);
+        }}
+      />
     </>
   );
 };
@@ -668,6 +826,10 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(salesActions.addPaymentMethod(authToken, payload)),
   markPaid: (authToken, uuid) =>
     dispatch(orderActions.markPaid(authToken, uuid)),
+  deleteOrder: (authToken, uuid) =>
+    dispatch(orderActions.deleteOrder(authToken, uuid)),
+  declineDelete: (authToken, uuid) =>
+    dispatch(orderActions.declineDelete(authToken, uuid)),
   markCancel: (authToken, uuid) =>
     dispatch(orderActions.cancelOrder(authToken, uuid)),
   getOrders: (token) => {

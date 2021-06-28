@@ -9,6 +9,7 @@ const SalesTab = (props) => {
   const onSelectFilter = (type) => {
     setFilter(type);
     props.clearDiscount();
+    props.clearDelete();
     if (type === '') props.clearFilter();
     else props.addFilter(type);
     props.getSalesWithFilter(session.user.auth_token);
@@ -16,6 +17,12 @@ const SalesTab = (props) => {
 
   const onSelectDiscount = () => {
     props.addDiscount();
+    props.addFilter('pending');
+    props.getSalesWithFilter(session.user.auth_token);
+  };
+
+  const onSelectDelete = () => {
+    props.addDelete();
     props.addFilter('pending');
     props.getSalesWithFilter(session.user.auth_token);
   };
@@ -102,27 +109,51 @@ const SalesTab = (props) => {
                 <i className="fas fa-ban text-base mr-1"></i> Cancelled
               </a>
             </li>
-            <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
-              <a
-                className={
-                  'transition ease-in duration-200 hover:bg-red-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5  ' +
-                  (openTab === 5
-                    ? 'text-white bg-red-500'
-                    : 'text-gray-600 bg-white')
-                }
-                onClick={(e) => {
-                  e.preventDefault();
-                  setOpenTab(5);
-                  onSelectDiscount();
-                }}
-                data-toggle="tab"
-                href="#link3"
-                role="tablist"
-              >
-                <i className="fas fa-ban text-base mr-1"></i> For Discount
-                Approval
-              </a>
-            </li>
+            {session.user.user.is_superuser ? (
+              <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
+                <a
+                  className={
+                    'transition ease-in duration-200 hover:bg-red-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5  ' +
+                    (openTab === 5
+                      ? 'text-white bg-red-500'
+                      : 'text-gray-600 bg-white')
+                  }
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOpenTab(5);
+                    onSelectDiscount();
+                  }}
+                  data-toggle="tab"
+                  href="#link3"
+                  role="tablist"
+                >
+                  <i className="fas fa-ban text-base mr-1"></i> Discount Pending
+                </a>
+              </li>
+            ) : null}
+            {session.user.user.is_superuser ? (
+              <li className="-mb-px mr-2 last:mr-0 flex-auto text-center">
+                <a
+                  className={
+                    'transition ease-in duration-200 hover:bg-red-600 cursor-pointer hover:text-white text-xs font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal p-5  ' +
+                    (openTab === 5
+                      ? 'text-white bg-red-500'
+                      : 'text-gray-600 bg-white')
+                  }
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOpenTab(5);
+                    onSelectDelete();
+                  }}
+                  data-toggle="tab"
+                  href="#link3"
+                  role="tablist"
+                >
+                  <i className="fas fa-trash-alt text-base mr-1"></i> Delete
+                  Pending
+                </a>
+              </li>
+            ) : null}
           </ul>
         </div>
       </div>

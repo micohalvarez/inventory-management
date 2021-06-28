@@ -10,11 +10,12 @@ export const getOrders = (authToken) => {
     const orders = getState().orders;
 
     dispatch({ type: actionTypes.GET_ORDERS_START });
-    console.log(authToken, 'hi');
+
     authInstance
       .get(
         `/purchase_order/?limit=${ORDERS_LIMIT}&offset=0` +
-          (orders.filter ? `&status=${orders.filter}` : ''),
+          (orders.filter ? `&status=${orders.filter}` : '') +
+          (orders.delete ? `&for_delete=${orders.delete}` : ''),
         {
           headers: {
             Authorization: `Token ${authToken}`,
@@ -192,6 +193,48 @@ export const cancelOrder = (authToken, uuid) => {
   return (dispatch) => {
     return authInstance.post(
       `/purchase_order/${uuid}/cancel/`,
+      {},
+      {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      }
+    );
+  };
+};
+
+export const deleteOrder = (authToken, uuid) => {
+  return (dispatch) => {
+    return authInstance.delete(
+      `/purchase_order/${uuid}/`,
+
+      {
+        headers: {
+          Authorization: `Token ${authToken}`,
+        },
+      }
+    );
+  };
+};
+
+export const addDelete = () => {
+  return (dispatch) => {
+    dispatch({
+      type: actionTypes.ADD_DELETE_ORDER,
+    });
+  };
+};
+
+export const clearDelete = () => {
+  return (dispatch) => {
+    dispatch({ type: actionTypes.CLEAR_DELETE_ORDER });
+  };
+};
+
+export const declineDelete = (authToken, uuid) => {
+  return (dispatch) => {
+    return authInstance.post(
+      `/purchase_order/${uuid}/decline_delete/`,
       {},
       {
         headers: {

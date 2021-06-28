@@ -24,6 +24,7 @@ const Orders = (props) => {
     props.getOrders(session.user.auth_token);
     props.getItems(session.user.auth_token);
     props.getPaymentTypes(session.user.auth_token);
+    props.getAllItems(session.user.auth_token);
   }, []);
 
   return (
@@ -61,7 +62,7 @@ const mapDispatchToProps = (dispatch) => ({
   getItems: (authToken) => dispatch(inventoryActions.getItems(authToken)),
   getPaymentTypes: (authToken) =>
     dispatch(salesActions.getPaymentTypes(authToken)),
-
+  getAllItems: (authToken) => dispatch(inventoryActions.getAllItems(authToken)),
   searchOrders: (authToken, id) =>
     dispatch(orderActions.searchOrders(authToken, id)),
 });

@@ -252,7 +252,7 @@ const InventoryTable = (props) => {
                             alt="..."
                           ></img>
                         </div>
-                        <span className={'ml-3 font-bold '}>{item.code}</span>
+                        <span className={'ml-3 font-bold'}>{item.code}</span>
                       </th>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                         {item.name}
