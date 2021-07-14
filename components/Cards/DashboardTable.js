@@ -69,7 +69,7 @@ const DashBoardTable = (props) => {
 
   const renderPagination = () => {
     var pagination = [];
-    var maxPages = Math.ceil(props.totalCount / 10);
+    var maxPages = Math.ceil(props.totalCount / 2);
     var indexStart =
       parseInt(props.page) >= 5
         ? parseInt(props.page) === maxPages - 1
@@ -605,8 +605,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getItems: (authToken) => dispatch(dashboardActions.getItems(authToken)),
-  getNextItems: (authToken) =>
-    dispatch(dashboardActions.getNextItems(authToken)),
+  getNextItems: (authToken, offset, page) =>
+    dispatch(dashboardActions.getNextItems(authToken, offset, page)),
   getDiscountApproveSales: (authToken) =>
     dispatch(dashboardActions.getDiscountApproveSales(authToken)),
   getNextDiscountApproveSales: (authToken) =>

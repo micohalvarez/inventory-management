@@ -54,7 +54,7 @@ const inventoryFilter = (props) => {
             ? 'border-gray-600 hover:bg-red-800 '
             : 'border-gray-600 hover:bg-gray-800')
         }
-        href="#pablo"
+
         ref={btnDropdownRef}
         onClick={(e) => {
           e.stopPropagation();
