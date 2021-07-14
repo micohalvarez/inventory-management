@@ -31,6 +31,10 @@ const DashBoardTable = (props) => {
     setShowDetailsModal(true);
   };
 
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
   //pagination for all items
   const onPressNumber = (event) => {
     if (parseInt(event.target.innerText) === 1) {
@@ -40,11 +44,13 @@ const DashBoardTable = (props) => {
 
       props.getNextItems(
         session.user.auth_token,
-        props.offSet + multiplier,
-        props.page + (parseInt(event.target.innerText) - 1)
+        multiplier,
+        parseInt(event.target.innerText)
       );
     }
   };
+  console.log(props);
+
   const onPressNext = () => {
     props.getNextItems(
       session.user.auth_token,
@@ -52,6 +58,7 @@ const DashBoardTable = (props) => {
       props.page + 1
     );
   };
+
   const onPressPrev = () => {
     props.getNextItems(
       session.user.auth_token,
@@ -59,6 +66,7 @@ const DashBoardTable = (props) => {
       props.page - 1
     );
   };
+
   const renderPagination = () => {
     var pagination = [];
     var maxPages = Math.ceil(props.totalCount / 10);
@@ -75,7 +83,15 @@ const DashBoardTable = (props) => {
           <a
             key={i}
             onClick={onPressNumber}
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ${
+              props.page === maxPages && i === maxPages
+                ? 'pointer-events-none'
+                : 'cursor-pointer'
+            } ${
+              props.page <= 1 && i === indexStart + 1
+                ? 'pointer-events-none'
+                : 'cursor-pointer'
+            }`}
           >
             {i}
           </a>
@@ -109,6 +125,13 @@ const DashBoardTable = (props) => {
               </th>
               <th
                 className={
+                  'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
+                }
+              >
+               Stock
+              </th>
+              <th
+                className={
                   'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left'
                 }
               ></th>
@@ -133,6 +156,11 @@ const DashBoardTable = (props) => {
                       </div>
                       <span className={'ml-3 font-bold '}>{item.code}</span>
                     </th>
+
+                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+           
+                      {item.name}
+                    </td>
 
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                       <i
@@ -193,7 +221,7 @@ const DashBoardTable = (props) => {
                   'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
                 }
               >
-                Item Code
+                Sales Order Number
               </th>
               <th
                 className={
@@ -207,7 +235,14 @@ const DashBoardTable = (props) => {
                   'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
                 }
               >
-                To be Discounted
+                Discount Price
+              </th>
+              <th
+                className={
+                  'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
+                }
+              >
+                To be Discounted (%)
               </th>
               <th
                 className={
@@ -227,7 +262,7 @@ const DashBoardTable = (props) => {
             {props.items.length > 0 ? (
               <>
                 {props.items.map((item, index) => (
-                  <tr class="text-gray-800 border-gray-200">
+                  <tr class="hover:bg-gray-200 cursor-pointer bg-gray-100 text-gray-800 border-gray-200">
                     <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
                       <span className={'ml-3 font-bold '}>
                         {item.order_number}
@@ -235,13 +270,19 @@ const DashBoardTable = (props) => {
                     </th>
 
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                      {item.subtotal}
+                      {`₱${numberWithCommas(item.subtotal)} PHP`}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                    {`₱${numberWithCommas(parseFloat(item.total * (item.total_discount / 100)).toFixed(2))} PHP`}
+             
+                    </td>
+                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+      
                       {item.total_discount + '%'}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                      {item.subtotal - item.total * (item.total_discount / 100)}
+                      
+                      {`₱${numberWithCommas(item.subtotal - item.total * (item.total_discount / 100))} PHP`}
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-right">
                       <button
@@ -259,7 +300,7 @@ const DashBoardTable = (props) => {
                 ))}
               </>
             ) : (
-              <tr class="text-gray-800 border-gray-200">
+            <tr class="bg-gray-100 text-gray-800 border-gray-200">
                 <td
                   colSpan="5"
                   align="center"
@@ -279,7 +320,7 @@ const DashBoardTable = (props) => {
     return (
       <div className="block w-full overflow-x-auto">
         <span className={'ml-3 font-bold '}>
-          For Sales Orders Discount Approval
+          Upcoming Payments
         </span>
         <table className="items-center w-full bg-transparent border-collapse">
           <thead className="bg-gray-100 ">
@@ -344,7 +385,7 @@ const DashBoardTable = (props) => {
                 ))}
               </>
             ) : (
-              <tr class="text-gray-800 border-gray-200">
+            <tr class="bg-gray-100 text-gray-800 border-gray-200">
                 <td
                   colSpan="3"
                   align="center"
@@ -364,7 +405,7 @@ const DashBoardTable = (props) => {
   const [selectedSales, setSelectedSales] = useState(false);
   const [purchaseDetailiModal, setPurchaseDetailModal] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState(false);
-
+  console.log(props)
   return (
     <>
       <SalesDetailsModal
@@ -409,6 +450,7 @@ const DashBoardTable = (props) => {
         setModalMessage={setModalMessage}
         setModalError={setModalError}
         getItems={props.getItems}
+        clearSelectedItem={()=>setSelectedItem(null)}
       />
       <SuccessModal
         showModal={successModal}
@@ -420,12 +462,16 @@ const DashBoardTable = (props) => {
 
       <div className="flex flex-row">
         <DashboardDropdown
-          sort={[
+          sort={         session.user.user.is_superuser ? [
             'Low on Stock',
             'For Sales Orders Discounts',
             'Upcoming Purchase Payments',
             'Upcoming Sales Payments',
-          ]}
+          ] : [
+            'Low on Stock',,
+            'Upcoming Purchase Payments',
+            'Upcoming Sales Payments',
+          ] }
           getItems={props.getItems}
           getDiscountApproveSales={props.getDiscountApproveSales}
           getPurchaseOrdersDeadline={props.getPurchaseOrdersDeadline}
@@ -481,9 +527,11 @@ const DashBoardTable = (props) => {
                 class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
                 aria-label="Pagination"
               >
-                <a
+                    <a
                   onClick={onPressPrev}
-                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${
+                    props.page <= 1 ? 'pointer-events-none' : 'cursor-pointer'
+                  }`}
                 >
                   <span class="sr-only">Previous</span>
 
@@ -514,7 +562,11 @@ const DashBoardTable = (props) => {
 
                 <a
                   onClick={onPressNext}
-                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${
+                    (props.offSet + 10) * props.page >= props.totalCount
+                      ? 'pointer-events-none'
+                      : 'cursor-pointer'
+                  }`}
                 >
                   <span class="sr-only">Next</span>
 

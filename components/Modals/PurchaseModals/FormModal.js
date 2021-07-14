@@ -59,6 +59,7 @@ const FormModal = (props) => {
           type: props.selectedItem.id,
           product: null,
           price: props.selectedItem.unit_price,
+          images:props.selectedItem.images,
           quantity: 1,
         },
       ]);
@@ -270,6 +271,9 @@ const FormModal = (props) => {
   };
   const clearState = () => {
     props.closeModal();
+
+    if(props.clearSelectedItem)
+    props.clearSelectedItem()
     clearErrors();
     setContinue(false);
     setItems([{ type: null, product: null, price: 0, quantity: 1 }]);
@@ -392,10 +396,11 @@ const FormModal = (props) => {
                                             </div>
                                           )}
 
-                                          <div className="bg-white flex-1">
-                                            <Select
+                                          <div className="bg-white flex-1 ml-2 ">
+                                            {props.selectedItem ? <span>{props.selectedItem.name}</span> 
+                                            : <Select
                                               options={props.allItems}
-                                              labelField={'name'}
+                                              labelField={'code'}
                                               valueField={'id'}
                                               searchBy={'name'}
                                               className="ml-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md "
@@ -407,7 +412,8 @@ const FormModal = (props) => {
                                                   handleType(index, null);
                                                 }
                                               }}
-                                            />
+                                            />}
+                                     
                                           </div>
                                         </td>
                                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">

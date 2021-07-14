@@ -12,7 +12,9 @@ const initialState = {
 };
 
 const data = (state = initialState, action) => {
+  console.log(action,'hi')
   switch (action.type) {
+
     case actionTypes.GET_ITEMS_START_DASHBOARD:
       return {
         ...state,

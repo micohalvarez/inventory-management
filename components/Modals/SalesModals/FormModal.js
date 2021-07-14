@@ -370,7 +370,7 @@ const FormModal = (props) => {
     setTotalDiscount(0);
     setTotalDiscountAmount(0);
     setSuccessModal(false);
-    setSubmitItems([{ product: null, quantity: 0 }]);
+    setSubmitItems([{ product: null, quantity: 0 ,box_amount:0}]);
   };
 
   return (

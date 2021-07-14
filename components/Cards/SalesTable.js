@@ -21,6 +21,7 @@ import * as inventoryActions from '../../redux/actions/inventoryActions';
 import { withRouter } from 'next/router';
 import ReportsModal from '../Modals/InventoryModals/ReportModal';
 const SalesTable = (props) => {
+
   const [showFormModal, setFormShowModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -308,7 +309,7 @@ const SalesTable = (props) => {
               ) : (
                 <tr class="bg-gray-100 text-gray-800 border-gray-200">
                   <td
-                    colSpan="7"
+                    colSpan="8"
                     align="center"
                     className="border-t-0 px-6 self-center align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4"
                   >
@@ -396,7 +397,7 @@ const SalesTable = (props) => {
                 <a
                   onClick={onPressNext}
                   className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${
-                    props.offSet * props.page > props.totalCount
+                    (props.offSet + 10) * props.page >= props.totalCount
                       ? 'pointer-events-none'
                       : 'cursor-pointer'
                   }`}
