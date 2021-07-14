@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   },
   tableRow: { margin: 'auto', flexDirection: 'row' },
   tableCol: {
-    width: '25%',
+    width: '20%',
     borderStyle: 'solid',
     borderWidth: 1,
     borderLeftWidth: 0,
@@ -227,21 +227,45 @@ class ExportWinnertoPDF extends Component {
               </Text>
             </View>
           </View>
+          <View style={styles.section}>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+              {`Received By:  \n ${
+                  this.props.order.received_by.first_name +
+                  ' ' +
+                  this.props.order.received_by.last_name
+                }`}
+              </Text>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>
+                {`Customer Name:  \n${
+                  this.props.order.customer_name
+                    ? this.props.order.customer_name
+                    : 'N/A'
+                }`}
+              </Text>
+            </View>
+          </View>
           <View style={styles.table}>
             {/* TableHeader */}
             <View style={styles.tableRow}>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>Item</Text>
+                <Text style={styles.tableCell}>Item Code</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>Item Name</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>Quantity</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>Price Per Item</Text>
+                <Text style={styles.tableCell}>Item Price</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>Amount</Text>
+                <Text style={styles.tableCell}>Box Price</Text>
               </View>
+    
             </View>
             {/* TableContent */}
             {Object.keys(this.props.order.items).map((name, index) => (
@@ -249,6 +273,11 @@ class ExportWinnertoPDF extends Component {
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
                     {this.props.order.items[index].product_code}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text style={styles.tableCell}>
+                    {this.props.order.items[index].product_name}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
@@ -263,14 +292,22 @@ class ExportWinnertoPDF extends Component {
                     ).toFixed(2)} PHP`}
                   </Text>
                 </View>
+
                 <View style={styles.tableCol}>
+                  <Text style={styles.tableCell}>
+                    {`${parseFloat(
+                      this.props.order.items[index].box_amount
+                    ).toFixed(2)} PHP`}
+                  </Text>
+                </View>
+                {/* <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
                     {` ${parseFloat(
                       this.props.order.items[index].quantity *
                         parseFloat(this.props.order.items[index].unit_price)
                     ).toFixed(2)} PHP`}
                   </Text>
-                </View>
+                </View> */}
               </View>
             ))}
           </View>

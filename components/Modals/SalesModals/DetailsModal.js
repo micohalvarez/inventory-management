@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/client';
 import ConfirmModal from '../ConfirmModal';
 import ExportToPdf from '../../ExportToPdf';
 const DetailsModal = (props) => {
+  console.log(props.selectedItem)
   const [session, loading] = useSession();
   const [isVisible, setVisible] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
@@ -621,7 +622,7 @@ const DetailsModal = (props) => {
                     <div className="px-4 py-5 bg-white sm:p-6">
                       {!isContinue && !isDiscount ? (
                         <>
-                          <div className="grid grid-cols-9 gap-6">
+                          <div className="grid grid-cols-12 gap-6">
                             <div className="col-span-8 sm:col-span-3">
                               <label
                                 for="sales_number"
@@ -708,6 +709,35 @@ const DetailsModal = (props) => {
                                       .toUpperCase()}
                               </p>
                             </div>
+                            
+                            <div className="col-span-6 sm:col-span-3">
+                              <label
+                                for="shipment_date"
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                Customer Name
+                              </label>
+                              <p className="block text-base font-medium ">
+                                {props.selectedItem.customer_name === null
+                                  ? 'N/A'
+                                  : props.selectedItem.customer_name}
+                              </p>
+                            </div>
+                            <div className="col-span-6 sm:col-span-3">
+                              <label
+                                for="shipment_date"
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                Received By
+                              </label>
+                              <p className="block text-base font-medium ">
+                                {props.selectedItem.received_by === null
+                                  ? 'N/A' :
+                                  (props.selectedItem.received_by.first_name +
+                                    ' ' +
+                                    props.selectedItem.received_by.last_name)}
+                              </p>
+                            </div>
                           </div>
                           <div className="mt-4">
                             <table className="items-center w-full bg-transparent border-collapse">
@@ -722,6 +752,13 @@ const DetailsModal = (props) => {
                                   </th>
                                   <th
                                     className={
+                                      'px-6 align-middle border border-solid py-3 text-sm uppercase border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                                    }
+                                  >
+                                    Item Name
+                                  </th>
+                                  <th
+                                    className={
                                       'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
                                     }
                                   >
@@ -732,16 +769,23 @@ const DetailsModal = (props) => {
                                       'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
                                     }
                                   >
-                                    Price Per Item
+                                     Item Price
+                                  </th>
+                                  <th
+                                    className={
+                                      'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                                    }
+                                  >
+                                    Box Price
                                   </th>
 
-                                  <th
+                                  {/* <th
                                     className={
                                       'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
                                     }
                                   >
                                     Amount
-                                  </th>
+                                  </th> */}
                                 </tr>
                               </thead>
                               <tbody>
@@ -772,6 +816,10 @@ const DetailsModal = (props) => {
                                         </span>
                                       </th>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                     {props.selectedItem.items[index]
+                                            .product_name}
+                                      </td>
+                                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {'x' +
                                           props.selectedItem.items[index]
                                             .quantity}
@@ -779,8 +827,11 @@ const DetailsModal = (props) => {
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {`₱${props.selectedItem.items[index].unit_price} PHP`}
                                       </td>
-
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                        {`₱${props.selectedItem.items[index].box_amount} PHP`}
+                                      </td>
+
+                                      {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {`₱ ${(
                                           props.selectedItem.items[index]
                                             .quantity *
@@ -789,7 +840,7 @@ const DetailsModal = (props) => {
                                               .unit_price
                                           )
                                         ).toFixed(2)} PHP`}
-                                      </td>
+                                      </td> */}
                                     </tr>
                                   )
                                 )}

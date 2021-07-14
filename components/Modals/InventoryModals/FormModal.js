@@ -9,6 +9,7 @@ const FormModal = (props) => {
   const [price, setPrice] = useState('');
   const [cost, setCost] = useState('');
   const [quantity, setQuantity] = useState('');
+
   const [description, setDescription] = useState('');
 
   const [codeError, setCodeError] = useState('');
@@ -16,6 +17,7 @@ const FormModal = (props) => {
   const [typeError, setTypeError] = useState('');
   const [priceError, setPriceError] = useState('');
   const [costError, setCostError] = useState('');
+
   const [quantityError, setQuantityError] = useState('');
   const [descriptionError, setDescriptionError] = useState('');
   const [hasError, setHasError] = useState(false);
@@ -55,6 +57,12 @@ const FormModal = (props) => {
     event.preventDefault();
     setQuantityError('');
     setQuantity(event.target.value);
+  };
+
+  const handleBoxAmount = (event) => {
+    event.preventDefault();
+    setBoxError('');
+    setBoxAmount(event.target.value);
   };
 
   const [firstPhoto, setFirstPhoto] = useState(null);

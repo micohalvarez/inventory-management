@@ -7,26 +7,34 @@ import { useSession } from 'next-auth/client';
 import SuccessModal from '../SuccessModal';
 import Select from 'react-dropdown-select';
 const FormModal = (props) => {
+  console.log(props)
   const [session, loading] = useSession();
 
   const [modalError, setModalError] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [successModal, setSuccessModal] = useState(false);
 
-  const [code, setCode] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [name, setName] = useState('');
   const [type, setType] = useState('');
 
-  const [codeError, setCodeError] = useState('');
+  const [customerNameError, setCustomerNameError] = useState('');
   const [nameError, setNameError] = useState('');
   const [typeError, setTypeError] = useState('');
 
   const [items, setItems] = useState([
-    { type: null, product: null, price: 0, quantity: 1, isOverride: false },
+    {
+      type: null,
+      product: null,
+      price: 0,
+      quantity: 1,
+      box_amount: 0,
+      isOverride: false,
+    },
   ]);
 
   const [submitItems, setSubmitItems] = useState([
-    { product: null, quantity: 1 },
+    { product: null, quantity: 1, box_amount: 0 },
   ]);
 
   const [totalDiscount, setTotalDiscount] = useState(0);
@@ -34,6 +42,8 @@ const FormModal = (props) => {
   const [totalAmount, setTotalAmount] = useState(0);
 
   const [quantity, setQuantity] = useState([0]);
+
+  const [boxError, setBoxError] = useState('');
   const [choices, setChoices] = useState(props.items);
   const [isContinue, setContinue] = useState(false);
 
@@ -116,8 +126,9 @@ const FormModal = (props) => {
       product: null,
       quantity: 1,
       price: 0,
+      box_amount: 0,
     });
-    subItems.push({ product: null, quantity: 1 });
+    subItems.push({ product: null, quantity: 1, box_amount: 0 });
 
     setSubmitItems(subItems);
 
@@ -147,6 +158,12 @@ const FormModal = (props) => {
     }
   };
 
+  const handleCustomerName = (event) => {
+    event.preventDefault();
+    setCustomerNameError('');
+    setCustomerName(event.target.value);
+  };
+
   const handleQuantity = (event, index) => {
     event.preventDefault();
     let testItems = [...items];
@@ -163,6 +180,23 @@ const FormModal = (props) => {
     }
   };
 
+  const handleBoxAmount = (event, index) => {
+    event.preventDefault();
+    let testItems = [...items];
+    let subItems = [...submitItems];
+    console.log(event.target.value)
+    if (!(event.target.value > 10000 || event.target.value < 0)) {
+
+      testItems[index].box_amount = event.target.value;
+
+      subItems[index].box_amount = event.target.value;
+
+      handleTotalAmount();
+      setSubmitItems(subItems);
+      setItems(testItems);
+    }
+  };
+
   function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
@@ -171,11 +205,15 @@ const FormModal = (props) => {
 
   const handleTotalAmount = () => {
     let totalAmount = 0;
+
     items.map((item) => {
-      totalAmount +=
-        (item.unit_price ? item.unit_price : item.price) * item.quantity;
+
+      totalAmount += ((item.unit_price ? item.unit_price : item.price) * item.quantity) + (item.box_amount ? parseFloat(item.box_amount) : 0)
+
+
     });
 
+    console.log(totalAmount)
     setTotalAmount(totalAmount);
   };
 
@@ -183,7 +221,7 @@ const FormModal = (props) => {
     event.preventDefault();
     let testItems = [...items];
     let subItems = [...submitItems];
-    console.log(event.target.value);
+
     if (!(event.target.value < 0)) {
       testItems[index].unit_price = event.target.value;
 
@@ -247,14 +285,27 @@ const FormModal = (props) => {
     event.preventDefault();
 
     var hasError = false;
+
     submitItems.map((item) => {
-      if (item.quantity <= 0) {
+      console.log(item.box_amount)
+      console.log(isNaN(item.box_amount))
+      if (item.quantity <= 0 || isNaN(item.quantity)) {
         hasError = true;
-        setModalMessage('Quantities must be greater than 0.');
+        setModalMessage('Quantities must be numeric and greater than 0.');
       }
       if (item.product === null) {
         hasError = true;
         setModalMessage('Order Form has no products added.');
+      }
+
+      if (item.box_amount < 0 || isNaN(item.box_amount)) {
+        hasError = true;
+        setModalMessage('Box Prices must be numeric and greater than 0.');
+      }
+
+      if (!customerName) {
+        hasError = true;
+        setModalMessage('Customer Name is required.');
       }
     });
 
@@ -264,7 +315,12 @@ const FormModal = (props) => {
       return false;
     } else {
       props
-        .createSalesOrder(session.user.auth_token, submitItems, totalDiscount)
+        .createSalesOrder(
+          session.user.auth_token,
+          submitItems,
+          totalDiscount,
+          customerName
+        )
         .then((res) => {
           console.log(res);
           if (res.status === 200) {
@@ -307,9 +363,10 @@ const FormModal = (props) => {
     props.closeModal();
     setContinue(false);
     setItems([
-      { type: null, product: null, price: 0, quantity: 1, isOverride: false },
+      { type: null, product: null, price: 0, quantity: 1, isOverride: false, box_amount:0 },
     ]);
     setTotalAmount(0);
+    setCustomerName('')
     setTotalDiscount(0);
     setTotalDiscountAmount(0);
     setSuccessModal(false);
@@ -362,6 +419,54 @@ const FormModal = (props) => {
                       <div className="mt-5 md:mt-0 md:col-span-2">
                         <form action="#" method="POST">
                           <div className="shadow overflow-hidden sm:rounded-md bg-">
+                            <div class="grid grid-cols-6 gap-6 p-6">
+                              {/* <div class="col-span-6 sm:col-span-3">
+                                <label
+                                  for="item_code"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                 Sales Order
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="Item Code"
+                                  value={code}
+                                  onChange={handleCode}
+                                  name="item_code"
+                                  id="item_code"
+                                  autocomplete="given-name"
+                                  class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                />
+                                {codeError ? (
+                                  <span className="text-red-500">
+                                    {codeError}
+                                  </span>
+                                ) : null}
+                              </div> */}
+                              <div class="col-span-6 sm:col-span-3">
+                                <label
+                                  for="customer_name"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                  Customer Name
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="Customer Name"
+                                  value={customerName}
+                                  onChange={handleCustomerName}
+                                  name="customer_name"
+                                  id="customer_name"
+                                  autocomplete="customer-name"
+                                  class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-5/12 shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                />
+                                {customerNameError ? (
+                                  <span className="text-red-500">
+                                    {customerNameError}
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
                             <div className="p-6 h-2/5 max-h-80 overflow-y-auto">
                               <table className="items-center w-full bg-transparent border-collapse">
                                 <thead className="bg-gray-100 ">
@@ -385,16 +490,25 @@ const FormModal = (props) => {
                                         'px-6 align-middle border-l-0 border-r-0  border border-solid py-3 text-sm uppercase  whitespace-no-wrap font-semibold text-left '
                                       }
                                     >
-                                      Price
+                                      Item Price
                                     </th>
 
                                     <th
+                                      className={
+                                        'px-6 align-middle border-l-0 border-r-0 border border-solid py-3 text-sm uppercase  whitespace-no-wrap font-semibold text-left'
+                                      }
+                                    >
+                                      Box Price
+                                    </th>
+                              
+
+                                    {/* <th
                                       className={
                                         'px-6 align-middle border border-l-0 border-r-0 border-solid py-3 text-sm uppercase whitespace-no-wrap font-semibold text-left'
                                       }
                                     >
                                       Amount
-                                    </th>
+                                    </th> */}
                                     <th
                                       className={
                                         'px-6 align-middle border border-l-0  border-solid py-3 text-sm uppercase whitespace-no-wrap font-semibold text-left'
@@ -432,7 +546,7 @@ const FormModal = (props) => {
                                           <div className="bg-white flex-1">
                                             <Select
                                               options={props.allItems}
-                                              labelField={'name'}
+                                              labelField={'code'}
                                               valueField={'id'}
                                               searchBy={'name'}
                                               className="ml-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md "
@@ -447,7 +561,7 @@ const FormModal = (props) => {
                                             />
                                           </div>
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                        <td className="border-t-0 px-4 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                           <input
                                             type="number"
                                             disabled={
@@ -461,13 +575,14 @@ const FormModal = (props) => {
                                             name="quantity"
                                             id="quantity"
                                             autocomplete="quantity"
-                                            className={`mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md ${
+                                            className={`mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-5/12 shadow-sm sm:text-sm border border-gray-300 rounded-md ${
                                               item.type === null
                                                 ? 'opacity-60 cursor-not-allowed'
                                                 : null
                                             }`}
                                           />
                                         </td>
+                    
                                         {session.user.user.is_superuser ? (
                                           <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap relative items-stretch">
                                             {item.type === null ? null : (
@@ -519,7 +634,29 @@ const FormModal = (props) => {
                                           </td>
                                         )}
 
-                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                        <td className="border-t-0 px-4 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                          <input
+                                            type="number"
+                                            disabled={
+                                              item.type === null ? true : false
+                                            }
+                                            value={item.box_amount}
+                                            onChange={(event) =>
+                                              handleBoxAmount(event, index)
+                                            }
+                                            placeholder="Box Price"
+                                            name="box_amount"
+                                            id="box_amount"
+                                            autocomplete="box_amount"
+                                            className={`mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-5/12 shadow-sm sm:text-sm border border-gray-300 rounded-md ${
+                                              item.type === null
+                                                ? 'opacity-60 cursor-not-allowed'
+                                                : null
+                                            }`}
+                                          />
+                                        </td>
+
+                                        {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                           <span>
                                             {numberWithCommas(
                                               (item.unit_price
@@ -527,7 +664,7 @@ const FormModal = (props) => {
                                                 : item.price) * item.quantity
                                             )}
                                           </span>
-                                        </td>
+                                        </td> */}
                                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                           <i
                                             onClick={(event) =>
@@ -853,13 +990,13 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getSales: (authToken) => dispatch(salesActions.getSales(authToken)),
-  createSalesOrder: (authToken, payload, totalDiscount) =>
+  createSalesOrder: (authToken, payload, totalDiscount, customerName) =>
     dispatch(
       salesActions.createSalesOrder(
         authToken,
         payload,
-
-        totalDiscount
+        totalDiscount,
+        customerName
       )
     ),
   addPaymentMethod: (authToken, payload) =>

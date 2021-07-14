@@ -132,7 +132,12 @@ export const getPaymentTypes = (authToken, filter) => {
   };
 };
 
-export const createSalesOrder = (authToken, payload, totalDiscount) => {
+export const createSalesOrder = (
+  authToken,
+  payload,
+  totalDiscount,
+  customerName
+) => {
   return (dispatch) => {
     var data;
 
@@ -140,12 +145,15 @@ export const createSalesOrder = (authToken, payload, totalDiscount) => {
       data = {
         items: payload,
         total_discount: totalDiscount / 100,
+        customer_name: customerName,
       };
     else
       data = {
         items: payload,
+        customer_name: customerName,
       };
 
+    console.log(data);
     return authInstance.post(`/sales_order/`, data, {
       headers: {
         Authorization: `Token ${authToken}`,

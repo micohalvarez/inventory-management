@@ -10,13 +10,14 @@ const OrderTab = (props) => {
 
   const onSelectFilter = (type) => {
     setFilter(type);
-
+    props.clearDelete()
     if (type === '') props.clearFilter();
     else props.addFilter(type);
     props.getSalesWithFilter(session.user.auth_token);
   };
 
   const onSelectDelete = () => {
+    props.clearDelete()
     props.addDelete();
     props.addFilter('pending');
     props.getSalesWithFilter(session.user.auth_token);

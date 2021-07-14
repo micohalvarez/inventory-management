@@ -52,6 +52,7 @@ const SalesTable = (props) => {
       );
     }
   };
+  console.log(props);
 
   const onPressNext = () => {
     props.getNextItems(
@@ -134,16 +135,7 @@ const SalesTable = (props) => {
         setModalMessage={setModalMessage}
         setModalError={setModalError}
       />
-      {/* <EditModal
-        showModal={showEditModal}
-        closeModal={() => setShowEditModal(false)}
-        paymentTypes={props.paymentTypes}
-        setSuccessModal={setSuccessModal}
-        setModalMessage={setModalMessage}
-        setModalError={setModalError}
-        selectedItem={selectedItem}
-        setSelectedItem={setSelectedItem}
-      />  */}
+
       <SuccessModal
         showModal={successModal}
         setSuccessModal={setSuccessModal}
@@ -222,6 +214,20 @@ const SalesTable = (props) => {
                 >
                   Date Created
                 </th>
+                <th
+                  className={
+                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
+                  }
+                >
+                  Payment Date
+                </th>
+                <th
+                  className={
+                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left '
+                  }
+                >
+                  Customer Name
+                </th>
 
                 {/* <th
                   className={
@@ -272,6 +278,17 @@ const SalesTable = (props) => {
                         {moment(item.created)
                           .format('MMM DD, YYYY')
                           .toUpperCase()}
+                      </td>
+
+                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                        {!item.payment_details
+                          ? 'N/A'
+                          : moment(item.payment_details.pdc_date)
+                              .format('MMM DD, YYYY')
+                              .toUpperCase()}
+                      </td>
+                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                        {!item.customer_name ? 'N/A' : item.customer_name}
                       </td>
 
                       {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-right">
