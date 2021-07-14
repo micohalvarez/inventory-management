@@ -69,7 +69,7 @@ const DashBoardTable = (props) => {
 
   const renderPagination = () => {
     var pagination = [];
-    var maxPages = Math.ceil(props.totalCount / 2);
+    var maxPages = Math.ceil(props.totalCount / 10);
     var indexStart =
       parseInt(props.page) >= 5
         ? parseInt(props.page) === maxPages - 1
