@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { withRouter } from 'next/router';
 import { connect } from 'react-redux';
 import * as salesActions from '../../../redux/actions/salesActions';
@@ -9,7 +9,9 @@ import { useSession } from 'next-auth/client';
 import ConfirmModal from '../ConfirmModal';
 import ExportToPdf from '../../ExportToPdf';
 const DetailsModal = (props) => {
-  console.log(props.selectedItem)
+  console.log(props.selectedItem,'hisadjanks')
+
+  const [items,setItems] = useState({})
   const [session, loading] = useSession();
   const [isVisible, setVisible] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
@@ -32,6 +34,34 @@ const DetailsModal = (props) => {
     </>,
   ]);
 
+
+  useEffect(() => {
+    if (props.selectedItem) {
+      initItems()
+    }
+  }, [props.selectedItem]);
+
+
+  const initItems = ()=>{
+    var newItems = [...props.selectedItem.items]
+    let submitItems = []
+
+    newItems.map( item=>{
+        item.isOverride = false
+        submitItems.push({isOverride : false,
+          product:item.product,
+          unit_price:item.unit_price,
+          product_name:item.product_name,
+          product_code:item.product_code,
+          quantity:item.quantity,
+          box_amount:item.box_amount,
+         })
+
+      })
+
+    setItems(submitItems)
+  }
+  // console.log(items,'tanginanaman')
   const [isContinue, setContinue] = useState(false);
   const [isDiscount, setDiscountApproval] = useState(false);
 
@@ -47,12 +77,45 @@ const DetailsModal = (props) => {
   const [accountName, setAccountName] = useState(null);
 
   const [totalDiscount, setTotalDiscount] = useState(null);
+  const [subTotal, setSubTotal] = useState(null);
+  const [totalAmount, setTotalAmount] = useState(null);
 
   const [discountError, setDiscountError] = useState(false);
 
   const [successModal, setSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState(false);
   const [modalError, setModalError] = useState(false);
+
+  const handlePrice = (event, index) => {
+
+    let newItems = [...items]
+
+    event.preventDefault();
+    
+    console.log(newItems)
+    if (!(event.target.value < 0)) {
+      newItems[index].unit_price = event.target.value;
+    }
+
+    setItems(newItems)
+
+    handleSubTotal()
+   
+  };
+
+  const handleSubTotal = () =>{
+    let sub = 0
+    console.log(items)
+    items.map(item=>{
+      if(item.unit_price === "")
+        sub += 0
+      else
+        sub += ((item.quantity * parseFloat(item.unit_price)) + parseFloat(item.box_amount))
+    })
+
+    console.log(sub)
+    setSubTotal(sub)
+  }
 
   const handleDiscount = (event) => {
     event.preventDefault();
@@ -62,9 +125,34 @@ const DetailsModal = (props) => {
     }
   };
 
+
   const submitDiscount = (event) => {
+    if(totalDiscount === ''){
+    
+      
+      setDiscountError('Required Field');
+      return
+    }
+
+    let unit_price = []
+    let hasChange = false
+
+    items.map((item, index) =>{
+        if(item.unit_price !== props.selectedItem.items[index].unit_price)
+            hasChange = true  
+        unit_price.push(
+         {
+            unit_price:item.unit_price,
+            product: item.product.id,
+         }
+        )
+    })
+
+    if(!hasChange)
+      unit_price = null
+
     let discount = totalDiscount
-      ? totalDiscount / 1000
+      ? totalDiscount / 100
       : props.selectedItem.total_discount;
 
     event.preventDefault();
@@ -72,9 +160,11 @@ const DetailsModal = (props) => {
       .approveDiscount(
         session.user.auth_token,
         props.selectedItem.uuid,
-        discount
+        discount,
+        unit_price
       )
       .then((res) => {
+        console.log(res,'hehe')
         if (res.status === 200) {
           props.setModalMessage('Discount has been approved.');
           props.setModalError(false);
@@ -128,12 +218,14 @@ const DetailsModal = (props) => {
                     totalDiscount
                       ? numberWithCommas(
                           parseFloat(
-                            props.selectedItem.total * (totalDiscount / 100)
+                            subTotal && subTotal !== ''  ? (subTotal * (totalDiscount / 100)) :
+                            props.selectedItem.subtotal * (totalDiscount / 100)
                           ).toFixed(2)
                         )
                       : numberWithCommas(
                           parseFloat(
-                            props.selectedItem.total *
+                            subTotal && subTotal !== '' ? (subTotal * props.selectedItem.total_discount) :
+                            props.selectedItem.subtotal *
                               props.selectedItem.total_discount
                           ).toFixed(2)
                         )
@@ -145,10 +237,23 @@ const DetailsModal = (props) => {
                   for="sales_date"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Sub Total
+                  Subtotal
                 </label>
                 <p className="block text-base font-medium ">
-                  {'₱' + props.selectedItem.subtotal + ' PHP'}
+                {`₱ ${
+                    subTotal
+                      ? numberWithCommas(
+                          parseFloat(
+                        subTotal
+                          ).toFixed(2)
+                        )
+                      : numberWithCommas(
+                          parseFloat(
+                            props.selectedItem.subtotal 
+                          ).toFixed(2)
+                        )
+                  } PHP`}
+         
                 </p>
               </div>
               <div className="col-span-6 sm:col-span-3">
@@ -161,13 +266,18 @@ const DetailsModal = (props) => {
                 <p className="block text-base font-medium ">
                   {`₱ ${
                     totalDiscount
-                      ? props.selectedItem.total -
+                      ?
+                      subTotal ? (subTotal  - subTotal * (totalDiscount / 100)) :
+                      props.selectedItem.subtotal -
                         props.selectedItem.total * (totalDiscount / 100)
                       : numberWithCommas(
                           parseFloat(
+                            subTotal ? (subTotal -
+                              subTotal *
+                                props.selectedItem.total_discount) :
                             props.selectedItem.subtotal -
-                              props.selectedItem.total *
-                                props.selectedItem.total_discount
+                              (props.selectedItem.total *
+                                props.selectedItem.total_discount)
                           ).toFixed(2)
                         )
                   } PHP`}
@@ -196,11 +306,160 @@ const DetailsModal = (props) => {
                   autocomplete="discount"
                   className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                 />
+                  {discountError ? (
+                    <span className="text-red-500">
+                      {discountError}
+                    </span>
+                  ) : null}
+              </div>
+            </div>
+            <div className="mt-4">
+            <table className="items-center w-full bg-transparent border-collapse">
+                <thead className="bg-gray-100 ">
+                  <tr>
+                    <th
+                      className={
+                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                      }
+                    >
+                      Item Code
+                    </th>
+                    <th
+                      className={
+                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                      }
+                    >
+                      Item Name
+                    </th>
+                    <th
+                      className={
+                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                      }
+                    >
+                      Quantity
+                    </th>
+                    <th
+                      className={
+                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                      }
+                    >
+                        Item Price
+                    </th>
+                    <th
+                      className={
+                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                      }
+                    >
+                      Box Price
+                    </th>
+
+                    {/* <th
+                      className={
+                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                      }
+                    >
+                      Amount
+                    </th> */}
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map(
+                    (item, index) => (
+                      <tr className="mt-1 justify-center align-center text-gray-800 border-gray-200 ">
+                        <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
+                          <div className="h-8 w-8  bg-white rounded-full border justify-center flex">
+                            <img
+                              src={
+                                item.product.images.length > 0
+                                  ? item.product.images[0].image
+                                  : '/img/sketch.jpg'
+                              }
+                              className="h-full overflow-hidden bg-white rounded-full  object-fit"
+                              alt="..."
+                            ></img>
+                          </div>
+
+                          <span className={'ml-3 font-bold '}>
+                            {
+                              item.product_code
+                            }
+                          </span>
+                        </th>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                        {item.product_name}
+                        </td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                          {'x' +
+                            item.quantity}
+                        </td>
+                        {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                          {`₱${item.unit_price} PHP`}
+                        </td> */}
+                        <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap relative items-stretch">
+                                          
+                          <span
+                           onClick={() =>{
+                            (item.isOverride =
+                              !item.isOverride)
+                            if(item.unit_price === "")
+                              item.unit_price = props.selectedItem.items[index].unit_price
+                            }
+                            }
+                            className={`z-10 h-full  cursor-pointer leading-snug font-normal absolute right-0 pr-2 py-3 ${
+                              ! item.isOverride
+                                ? 'text-gray-600 hover:text-gray-800'
+                                : 'text-gray-800 hover:text-gray-600'
+                            }`}
+                          >
+                            <i className="fas fa-edit"></i>
+                          </span>
+                
+
+                          <input
+                            type="number"
+                            name="price"
+                            disabled={
+                              item.isOverride ? false : true
+                            }
+                            value={
+                              item.unit_price
+                            }
+                            onChange={(event) =>
+                              handlePrice(event, index)
+                            }
+                            id="price"
+                            class={`mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md ${
+                            
+                              !true
+                                ? 'opacity-80 cursor-not-allowed'
+                                : null
+                            }`}
+                          />
+                        </td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                          {`₱${item.box_amount} PHP`}
+                        </td>
+
+                        {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                          {`₱ ${(
+                            props.selectedItem.items[index]
+                              .quantity *
+                            parseFloat(
+                              props.selectedItem.items[index]
+                                .unit_price
+                            )
+                          ).toFixed(2)} PHP`}
+                        </td> */}
+                      </tr>
+                    )
+                  )}
+               
+                </tbody>
+              </table>
               </div>
             </div>
           </div>
         </div>
-      </div>
     );
   };
 
@@ -511,6 +770,7 @@ const DetailsModal = (props) => {
     setBankName(null);
     setAccountNum(null);
     setAccountName(null);
+    setDiscountApproval(false)
     setPaymentDate(new Date());
     setNewitems([
       <>
@@ -866,19 +1126,25 @@ const DetailsModal = (props) => {
                                     }
                                     align="end"
                                   >
-                                    <span>Total Discount</span>
+                                    <span>{(props.selectedItem.total_discount > 0 &&
+                          props.selectedItem.discount_approved === false ) || !props.selectedItem.price_approved   ? 'To be Discounted' : 'Total Discount'}</span>
                                   </th>
                                   <td
                                     className={
                                       ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold   text-red-500  border-gray-200'
                                     }
                                   >
-                                    <span>{`₱ ${numberWithCommas(
+                                    <span>{(props.selectedItem.total_discount > 0 &&
+                          props.selectedItem.discount_approved === false ) || !props.selectedItem.price_approved ? (`₱ ${numberWithCommas(
+                                      parseFloat(
+                                        props.selectedItem.total * props.selectedItem.total_discount
+                                      ).toFixed(2)
+                                    )} PHP`) : (`₱ ${numberWithCommas(
                                       parseFloat(
                                         props.selectedItem.total -
                                           props.selectedItem.subtotal
                                       ).toFixed(2)
-                                    )} PHP`}</span>
+                                    )} PHP`)}</span>
                                   </td>
                                 </tr>
                               </tbody>
@@ -933,7 +1199,7 @@ const DetailsModal = (props) => {
                             <button
                               className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
-                              onClick={() => props.closeModal()}
+                              onClick={() => clearState()}
                             >
                               Close
                             </button>
@@ -990,7 +1256,7 @@ const DetailsModal = (props) => {
                             <button
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
-                              onClick={() => props.closeModal()}
+                              onClick={() => clearState()}
                             >
                               Close
                             </button>
@@ -1001,7 +1267,7 @@ const DetailsModal = (props) => {
                             <button
                               className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
-                              onClick={() => props.closeModal()}
+                              onClick={() => clearState()}
                             >
                               Close
                             </button>
@@ -1015,8 +1281,8 @@ const DetailsModal = (props) => {
                               Mark as Paid
                             </button>
                           </>
-                        ) : props.selectedItem.total_discount > 0 &&
-                          props.selectedItem.discount_approved === false ? (
+                        ) : (props.selectedItem.total_discount > 0 &&
+                          props.selectedItem.discount_approved === false ) || !props.selectedItem.price_approved ? (
                           <>
                             <button
                               className={`bg-green-600 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150
@@ -1032,7 +1298,7 @@ const DetailsModal = (props) => {
                                   : submitDiscount(event)
                               }
                             >
-                              {!isDiscount ? 'Approve Discount' : 'Submit'}
+                              {!isDiscount ? 'Approve Order' : 'Submit'}
                             </button>
                           </>
                         ) : (
@@ -1040,11 +1306,12 @@ const DetailsModal = (props) => {
                             <button
                               className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
-                              onClick={() => props.closeModal()}
+                              onClick={() => clearState()}
                             >
                               Close
                             </button>
-                            <button
+                            {!isContinue ? 
+                            (<button
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
                               onClick={(event) => {
@@ -1055,7 +1322,7 @@ const DetailsModal = (props) => {
                               }}
                             >
                               Delete
-                            </button>
+                            </button>) : null}
                             <button
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
@@ -1130,8 +1397,8 @@ const mapDispatchToProps = (dispatch) => ({
   getSales: (token) => {
     dispatch(salesActions.getSales(token));
   },
-  approveDiscount: (token, uuid, discount) =>
-    dispatch(salesActions.approveDiscount(token, uuid, discount)),
+  approveDiscount: (token, uuid, discount,unit_price) =>
+    dispatch(salesActions.approveDiscount(token, uuid, discount,unit_price)),
 });
 
 export default withRouter(

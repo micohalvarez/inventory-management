@@ -18,6 +18,7 @@ import SuccessModal from '../Modals/SuccessModal';
 import * as userActions from '../../redux/actions/userActions';
 
 const UsersTable = (props) => {
+  console.log(props)
   const [showFormModal, setFormShowModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -204,7 +205,7 @@ const UsersTable = (props) => {
                         {item.username}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                        {item.is_staff ? 'TRUE' : 'FALSE'}
+                        {item.is_superuser ? 'TRUE' : 'FALSE'}
                       </td>
 
                       {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-right">

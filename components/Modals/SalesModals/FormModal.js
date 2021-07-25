@@ -287,8 +287,7 @@ const FormModal = (props) => {
     var hasError = false;
 
     submitItems.map((item) => {
-      console.log(item.box_amount)
-      console.log(isNaN(item.box_amount))
+  
       if (item.quantity <= 0 || isNaN(item.quantity)) {
         hasError = true;
         setModalMessage('Quantities must be numeric and greater than 0.');
@@ -322,7 +321,7 @@ const FormModal = (props) => {
           customerName
         )
         .then((res) => {
-          console.log(res);
+
           if (res.status === 200) {
             props.setModalMessage(
               'You have successfully added a new sales order.'
@@ -546,9 +545,9 @@ const FormModal = (props) => {
                                           <div className="bg-white flex-1">
                                             <Select
                                               options={props.allItems}
-                                              labelField={'code'}
+                                              labelField={'name'}
                                               valueField={'id'}
-                                              searchBy={'name'}
+                                              searchBy={'code'}
                                               className="ml-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md "
                                               clearOnSelect={true}
                                               onChange={(value) => {
@@ -583,7 +582,7 @@ const FormModal = (props) => {
                                           />
                                         </td>
                     
-                                        {session.user.user.is_superuser ? (
+                                        {true ? (
                                           <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap relative items-stretch">
                                             {item.type === null ? null : (
                                               <span

@@ -127,10 +127,9 @@ const SalesTab = (props) => {
                     onSelectDiscount();
                   }}
                   data-toggle="tab"
-                  href="#link3"
                   role="tablist"
                 >
-                  <i className="fas fa-ban text-base mr-1"></i> Discount Pending
+                  <i className="fas fa-address-book text-base mr-1"></i> For Approval
                 </a>
               </li>
             ) : null}

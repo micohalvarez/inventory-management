@@ -8,7 +8,6 @@ export const getSales = (authToken) => {
   return (dispatch, getState) => {
     const sales = getState().sales;
     dispatch({ type: actionTypes.GET_SALES_START });
-    console.log(sales);
     authInstance
       .get(
         `/sales_order/?limit=${SALES_LIMIT}&offset=0` +
@@ -196,14 +195,19 @@ export const addPaymentMethod = (authToken, payload) => {
   };
 };
 
-export const approveDiscount = (authToken, uuid, discount) => {
+export const approveDiscount = (authToken, uuid, discount, unit_price) => {
   return (dispatch) => {
-    console.log('hoy');
+    
+    console.log(discount)
+    var data = {
+      total_discount: discount,
+      ...(unit_price && {unit_price: unit_price})
+    }
+
+    console.log(data)
     return authInstance.post(
       `/sales_order/${uuid}/approve_discount/`,
-      {
-        total_discount: discount,
-      },
+      data,
       {
         headers: {
           Authorization: `Token ${authToken}`,
