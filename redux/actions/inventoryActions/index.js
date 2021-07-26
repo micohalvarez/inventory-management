@@ -13,7 +13,8 @@ export const getItems = (authToken, slug = null) => {
       .get(
         `/product/?limit=${ITEMS_LIMIT}&offset=0` +
           (inventory.filter ? `&category=${inventory.filter}` : '') +
-          (inventory.sort ? `&ordering=${inventory.sort}` : ''),
+          (inventory.sort ? `&ordering=${inventory.sort}` : '&ordering=-created'),
+
         {
           headers: {
             Authorization: `Token ${authToken}`,
@@ -42,7 +43,6 @@ export const getItems = (authToken, slug = null) => {
 export const searchItem = (authToken, slug) => {
   return (dispatch, getState) => {
     dispatch({ type: actionTypes.GET_ITEMS_START });
-    console.log(slug);
     authInstance
       .get(`/product/?search=${slug}`, {
         headers: {
@@ -50,7 +50,7 @@ export const searchItem = (authToken, slug) => {
         },
       })
       .then((res) => {
-        console.log(res);
+
         if (res.status === 200 && res.data) {
           var array = [];
           dispatch({
@@ -98,7 +98,7 @@ export const getNextItems = (authToken, offSet, page) => {
         }
       )
       .then((res) => {
-        console.log(res, 'next');
+
         if (res.status === 200 && res.data.results) {
           dispatch({
             type: actionTypes.GET_ITEMS_SUCCESS,
@@ -133,7 +133,7 @@ export const getItemsWithFilter = (authToken) => {
         }
       )
       .then((res) => {
-        console.log(res);
+
         if (res.status === 200 && res.data.results) {
           dispatch({
             type: actionTypes.GET_ITEMS_SUCCESS,
@@ -168,9 +168,9 @@ export const getItemsWithOrdering = (authToken) => {
         }
       )
       .then((res) => {
-        console.log(res);
+
         if (res.status === 200 && res.data.results) {
-          console.log(res);
+
           dispatch({
             type: actionTypes.GET_ITEMS_SUCCESS,
             payload: {
@@ -191,7 +191,6 @@ export const getItemsWithOrdering = (authToken) => {
 export const getCategories = (authToken, filter) => {
   return (dispatch) => {
     dispatch({ type: actionTypes.GET_CATEGORIES_START });
-    console.log(filter);
     authInstance
       .get(`/product/category/?ordering=id`, {
         headers: {
@@ -199,9 +198,8 @@ export const getCategories = (authToken, filter) => {
         },
       })
       .then((res) => {
-        console.log(res);
         if (res.status === 200 && res.data.results) {
-          console.log(res);
+
           dispatch({
             type: actionTypes.GET_CATEGORIES_SUCCESS,
             payload: {
@@ -219,7 +217,7 @@ export const getCategories = (authToken, filter) => {
 export const addItem = (authToken, payload) => {
   return (dispatch) => {
     dispatch({ type: actionTypes.ADD_ITEM_START });
-    console.log(payload);
+
 
     return authInstance.post(`/product/`, payload, {
       headers: {
@@ -232,8 +230,7 @@ export const addItem = (authToken, payload) => {
 export const editItem = (authToken, payload, slug) => {
   return (dispatch) => {
     dispatch({ type: actionTypes.ADD_ITEM_START });
-    console.log(payload);
-    console.log(slug);
+
 
     return authInstance.patch(`/product/${slug}/`, payload, {
       headers: {
@@ -284,7 +281,7 @@ export const getAllItems = (authToken) => {
 export const getOrdersPerItem = (authToken, slug, date = null) => {
   return (dispatch) => {
     dispatch({ type: actionTypes.GET_ORDERS_PER_ITEM_START });
-    console.log(authToken);
+
     return authInstance.get(
       `/product/${slug}/orders/` + (date ? `?order_date=${date}` : ''),
       {

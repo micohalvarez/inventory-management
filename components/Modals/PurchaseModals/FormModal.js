@@ -7,11 +7,11 @@ import { useSession } from 'next-auth/client';
 import SuccessModal from '../SuccessModal';
 import Select from 'react-dropdown-select';
 const FormModal = (props) => {
-  console.log(props.selectedItem);
+
   const [modalError, setModalError] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [successModal, setSuccessModal] = useState(false);
-  console.log(props.allItems);
+
   const [type, setType] = useState('');
 
   const [total, setTotal] = useState(0);
@@ -400,9 +400,9 @@ const FormModal = (props) => {
                                             {props.selectedItem ? <span>{props.selectedItem.name}</span> 
                                             : <Select
                                               options={props.allItems}
-                                              labelField={'code'}
+                                              labelField={'name'}
                                               valueField={'id'}
-                                              searchBy={'name'}
+                                              searchBy={'code'}
                                               className="ml-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-half shadow-sm sm:text-sm border border-gray-300 rounded-md "
                                               clearOnSelect={true}
                                               onChange={(value) => {

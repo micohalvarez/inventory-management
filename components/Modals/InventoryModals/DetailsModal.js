@@ -1,7 +1,6 @@
 import React from 'react';
 
 const DetailsModal = (props) => {
-  console.log(props);
   return (
     <>
       {props.showModal ? (

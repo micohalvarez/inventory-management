@@ -53,7 +53,6 @@ const SalesTable = (props) => {
       );
     }
   };
-  console.log(props);
 
   const onPressNext = () => {
     props.getNextItems(

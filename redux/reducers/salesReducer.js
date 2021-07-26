@@ -17,7 +17,7 @@ const initialState = {
 };
 
 const data = (state = initialState, action) => {
-  console.log(action);
+
   switch (action.type) {
     case actionTypes.GET_SALES_START:
       return {

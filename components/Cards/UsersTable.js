@@ -18,7 +18,6 @@ import SuccessModal from '../Modals/SuccessModal';
 import * as userActions from '../../redux/actions/userActions';
 
 const UsersTable = (props) => {
-  console.log(props)
   const [showFormModal, setFormShowModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -92,7 +91,6 @@ const UsersTable = (props) => {
     return pagination;
   };
 
-  console.log(props);
 
   return (
     <>

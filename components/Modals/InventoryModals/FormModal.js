@@ -107,7 +107,6 @@ const FormModal = (props) => {
     };
     imageCompression(file, options)
       .then(function (compressedFile) {
-        console.log(compressedFile, 'compressedFile');
         compressed = compressedFile;
 
         setThirdPhoto(compressed);

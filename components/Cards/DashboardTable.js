@@ -49,7 +49,6 @@ const DashBoardTable = (props) => {
       );
     }
   };
-  console.log(props);
 
   const onPressNext = () => {
     props.getNextItems(
@@ -405,7 +404,6 @@ const DashBoardTable = (props) => {
   const [selectedSales, setSelectedSales] = useState(false);
   const [purchaseDetailiModal, setPurchaseDetailModal] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState(false);
-  console.log(props)
   return (
     <>
       <SalesDetailsModal

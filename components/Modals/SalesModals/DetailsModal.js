@@ -8,8 +8,9 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useSession } from 'next-auth/client';
 import ConfirmModal from '../ConfirmModal';
 import ExportToPdf from '../../ExportToPdf';
+import SuccessModal from '../SuccessModal';
 const DetailsModal = (props) => {
-  console.log(props.selectedItem,'hisadjanks')
+
 
   const [items,setItems] = useState({})
   const [session, loading] = useSession();
@@ -87,12 +88,9 @@ const DetailsModal = (props) => {
   const [modalError, setModalError] = useState(false);
 
   const handlePrice = (event, index) => {
-
+    event.preventDefault();
     let newItems = [...items]
 
-    event.preventDefault();
-    
-    console.log(newItems)
     if (!(event.target.value < 0)) {
       newItems[index].unit_price = event.target.value;
     }
@@ -105,7 +103,6 @@ const DetailsModal = (props) => {
 
   const handleSubTotal = () =>{
     let sub = 0
-    console.log(items)
     items.map(item=>{
       if(item.unit_price === "")
         sub += 0
@@ -113,7 +110,6 @@ const DetailsModal = (props) => {
         sub += ((item.quantity * parseFloat(item.unit_price)) + parseFloat(item.box_amount))
     })
 
-    console.log(sub)
     setSubTotal(sub)
   }
 
@@ -128,18 +124,22 @@ const DetailsModal = (props) => {
 
   const submitDiscount = (event) => {
     if(totalDiscount === ''){
-    
-      
+
       setDiscountError('Required Field');
       return
     }
 
     let unit_price = []
     let hasChange = false
+    let error = false
 
     items.map((item, index) =>{
         if(item.unit_price !== props.selectedItem.items[index].unit_price)
             hasChange = true  
+        if(item.unit_price === ""){
+          error = true
+          setModalMessage('Each item must have price.');
+        }
         unit_price.push(
          {
             unit_price:item.unit_price,
@@ -147,6 +147,13 @@ const DetailsModal = (props) => {
          }
         )
     })
+
+    if (error) {
+      setModalError(true);
+      setSuccessModal(true);
+      return false;
+    }
+    else{
 
     if(!hasChange)
       unit_price = null
@@ -164,7 +171,6 @@ const DetailsModal = (props) => {
         unit_price
       )
       .then((res) => {
-        console.log(res,'hehe')
         if (res.status === 200) {
           props.setModalMessage('Discount has been approved.');
           props.setModalError(false);
@@ -187,6 +193,7 @@ const DetailsModal = (props) => {
       });
     clearState();
     setDiscountApproval(false);
+    }
   };
 
   const renderDiscountContent = () => {
@@ -218,13 +225,13 @@ const DetailsModal = (props) => {
                     totalDiscount
                       ? numberWithCommas(
                           parseFloat(
-                            subTotal && subTotal !== ''  ? (subTotal * (totalDiscount / 100)) :
+                            subTotal && subTotal !== '' || subTotal === 0  ? (subTotal * (totalDiscount / 100)) :
                             props.selectedItem.subtotal * (totalDiscount / 100)
                           ).toFixed(2)
                         )
                       : numberWithCommas(
                           parseFloat(
-                            subTotal && subTotal !== '' ? (subTotal * props.selectedItem.total_discount) :
+                            subTotal && subTotal !== ''|| subTotal === 0 ? (subTotal * props.selectedItem.total_discount) :
                             props.selectedItem.subtotal *
                               props.selectedItem.total_discount
                           ).toFixed(2)
@@ -241,7 +248,7 @@ const DetailsModal = (props) => {
                 </label>
                 <p className="block text-base font-medium ">
                 {`₱ ${
-                    subTotal
+                    subTotal || subTotal === 0
                       ? numberWithCommas(
                           parseFloat(
                         subTotal
@@ -267,12 +274,12 @@ const DetailsModal = (props) => {
                   {`₱ ${
                     totalDiscount
                       ?
-                      subTotal ? (subTotal  - subTotal * (totalDiscount / 100)) :
+                      subTotal || subTotal === 0 ? (subTotal  - subTotal * (totalDiscount / 100)) :
                       props.selectedItem.subtotal -
                         props.selectedItem.total * (totalDiscount / 100)
                       : numberWithCommas(
                           parseFloat(
-                            subTotal ? (subTotal -
+                            subTotal  || subTotal === 0 ? (subTotal -
                               subTotal *
                                 props.selectedItem.total_discount) :
                             props.selectedItem.subtotal -
@@ -659,7 +666,7 @@ const DetailsModal = (props) => {
         error = true;
       }
 
-      if (accountNum === null && accountNum === '') {
+      if (accountNum === null || accountNum === '') {
         setAccountNumError('Please up field');
         error = true;
       }
@@ -810,6 +817,7 @@ const DetailsModal = (props) => {
           props.setModalMessage('Sales order will be checked for deletion');
           props.setModalError(false);
           props.setSuccessModal(true);
+          props.getSales(session.user.auth_token);
         } else {
           props.setModalMessage('Sales order cannot be deleted.');
           props.setModalError(true);
@@ -876,7 +884,14 @@ const DetailsModal = (props) => {
                       ×
                     </span>
                   </button>
+             
                 </div>
+                <SuccessModal
+                  showModal={successModal}
+                  closeModal={() => setSuccessModal(false)}
+                  message={modalMessage}
+                  hasError={modalError}
+                />
                 <div className="mt-5 md:mt-0 md:col-span-2">
                   <div className="shadow overflow-hidden sm:rounded-md bg-">
                     <div className="px-4 py-5 bg-white sm:p-6">

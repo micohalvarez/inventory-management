@@ -45,7 +45,6 @@ const ReportModal = (props) => {
     }
 
     let date = null;
-    console.log(reportDate);
     if (reportDate) {
       date = moment(reportDate).format('YYYY-MM-DD');
     }
@@ -105,7 +104,6 @@ const ReportModal = (props) => {
             quantity: numberWithCommas(totalQuantity),
           });
           setProductName(selectedItem.toUpperCase());
-          console.log(finalReport);
           setLoadingBar(false);
           setReportData(finalReport);
           generateReport();
@@ -120,8 +118,7 @@ const ReportModal = (props) => {
   const generateReport = () => {
     setTimeout(
       function () {
-        console.log(reportData);
-        console.log(csvLink.link.click());
+   
         csvLink.link.click();
       }.bind(this),
       2000

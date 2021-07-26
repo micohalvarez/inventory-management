@@ -6,7 +6,6 @@ import { Alert } from 'reactstrap';
 import { useSession } from 'next-auth/client';
 import SuccessModal from '../SuccessModal';
 const EditModal = (props) => {
-  console.log(props.selectedItem);
   const [session, loading] = useSession();
 
   const [modalError, setModalError] = useState('');
@@ -33,14 +32,14 @@ const EditModal = (props) => {
 
   useEffect(() => {
     if (props.selectedItem) {
-      console.log('hi');
+
       setTotalAmount(props.selectedItem.total);
 
       setTotalDiscount(props.selectedItem.total_discount * 10);
 
       var newItems = [];
       props.selectedItem.items.map((item, index) => {
-        console.log(item);
+
         newItems.push([{ type: null, product: null, price: 0, quantity: 1 }]);
         newItems[index].type = item.product.category.id;
         newItems[index].product = item.product.id;
@@ -131,7 +130,7 @@ const EditModal = (props) => {
     setDiscountError('');
     if (!(event.target.value > 100 || event.target.value < 0)) {
       setTotalDiscount(event.target.value);
-      console.log(totalDiscount);
+
     }
   };
 
@@ -215,7 +214,6 @@ const EditModal = (props) => {
 
     var hasError = false;
     submitItems.map((item) => {
-      console.log(item);
       if (item.quantity <= 0) {
         hasError = true;
         setModalMessage('Quantities must be greater than 0.');
@@ -239,7 +237,6 @@ const EditModal = (props) => {
           totalDiscount
         )
         .then((res) => {
-          console.log(res);
           if (res.status === 200) {
             props.setModalMessage(
               'You have successfully added a new sales order.'

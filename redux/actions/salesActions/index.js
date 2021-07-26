@@ -10,7 +10,7 @@ export const getSales = (authToken) => {
     dispatch({ type: actionTypes.GET_SALES_START });
     authInstance
       .get(
-        `/sales_order/?limit=${SALES_LIMIT}&offset=0` +
+        `/sales_order/?limit=${SALES_LIMIT}&offset=0&ordering=-created` +
           (sales.filter ? `&status=${sales.filter}` : '') +
           (sales.discounted ? `&discount_approved=${sales.discounted}` : '') +
           (sales.delete ? `&for_delete=${sales.delete}` : ''),
@@ -35,6 +35,7 @@ export const getSales = (authToken) => {
         }
       })
       .catch(({ response }) => {
+        console.log(response,'hi')
         dispatch({ type: actionTypes.GET_SALES_FAIL });
       });
   };
@@ -126,6 +127,7 @@ export const getPaymentTypes = (authToken, filter) => {
         }
       })
       .catch(({ response }) => {
+        console.log(response,'hi')
         dispatch({ type: actionTypes.GET_PAYMENT_FAIL });
       });
   };

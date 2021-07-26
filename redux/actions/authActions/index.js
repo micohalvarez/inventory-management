@@ -27,12 +27,10 @@ export const login = (payload) => {
       password: payload.password,
     };
 
-    console.log(data);
     authInstance
       .post('/account/login/', data)
       .then((res) => {
         if (res.status === 200) {
-          console.log(res);
           const authPayload = {
             signedIn: true,
             authToken: res.data.auth_token,
@@ -59,7 +57,6 @@ export const loginNextAuth = (payload) => {
       password: payload.password,
     })
       .then((res) => {
-        console.log(res);
 
         if (!res.error) {
           dispatch({ type: authActionTypes.LOGIN_SUCCESS });
@@ -69,7 +66,6 @@ export const loginNextAuth = (payload) => {
         }
       })
       .catch(() => {
-        console.log('SIGN IN FAIL');
         dispatch({ type: authActionTypes.LOGIN_FAIL });
       });
   };
@@ -93,7 +89,6 @@ export const getUsers = (authToken) => {
   return (dispatch, getState) => {
     const inventory = getState().inventory;
     dispatch({ type: actionTypes.GET_ITEMS_START });
-    console.log(inventory);
     authInstance
       .get(
         `/accoun/?limit=${10}&offset=0` +

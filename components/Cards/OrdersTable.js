@@ -63,9 +63,6 @@ const OrdersTable = (props) => {
       props.page - 1
     );
   };
-  console.log(props.offSet);
-  console.log(props.page);
-  console.log(props.totalCount);
 
   const renderPagination = () => {
     var pagination = [];

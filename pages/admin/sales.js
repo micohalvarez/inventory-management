@@ -26,7 +26,6 @@ const Sales = (props) => {
     props.getAllItems(session.user.auth_token);
   }, []);
 
-  console.log(props);
   return (
     <Admin showSideBar={showSideBar}>
       <AdminNavbar

@@ -98,7 +98,6 @@ const EditModal = (props) => {
       maxWidthOrHeight: 1920,
       useWebWorker: true,
     };
-    console.log(file);
     setFirstPhoto(file);
     setDisplayFirst(URL.createObjectURL(file));
     event.target.value = '';
@@ -162,12 +161,10 @@ const EditModal = (props) => {
       }
 
     if (description === '') {
-      console.log('hehe');
       setDescriptionError('Please up field');
       error = true;
     }
     if (error) {
-      console.log('hehe');
       setHasError(true);
     } else {
       const payload = {
@@ -274,7 +271,7 @@ const EditModal = (props) => {
                     <div class="mt-5 md:mt-0 md:col-span-2">
                       <form
                         onSubmit={(e) => {
-                          console.log('hi');
+              
                           handleSubmit(e);
                         }}
                       >

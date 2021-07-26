@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/client';
 import SuccessModal from '../SuccessModal';
 import Select from 'react-dropdown-select';
 const FormModal = (props) => {
-  console.log(props)
+
   const [session, loading] = useSession();
 
   const [modalError, setModalError] = useState('');
@@ -184,7 +184,6 @@ const FormModal = (props) => {
     event.preventDefault();
     let testItems = [...items];
     let subItems = [...submitItems];
-    console.log(event.target.value)
     if (!(event.target.value > 10000 || event.target.value < 0)) {
 
       testItems[index].box_amount = event.target.value;
@@ -213,7 +212,6 @@ const FormModal = (props) => {
 
     });
 
-    console.log(totalAmount)
     setTotalAmount(totalAmount);
   };
 
@@ -221,7 +219,6 @@ const FormModal = (props) => {
     event.preventDefault();
     let testItems = [...items];
     let subItems = [...submitItems];
-
     if (!(event.target.value < 0)) {
       testItems[index].unit_price = event.target.value;
 
@@ -300,6 +297,15 @@ const FormModal = (props) => {
       if (item.box_amount < 0 || isNaN(item.box_amount)) {
         hasError = true;
         setModalMessage('Box Prices must be numeric and greater than 0.');
+      }
+
+      if(item.box_amount === ""){
+        item.box_amount = 0
+      }
+      
+      if (item.unit_price === "") {
+        hasError = true;
+        setModalMessage('Each item must have price.');
       }
 
       if (!customerName) {
@@ -608,7 +614,7 @@ const FormModal = (props) => {
                                               }
                                               value={
                                                 item.isOverride
-                                                  ? item.unit_price
+                                                  ? item.unit_price || item.unit_price === 0 || item.unit_price === ""
                                                     ? item.unit_price
                                                     : item.price
                                                   : item.price
@@ -768,10 +774,11 @@ const FormModal = (props) => {
                                     }
                                   >
                                     <span>{`₱ ${
+                                    
                                       totalDiscount
-                                        ? totalAmount -
-                                          totalAmount * (totalDiscount / 100)
-                                        : totalAmount
+                                        ?   parseFloat(totalAmount -
+                                          totalAmount * (totalDiscount / 100)).toFixed(2)
+                                        : parseFloat(totalAmount).toFixed(2)
                                     } PHP`}</span>
                                   </td>
                                 </tfoot>

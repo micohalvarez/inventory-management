@@ -13,7 +13,7 @@ export const getOrders = (authToken) => {
 
     authInstance
       .get(
-        `/purchase_order/?limit=${ORDERS_LIMIT}&offset=0` +
+        `/purchase_order/?limit=${ORDERS_LIMIT}&offset=0&ordering=-created` +
           (orders.filter ? `&status=${orders.filter}` : '') +
           (orders.delete ? `&for_delete=${orders.delete}` : ''),
         {
@@ -23,7 +23,6 @@ export const getOrders = (authToken) => {
         }
       )
       .then((res) => {
-        console.log(res);
         if (res.status === 200) {
           dispatch({
             type: actionTypes.GET_ORDERS_SUCCESS,
@@ -124,7 +123,7 @@ export const getOrdersWithFilter = (authToken, filter) => {
         },
       })
       .then((res) => {
-        console.log(res);
+
         if (res.status === 200 && res.data.results) {
           dispatch({
             type: actionTypes.GET_ORDERS_SUCCESS,
@@ -176,7 +175,7 @@ export const clearFilter = () => {
 
 export const markPaid = (authToken, uuid) => {
   return (dispatch) => {
-    console.log('HOy');
+
     return authInstance.post(
       `/purchase_order/${uuid}/mark_as_paid/`,
       {},

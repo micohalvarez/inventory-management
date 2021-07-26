@@ -9,7 +9,7 @@ import moment from 'moment';
 import ConfirmModal from '../ConfirmModal';
 import { useSession } from 'next-auth/client';
 const DetailsModal = (props) => {
-  console.log(props);
+
   const [isVisible, setVisible] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [onConfirm, setOnConfirm] = useState(null);
@@ -35,19 +35,23 @@ const DetailsModal = (props) => {
   const [isContinue, setContinue] = useState(false);
 
   const [paymentType, setPaymentType] = useState(null);
+  const [paymentTypeError, setPaymentTypeError] = useState(null);
   const [bankName, setBankName] = useState(null);
+  const [bankNameError, setBankNameError] = useState(null);
   const [accountNum, setAccountNum] = useState(null);
+  const [accountNumError, setAccountNumError] = useState(null);
   const [accountName, setAccountName] = useState(null);
   const [paymentDate, setPaymentDate] = useState(new Date());
+  const [paymentDateError, setPaymentDateError] = useState(null);
 
   const handlePaymentType = (event) => {
     event.preventDefault();
-
+    setPaymentTypeError('');
     setPaymentType(event.target.value);
   };
   const handleAccountNum = (event) => {
     event.preventDefault();
-
+    setAccountNumError('');
     setAccountNum(event.target.value);
   };
   const handleAccountName = (event) => {
@@ -56,11 +60,35 @@ const DetailsModal = (props) => {
   };
   const handleBankName = (event) => {
     event.preventDefault();
+    setBankNameError('');
     setBankName(event.target.value);
   };
   const handlePaymentSubmit = (event) => {
     event.preventDefault();
 
+    let error = false;
+    if (paymentType === null) {
+      setPaymentTypeError('Please up field');
+      error = true;
+    } else if (paymentType !== null && paymentType >= 2) {
+      if (bankName === null || bankName === '') {
+        setBankNameError('Please up field');
+        error = true;
+      }
+
+      if (accountNum === null || accountNum === '') {
+        setAccountNumError('Please up field');
+        error = true;
+      }
+      if (
+        !moment(paymentDate).isValid() ||
+        paymentDate === null ||
+        paymentDate === ''
+      ) {
+        setPaymentDateError('Please enter a valid date');
+      }
+    }
+    if (!error) {
     const payload = {
       order: props.selectedItem.id,
       type: paymentType,
@@ -91,6 +119,7 @@ const DetailsModal = (props) => {
         props.setSuccessModal(true);
       });
     clearState();
+    }
   };
 
   const markPaid = (event) => {
@@ -100,12 +129,12 @@ const DetailsModal = (props) => {
       .markPaid(session.user.auth_token, props.selectedItem.uuid)
       .then((res) => {
         if (res.status === 200) {
-          props.setModalMessage('Sales order has been marked as paid.');
+          props.setModalMessage('Purchase order has been marked as paid.');
           props.setModalError(false);
           props.setSuccessModal(true);
           props.getOrders(session.user.auth_token);
         } else {
-          props.setModalMessage('Sales order cannot be marked as paid.');
+          props.setModalMessage('Purchase order cannot be marked as paid.');
           props.setModalError(true);
           props.setSuccessModal(true);
         }
@@ -127,12 +156,22 @@ const DetailsModal = (props) => {
       .markCancel(session.user.auth_token, props.selectedItem.uuid)
       .then((res) => {
         if (res.status === 200) {
-          alert('Purchase order has bene marked as cancelled');
+          props.setModalMessage('Purchase order has been marked as cancelled.');
+          props.setModalError(false);
+          props.setSuccessModal(true);
           props.getOrders(session.user.auth_token);
-        } else alert('Purchase order cannot be marked as cancelled');
+        } else {
+          props.setModalMessage('Purchase order cannot be marked as cancelled.');
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        }
       })
-      .catch(({ response }) => {
-        alert('An error has occurred');
+      .catch((error) => {
+        props.setModalMessage(
+          'A server error has occurred. Please try again later'
+        );
+        props.setModalError(true);
+        props.setSuccessModal(true);
       });
     clearState();
   };
@@ -162,7 +201,6 @@ const DetailsModal = (props) => {
     props
       .deleteOrder(session.user.auth_token, props.selectedItem.uuid)
       .then((res) => {
-        console.log(res);
         if (res.status === 204) {
           props.setModalMessage('Purchase order has been deleted.');
           props.setModalError(false);
@@ -528,6 +566,9 @@ const DetailsModal = (props) => {
                                       </option>
                                     ))}
                                   </select>
+                                  {paymentTypeError ? (
+                  <span className="text-red-500">{paymentTypeError}</span>
+                ) : null}
                                 </div>
 
                                 <div className="col-span-6 sm:col-span-3">
@@ -552,6 +593,9 @@ const DetailsModal = (props) => {
                                     autocomplete="given-name"
                                     className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                                   />
+                                          {accountNumError ? (
+                  <span className="text-red-500">{accountNumError}</span>
+                ) : null}
                                 </div>
                                 <div className="col-span-6 sm:col-span-3">
                                   <label
@@ -575,6 +619,9 @@ const DetailsModal = (props) => {
                                     autocomplete="given-name"
                                     className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                                   />
+                                       {bankNameError ? (
+                  <span className="text-red-500">{bankNameError}</span>
+                ) : null}
                                 </div>
                                 <div className="col-span-6 sm:col-span-3">
                                   <label
@@ -593,9 +640,11 @@ const DetailsModal = (props) => {
                                     selected={paymentDate}
                                     onChange={(date) => {
                                       setPaymentDate(date);
-                                      console.log(date);
                                     }}
                                   />
+                                    {paymentDateError ? (
+                  <span className="text-red-500">{paymentDateError}</span>
+                ) : null}
                                 </div>
                               </div>
                               {/* <div className="mt-4">
@@ -671,7 +720,7 @@ const DetailsModal = (props) => {
                             <button
                               className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
-                              onClick={() => props.closeModal()}
+                              onClick={() => clearState()}
                             >
                               Close
                             </button>
@@ -749,10 +798,11 @@ const DetailsModal = (props) => {
                             <button
                               className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
-                              onClick={() => props.closeModal()}
+                              onClick={() => clearState()}
                             >
                               Close
                             </button>
+                            {!isContinue ? (
                             <button
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
@@ -765,14 +815,17 @@ const DetailsModal = (props) => {
                             >
                               Delete
                             </button>
+                            ):null}
                             <button
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
                               onClick={(event) => {
-                                markCancel(event);
+                                !isContinue
+                                  ? markCancel(event)
+                                  : setContinue(false);
                               }}
                             >
-                              Cancel
+                               {!isContinue ? 'Cancel' : 'Back'}
                             </button>
                             <button
                               className="bg-green-600 text-white hover:bg-green-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"

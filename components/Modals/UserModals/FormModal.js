@@ -58,11 +58,10 @@ const FormModal = (props) => {
         ...(userType === 1 && { groups: [1] }),
       };
 
-      console.log(payload);
       props
         .createUser(session.user.auth_token, payload)
         .then((res) => {
-          console.log(res);
+
           if (res.status === 201) {
             props.setModalMessage('You have successfully added a new user.');
             props.setModalError(false);
@@ -305,7 +304,6 @@ const FormModal = (props) => {
                                 </label>
                                 <select
                                   onChange={(event) => {
-                                    console.log(event.target.value);
                                     setUserType(event.target.value);
                                   }}
                                   class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
