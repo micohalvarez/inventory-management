@@ -10,13 +10,14 @@ import ConfirmModal from '../ConfirmModal';
 import ExportToPdf from '../../ExportToPdf';
 import SuccessModal from '../SuccessModal';
 const DetailsModal = (props) => {
-
+  console.log(props)
 
   const [items,setItems] = useState({})
   const [session, loading] = useSession();
   const [isVisible, setVisible] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [onConfirm, setOnConfirm] = useState(null);
+  const [totalBoxAmount, setBoxAmount] = useState(0);
 
   const [newItems, setNewitems] = useState([
     <>
@@ -46,7 +47,7 @@ const DetailsModal = (props) => {
   const initItems = ()=>{
     var newItems = [...props.selectedItem.items]
     let submitItems = []
-
+    let totalBoxAmount = 0;
     newItems.map( item=>{
         item.isOverride = false
         submitItems.push({isOverride : false,
@@ -57,8 +58,10 @@ const DetailsModal = (props) => {
           quantity:item.quantity,
           box_amount:item.box_amount,
          })
-
+         totalBoxAmount += parseFloat(item.box_amount)
       })
+
+    setBoxAmount(totalBoxAmount)
 
     setItems(submitItems)
   }
@@ -225,14 +228,14 @@ const DetailsModal = (props) => {
                     totalDiscount
                       ? numberWithCommas(
                           parseFloat(
-                            subTotal && subTotal !== '' || subTotal === 0  ? (subTotal * (totalDiscount / 100)) :
-                            props.selectedItem.subtotal * (totalDiscount / 100)
+                            subTotal && subTotal !== '' || subTotal === 0  ? ((subTotal - totalBoxAmount) * (totalDiscount / 100)) :
+                            (props.selectedItem.subtotal - totalBoxAmount) * (totalDiscount / 100)
                           ).toFixed(2)
                         )
                       : numberWithCommas(
                           parseFloat(
-                            subTotal && subTotal !== ''|| subTotal === 0 ? (subTotal * props.selectedItem.total_discount) :
-                            props.selectedItem.subtotal *
+                            subTotal && subTotal !== ''|| subTotal === 0 ? ((subTotal - totalBoxAmount) * props.selectedItem.total_discount) :
+                            (props.selectedItem.subtotal - totalBoxAmount) *
                               props.selectedItem.total_discount
                           ).toFixed(2)
                         )
@@ -274,16 +277,16 @@ const DetailsModal = (props) => {
                   {`₱ ${
                     totalDiscount
                       ?
-                      subTotal || subTotal === 0 ? (subTotal  - subTotal * (totalDiscount / 100)) :
+                      subTotal || subTotal === 0 ? (subTotal  - (subTotal - totalBoxAmount) * (totalDiscount / 100)) :
                       props.selectedItem.subtotal -
-                        props.selectedItem.total * (totalDiscount / 100)
+                      (props.selectedItem.subtotal - totalBoxAmount) * (totalDiscount / 100)
                       : numberWithCommas(
                           parseFloat(
                             subTotal  || subTotal === 0 ? (subTotal -
-                              subTotal *
+                              (subTotal- totalBoxAmount) *
                                 props.selectedItem.total_discount) :
                             props.selectedItem.subtotal -
-                              (props.selectedItem.total *
+                              ((props.selectedItem.subtotal - totalBoxAmount) *
                                 props.selectedItem.total_discount)
                           ).toFixed(2)
                         )
@@ -399,9 +402,7 @@ const DetailsModal = (props) => {
                           {'x' +
                             item.quantity}
                         </td>
-                        {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                          {`₱${item.unit_price} PHP`}
-                        </td> */}
+                  
                         <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap relative items-stretch">
                                           
                           <span
@@ -1013,6 +1014,19 @@ const DetailsModal = (props) => {
                                     props.selectedItem.received_by.last_name)}
                               </p>
                             </div>
+                            <div className="col-span-6 sm:col-span-3">
+                              <label
+                                for="shipment_date"
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                Note
+                              </label>
+                              <p className="block text-base font-medium ">
+                                {props.selectedItem.note === null
+                                  ? 'N/A' :
+                                  (props.selectedItem.note )}
+                              </p>
+                            </div>
                           </div>
                           <div className="mt-4">
                             <table className="items-center w-full bg-transparent border-collapse">
@@ -1142,7 +1156,7 @@ const DetailsModal = (props) => {
                                     align="end"
                                   >
                                     <span>{(props.selectedItem.total_discount > 0 &&
-                          props.selectedItem.discount_approved === false ) || !props.selectedItem.price_approved   ? 'To be Discounted' : 'Total Discount'}</span>
+                            props.selectedItem.discount_approved === false ) || !props.selectedItem.price_approved   ? 'To be Discounted' : 'Total Discount'}</span>
                                   </th>
                                   <td
                                     className={
@@ -1152,7 +1166,7 @@ const DetailsModal = (props) => {
                                     <span>{(props.selectedItem.total_discount > 0 &&
                           props.selectedItem.discount_approved === false ) || !props.selectedItem.price_approved ? (`₱ ${numberWithCommas(
                                       parseFloat(
-                                        props.selectedItem.total * props.selectedItem.total_discount
+                                        (props.selectedItem.subtotal - totalBoxAmount) * props.selectedItem.total_discount
                                       ).toFixed(2)
                                     )} PHP`) : (`₱ ${numberWithCommas(
                                       parseFloat(

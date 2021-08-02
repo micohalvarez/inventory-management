@@ -137,7 +137,8 @@ export const createSalesOrder = (
   authToken,
   payload,
   totalDiscount,
-  customerName
+  customerName,
+  note
 ) => {
   return (dispatch) => {
     var data;
@@ -147,11 +148,13 @@ export const createSalesOrder = (
         items: payload,
         total_discount: totalDiscount / 100,
         customer_name: customerName,
+        ...(note && {note: note})
       };
     else
       data = {
         items: payload,
         customer_name: customerName,
+        ...(note && {note: note})
       };
 
     console.log(data);

@@ -6,6 +6,7 @@ import { Alert } from 'reactstrap';
 import { useSession } from 'next-auth/client';
 import SuccessModal from '../SuccessModal';
 import Select from 'react-dropdown-select';
+import DatePicker from 'react-datepicker';
 const FormModal = (props) => {
 
   const [session, loading] = useSession();
@@ -15,13 +16,18 @@ const FormModal = (props) => {
   const [successModal, setSuccessModal] = useState(false);
 
   const [customerName, setCustomerName] = useState('');
+  const [note,setNote]= useState('')
   const [name, setName] = useState('');
   const [type, setType] = useState('');
 
   const [customerNameError, setCustomerNameError] = useState('');
+  const [noteError, setNoteError] = useState('');
   const [nameError, setNameError] = useState('');
   const [typeError, setTypeError] = useState('');
 
+  const [paymentDate, setPaymentDate] = useState(new Date());
+  const [paymentDateError, setPaymentDateError] = useState(null);
+  
   const [items, setItems] = useState([
     {
       type: null,
@@ -40,7 +46,7 @@ const FormModal = (props) => {
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [totalDiscountAmount, setTotalDiscountAmount] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
-
+  const [totalBoxAmount, setTotalBoxAmount] = useState(0);
   const [quantity, setQuantity] = useState([0]);
 
   const [boxError, setBoxError] = useState('');
@@ -164,6 +170,12 @@ const FormModal = (props) => {
     setCustomerName(event.target.value);
   };
 
+  const handleNote = (event) => {
+    event.preventDefault();
+    setNoteError('');
+    setNote(event.target.value);
+  };
+
   const handleQuantity = (event, index) => {
     event.preventDefault();
     let testItems = [...items];
@@ -204,15 +216,15 @@ const FormModal = (props) => {
 
   const handleTotalAmount = () => {
     let totalAmount = 0;
-
+    let totalBox = 0
     items.map((item) => {
 
       totalAmount += ((item.unit_price ? item.unit_price : item.price) * item.quantity) + (item.box_amount ? parseFloat(item.box_amount) : 0)
-
-
+      totalBox += (item.box_amount ? parseFloat(item.box_amount) : 0)
     });
 
     setTotalAmount(totalAmount);
+    setTotalBoxAmount(totalBox);
   };
 
   const handlePrice = (event, index) => {
@@ -324,7 +336,8 @@ const FormModal = (props) => {
           session.user.auth_token,
           submitItems,
           totalDiscount,
-          customerName
+          customerName,
+          note
         )
         .then((res) => {
 
@@ -471,6 +484,51 @@ const FormModal = (props) => {
                                   </span>
                                 ) : null}
                               </div>
+                              <div class="col-span-6 sm:col-span-3">
+                                <label
+                                  for="customer_name"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                  Note/Remark(Optional)
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="Note/Remark"
+                                  value={note}
+                                  onChange={handleNote}
+                                  name="note"
+                                  id="note"
+                                  autocomplete="note"
+                                  class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-5/12 shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                />
+                                {noteError ? (
+                                  <span className="text-red-500">
+                                    {noteError}
+                                  </span>
+                                ) : null}
+                              </div>
+                          {/* <div className="col-span-6 sm:col-span-3 flex flex-col">
+                            <label
+                              for="sales_date"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              Purchase Date
+                            </label>
+                            <DatePicker
+                              disabled={
+                                paymentType === null || paymentType < 2 ? true : false
+                              }
+                              className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                              selected={paymentDate}
+                              onChange={(date) => {
+                                setPaymentDateError(null);
+                                setPaymentDate(date);
+                              }}
+                            />
+                            {paymentDateError ? (
+                              <span className="text-red-500">{paymentDateError}</span>
+                            ) : null}
+                          </div> */}
                             </div>
                             <div className="p-6 h-2/5 max-h-80 overflow-y-auto">
                               <table className="items-center w-full bg-transparent border-collapse">
@@ -732,7 +790,7 @@ const FormModal = (props) => {
                                         totalDiscount > 0
                                           ? numberWithCommas(
                                               parseFloat(
-                                                totalAmount *
+                                                (totalAmount - totalBoxAmount) *
                                                   (totalDiscount / 100)
                                               ).toFixed(2)
                                             )
@@ -776,9 +834,10 @@ const FormModal = (props) => {
                                     <span>{`₱ ${
                                     
                                       totalDiscount
-                                        ?   parseFloat(totalAmount -
-                                          totalAmount * (totalDiscount / 100)).toFixed(2)
-                                        : parseFloat(totalAmount).toFixed(2)
+                                        ?   numberWithCommas(parseFloat(totalAmount -
+                                          (totalAmount - totalBoxAmount) *
+                                          (totalDiscount / 100)).toFixed(2))
+                                        : numberWithCommas(parseFloat(totalAmount).toFixed(2))
                                     } PHP`}</span>
                                   </td>
                                 </tfoot>
@@ -996,13 +1055,14 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getSales: (authToken) => dispatch(salesActions.getSales(authToken)),
-  createSalesOrder: (authToken, payload, totalDiscount, customerName) =>
+  createSalesOrder: (authToken, payload, totalDiscount, customerName,note) =>
     dispatch(
       salesActions.createSalesOrder(
         authToken,
         payload,
         totalDiscount,
-        customerName
+        customerName,
+        note
       )
     ),
   addPaymentMethod: (authToken, payload) =>
