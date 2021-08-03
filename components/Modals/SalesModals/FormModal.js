@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { withRouter } from 'next/router';
 import { connect } from 'react-redux';
 import * as salesActions from '../../../redux/actions/salesActions';
-import { Alert } from 'reactstrap';
+
 import { useSession } from 'next-auth/client';
 import SuccessModal from '../SuccessModal';
 import Select from 'react-dropdown-select';
 import DatePicker from 'react-datepicker';
+import moment from 'moment';
 const FormModal = (props) => {
 
   const [session, loading] = useSession();
@@ -27,6 +28,9 @@ const FormModal = (props) => {
 
   const [paymentDate, setPaymentDate] = useState(new Date());
   const [paymentDateError, setPaymentDateError] = useState(null);
+
+  const [purchaseDate, setPurchaseDate] = useState(new Date());
+  const [purchaseDateError, setPurchaseDateError] = useState(null);
   
   const [items, setItems] = useState([
     {
@@ -337,10 +341,10 @@ const FormModal = (props) => {
           submitItems,
           totalDiscount,
           customerName,
-          note
+          note,
+          moment(purchaseDate).format('YYYY-MM-DD'),
         )
         .then((res) => {
-
           if (res.status === 200) {
             props.setModalMessage(
               'You have successfully added a new sales order.'
@@ -385,6 +389,8 @@ const FormModal = (props) => {
     ]);
     setTotalAmount(0);
     setCustomerName('')
+    setNote('')
+    setPurchaseDate(new Date())
     setTotalDiscount(0);
     setTotalDiscountAmount(0);
     setSuccessModal(false);
@@ -507,28 +513,26 @@ const FormModal = (props) => {
                                   </span>
                                 ) : null}
                               </div>
-                          {/* <div className="col-span-6 sm:col-span-3 flex flex-col">
+                          <div className="col-span-6 sm:col-span-3 flex flex-col">
                             <label
                               for="sales_date"
                               className="block text-sm font-medium text-gray-700"
                             >
-                              Purchase Date
+                              Date of Purchase
                             </label>
                             <DatePicker
-                              disabled={
-                                paymentType === null || paymentType < 2 ? true : false
-                              }
+                      
                               className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-                              selected={paymentDate}
+                              selected={purchaseDate}
                               onChange={(date) => {
-                                setPaymentDateError(null);
-                                setPaymentDate(date);
+                                setPurchaseDateError(null);
+                                setPurchaseDate(date);
                               }}
                             />
-                            {paymentDateError ? (
-                              <span className="text-red-500">{paymentDateError}</span>
+                            {purchaseDateError ? (
+                              <span className="text-red-500">{purchaseDateError}</span>
                             ) : null}
-                          </div> */}
+                          </div>
                             </div>
                             <div className="p-6 h-2/5 max-h-80 overflow-y-auto">
                               <table className="items-center w-full bg-transparent border-collapse">
@@ -1055,14 +1059,14 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getSales: (authToken) => dispatch(salesActions.getSales(authToken)),
-  createSalesOrder: (authToken, payload, totalDiscount, customerName,note) =>
+  createSalesOrder: (authToken, payload, totalDiscount, customerName,note,purchaseDate) =>
     dispatch(
       salesActions.createSalesOrder(
         authToken,
         payload,
         totalDiscount,
         customerName,
-        note
+        note,purchaseDate
       )
     ),
   addPaymentMethod: (authToken, payload) =>

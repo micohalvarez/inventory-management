@@ -41,6 +41,31 @@ export const getSales = (authToken) => {
   };
 };
 
+
+export const editPayment = (authToken, uuid,payload) => {
+  return (dispatch) => {
+
+    console.log(payload)
+    return authInstance.patch(`/payment/${uuid}/update_payment/`, payload, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+  };
+};
+
+export const editOrder = (authToken, uuid,payload) => {
+  return (dispatch) => {
+
+    console.log(payload)
+    return authInstance.patch(`/sales_order/${uuid}/update_order/`, payload, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+  };
+};
+
 export const getNextItems = (authToken, offSet, page) => {
   return (dispatch, getState) => {
     const sales = getState().sales;
@@ -138,7 +163,8 @@ export const createSalesOrder = (
   payload,
   totalDiscount,
   customerName,
-  note
+  note,
+  purchaseDate
 ) => {
   return (dispatch) => {
     var data;
@@ -148,16 +174,18 @@ export const createSalesOrder = (
         items: payload,
         total_discount: totalDiscount / 100,
         customer_name: customerName,
-        ...(note && {note: note})
+        ...(note && {note: note}),
+        ...(purchaseDate && {purchased_date : purchaseDate})
       };
     else
       data = {
         items: payload,
         customer_name: customerName,
-        ...(note && {note: note})
+        ...(note && {note: note}),
+        ...(purchaseDate && {purchased_date : purchaseDate})
       };
 
-    console.log(data);
+    console.log(data)
     return authInstance.post(`/sales_order/`, data, {
       headers: {
         Authorization: `Token ${authToken}`,

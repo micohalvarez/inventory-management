@@ -33,6 +33,17 @@ const DetailsModal = (props) => {
   ]);
 
   const [isContinue, setContinue] = useState(false);
+  const [editPayment, setEditPayment] = useState(false);
+  const [editOrder, setEditOrder] = useState(false);
+
+  const [editPaymentDate, setEditPaymentDate] = useState(null);
+
+  const [editPurchaseDate, setEditPurchaseDate] = useState(null);
+  const [customerName, setCustomerName] = useState(null);
+  const [note, setNote] = useState(null);
+
+  const [customerNameError,setCustomerNameError] = useState('')
+  const [noteError,setNoteError] = useState('')
 
   const [paymentType, setPaymentType] = useState(null);
   const [paymentTypeError, setPaymentTypeError] = useState(null);
@@ -62,6 +73,12 @@ const DetailsModal = (props) => {
     event.preventDefault();
     setBankNameError('');
     setBankName(event.target.value);
+  };
+
+  const handleNote = (event) => {
+    event.preventDefault();
+    setNoteError('');
+    setNote(event.target.value);
   };
   const handlePaymentSubmit = (event) => {
     event.preventDefault();
@@ -176,9 +193,118 @@ const DetailsModal = (props) => {
     clearState();
   };
 
+  const handleEditPayment = (event) => {
+    event.preventDefault();
+    let error = false;
+    
+    if(paymentType === null && bankName === null && accountNum === null && editPaymentDate === null){
+      error = true
+      setModalMessage("No changes detected.");
+      setModalError(true);
+      setSuccessModal(true);
+    }
+    
+    if ((paymentType !== null && paymentType >= 2))  {
+      if ((bankName === null || bankName === '') && props.selectedItem.payment_details.bank_name === null ) {
+        setBankNameError('Please up field');
+        error = true;
+      }
+
+      if ((accountNum === null || accountNum === '') && props.selectedItem.payment_details.account_number === null) {
+        setAccountNumError('Please up field');
+        error = true;
+      }
+      if ( editPaymentDate !== null){
+         if(!moment(editPaymentDate).isValid() || editPaymentDate === '')
+            setPaymentDateError('Please enter a valid date');
+      }
+    }
+
+    if (!error) {
+  
+      const payload = {
+        ...(paymentType && {type : paymentType}),
+        ...(bankName && {bank_name : bankName}),
+        ...(accountName && {account_name: accountName}),
+        ...(accountNum && {account_number : accountNum}),
+        ...(editPaymentDate && {pdc_date : moment(editPaymentDate).format('YYYY-MM-DD')})
+
+      };
+      props
+        .editPayment(session.user.auth_token,props.selectedItem.payment_details.uuid, payload)
+        .then((res) => {
+          if (res.status === 200) {
+            props.setModalMessage('Purchase order has been successfully updated.');
+            props.setModalError(false);
+            props.setSuccessModal(true);
+            props.getOrders(session.user.auth_token);
+          } else {
+            props.setModalMessage('Purchase order cannot be updated.');
+            props.setModalError(true);
+            props.setSuccessModal(true);
+          }
+        })
+        .catch(({ response }) => {
+          props.setModalMessage(
+            'A server error has occurred. Please try again later.'
+          );
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        });
+      clearState();
+    }
+  };
+
+
+  const handleEditOrder = (event) => {
+    event.preventDefault();
+    let error = false;
+    
+    if(editPurchaseDate === null && note === null ){
+      error = true
+      setModalMessage("No changes detected.");
+      setModalError(true);
+      setSuccessModal(true);
+    }
+    
+    if (!error) {
+  
+      const payload = {
+        ...(note && {note : note}),
+        ...(editPurchaseDate && {purchased_date : moment(editPurchaseDate).format('YYYY-MM-DD')})
+      }
+
+      
+      props
+        .editOrder(session.user.auth_token,props.selectedItem.uuid, payload)
+        .then((res) => {
+          if (res.status === 200) {
+            props.setModalMessage('Payment Type has been succesfully added.');
+            props.setModalError(false);
+            props.setSuccessModal(true);
+            props.getOrders(session.user.auth_token);
+          } else {
+            props.setModalMessage('Payment Type cannot be added.');
+            props.setModalError(true);
+            props.setSuccessModal(true);
+          }
+        })
+        .catch(({ response }) => {
+          props.setModalMessage(
+            'A server error has occurred. Please try again later.'
+          );
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        });
+      clearState();
+    }
+  };
+
   const clearState = () => {
     props.closeModal();
     setContinue(false);
+    setEditOrder(false)
+    setEditPayment(false)
     setNewitems([
       <>
         <tr
@@ -259,6 +385,276 @@ const DetailsModal = (props) => {
     setOnConfirm(method);
   };
 
+
+
+  const renderEditPayment = () => {
+    return (
+      <div className="mt-5 md:mt-0 md:col-span-2">
+        <div className="shadow overflow-hidden sm:rounded-md bg-">
+          <div className="px-4 py-5 bg-white sm:p-6">
+            <div className="grid grid-cols-6 gap-6">
+              <div className="col-span-8 sm:col-span-3">
+                <label
+                  for="sales_number"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Sales Order Number
+                </label>
+                <p className="block text-base font-medium">
+                  {props.selectedItem.order_number}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="customer_name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Status
+                </label>
+                <p className="block text-base font-medium">
+                  {props.selectedItem.status.toUpperCase()}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Sales Order Date
+                </label>
+                <p className="block text-base font-medium ">
+                  {new Date().toDateString()}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Total Amount
+                </label>
+                <p className="block text-base font-medium ">
+                  {'₱' + props.selectedItem.total + ' PHP'}
+                </p>
+              </div>
+
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Payment Type
+                </label>
+                <select
+                  onChange={(event) => {
+                    handlePaymentType(event);
+                  }}
+                  id="item_type"
+                  placeholder="Item Type/Category"
+                  name="item_type"
+                  autocomplete="item_type"
+                  class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  <option
+                    class="text-color-gray-300"
+                    value=""
+                    disabled
+                    hidden
+    
+                  >
+                    Item Type/Category
+                  </option>
+
+                  {props.paymentTypes.map((test) => (
+                    <option selected={test.id===props.selectedItem.payment_details.type.id}key={test.id} value={test.id}>
+                      {test.name}
+                    </option>
+                  ))}
+                </select>
+                {paymentTypeError ? (
+                  <span className="text-red-500">{paymentTypeError}</span>
+                ) : null}
+              </div>
+
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Account Number
+                </label>
+                <input
+                  autocomplete="off"
+                  value={accountNum ? accountNum : props.selectedItem.payment_details.account_number ? props.selectedItem.payment_details.account_number : accountNum}
+                  onChange={handleAccountNum}
+                  disabled={
+                    paymentType === null ?  props.selectedItem.payment_details.type.id < 2 ?  true  : false : paymentType < 2 ? true :false
+                  }
+                  type="text"
+                  placeholder="Account Number"
+                  name="account_number"
+                  id="account_number"
+                  className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                />
+                {accountNumError ? (
+                  <span className="text-red-500">{accountNumError}</span>
+                ) : null}
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Bank Name
+                </label>
+                <input
+                  autocomplete="off"
+                  value={bankName ? bankName : props.selectedItem.payment_details.bank_name ? props.selectedItem.payment_details.bank_name : bankName}
+    
+                  onChange={handleBankName}
+                  disabled={
+                    paymentType === null ?  props.selectedItem.payment_details.type.id < 2 ?  true  : false : paymentType < 2 ? true :false
+                  }
+                  type="text"
+                  placeholder="Bank Name"
+                  name="bank_name"
+                  id="bank_name"
+                  className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                />
+                {bankNameError ? (
+                  <span className="text-red-500">{bankNameError}</span>
+                ) : null}
+              </div>
+              <div className="col-span-6 sm:col-span-3 flex flex-col">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Payment Date
+                </label>
+                <DatePicker
+                  className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  selected={editPaymentDate ? editPaymentDate : props.selectedItem.payment_details.pdc_date ?  new Date(props.selectedItem.payment_details.pdc_date) :  new Date(props.selectedItem.payment_details.created)  ?  new Date(props.selectedItem.payment_details.created)  : paymentDate}
+                  onChange={(date) => {
+                    setPaymentDateError(null);
+                    setEditPaymentDate(date);
+                  }}
+                />
+                {paymentDateError ? (
+                  <span className="text-red-500">{paymentDateError}</span>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+
+  const renderEditOrder = () => {
+    return (
+      <div className="mt-5 md:mt-0 md:col-span-2">
+        <div className="shadow overflow-hidden sm:rounded-md bg-">
+          <div className="px-4 py-5 bg-white sm:p-6">
+            <div className="grid grid-cols-6 gap-6">
+              <div className="col-span-8 sm:col-span-3">
+                <label
+                  for="sales_number"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Sales Order Number
+                </label>
+                <p className="block text-base font-medium">
+                  {props.selectedItem.order_number}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="customer_name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Status
+                </label>
+                <p className="block text-base font-medium">
+                  {props.selectedItem.status.toUpperCase()}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Sales Order Date
+                </label>
+                <p className="block text-base font-medium ">
+                  {new Date().toDateString()}
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Total Amount
+                </label>
+                <p className="block text-base font-medium ">
+                  {'₱' + props.selectedItem.total + ' PHP'}
+                </p>
+              </div>
+
+              <div className="col-span-6 sm:col-span-3 flex flex-col">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Purchased Date
+                </label>
+                <DatePicker
+                  className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  selected={editPurchaseDate ? editPurchaseDate : props.selectedItem.purchased_date ?  new Date(props.selectedItem.purchased_date ) : editPurchaseDate}
+                  onChange={(date) => {
+                    setPaymentDateError(null);
+                    setEditPurchaseDate(date);
+                  }}
+                />
+                {paymentDateError ? (
+                  <span className="text-red-500">{paymentDateError}</span>
+                ) : null}
+              </div>
+  
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  for="sales_date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Note
+                </label>
+                <input
+                  autocomplete="off"
+                  value={note ? note : props.selectedItem.note ? props.selectedItem.note : note}
+                  onChange={handleNote}
+            
+                  type="text"
+                  placeholder="Note"
+                  name="note"
+                  id="note"
+                  className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                />
+                {accountNumError ? (
+                  <span className="text-red-500">{accountNumError}</span>
+                ) : null}
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+
+
   return (
     <>
       {props.showModal ? (
@@ -288,7 +684,7 @@ const DetailsModal = (props) => {
                 <div className="mt-5 md:mt-0 md:col-span-2">
                   <div className="shadow overflow-hidden sm:rounded-md bg-">
                     <div className="px-4 py-5 bg-white sm:p-6">
-                      {!isContinue ? (
+                      {!isContinue && !editPayment && !editOrder ? (
                         <>
                           <div className="grid grid-cols-9 gap-6">
                             <div className="col-span-8 sm:col-span-3">
@@ -375,6 +771,35 @@ const DetailsModal = (props) => {
                                     )
                                       .format('MMM DD, YYYY')
                                       .toUpperCase()}
+                              </p>
+                            </div>
+                            <div className="col-span-6 sm:col-span-6 flex-wrap">
+                              <label
+                                for="shipment_date"
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                Note
+                              </label>
+                              <p className="block text-base font-medium break-words">
+                                {props.selectedItem.note === null
+                                  ? 'N/A' :
+                                  (props.selectedItem.note )}
+                              </p>
+                            </div>
+                            <div className="col-span-6 sm:col-span-3">
+                              <label
+                                for="shipment_date"
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                Purchased Date
+                              </label>
+                              <p className="block text-base font-medium ">
+                                {props.selectedItem.purchased_date === null
+                                  ? 'N/A' :
+                                  (moment(
+                                    props.selectedItem.purchased_date)
+                                    .format('MMM DD, YYYY')
+                                    .toUpperCase())}
                               </p>
                             </div>
                           </div>
@@ -483,7 +908,7 @@ const DetailsModal = (props) => {
                             </table>
                           </div>
                         </>
-                      ) : (
+                      ) : editPayment ? renderEditPayment() : editOrder ? renderEditOrder() : (
                         <div className="mt-5 md:mt-0 md:col-span-2">
                           <div className="shadow overflow-hidden sm:rounded-md bg-">
                             <div className="px-4 py-5 bg-white sm:p-6">
@@ -717,13 +1142,13 @@ const DetailsModal = (props) => {
                       <div className="mt-4 text-right ">
                         {props.forDelete && !props.isPaid? (
                           <>
-                            <button
+                            {/* <button
                               className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
                               onClick={() => clearState()}
                             >
                               Close
-                            </button>
+                            </button> */}
                             <button
                               disabled={
                                 session.user.user.is_superuser ? false : true
@@ -765,24 +1190,73 @@ const DetailsModal = (props) => {
                               Delete Purchase Order
                             </button>
                           </>
-                        ) : props.isPaid ? (
+                        ) : props.isPaid ? editPayment || editOrder ? 
+                        (<>
+
                           <button
-                            className="bg-red-600 text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                            className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                             type="button"
-                            onClick={() => props.closeModal()}
+                            onClick={(event) => {
+                              setEditPayment(false);
+                              setEditOrder(false)
+                            }}
                           >
-                            Close
+                            {'Back'}
                           </button>
+                   
+                          <button
+                            className={`bg-green-600 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150
+                          `}
+                            type="button"
+                            onClick={(event) =>{
+                              if(editPayment)
+                                handleEditPayment(event)
+                              else  if(editOrder)
+                                handleEditOrder(event)
+
+                            }}
+                          >
+                            {'Submit'}
+                          </button>
+                      </>)
+                        : (
+                          // <button
+                          //   className="bg-red-600 text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                          //   type="button"
+                          //   onClick={() => props.closeModal()}
+                          // >
+                          //   Close
+                          // </button>
+                          <>
+                          <button
+                          className="bg-green-600 text-white hover:bg-green-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                          type="button"
+                          onClick={(event) => {
+                            setEditOrder(true)
+                          }}
+                            >
+                            { 'Edit Order Details' }
+                          </button>
+                          <button
+                          className="bg-green-600 text-white hover:bg-green-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                          type="button"
+                          onClick={(event) => {
+                            setEditPayment(true)
+                          }}
+                            >
+                            { 'Edit Payment Details' }
+                          </button>
+                          </>
                         ) : props.selectedItem.payment_details !== null &&
                           props.selectedItem.payment_details.type.id === 2 ? (
                           <>
-                            <button
+                            {/* <button
                               className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
                               onClick={() => props.closeModal()}
                             >
                               Close
-                            </button>
+                            </button> */}
                             <button
                               className="bg-green-600 text-white hover:bg-green-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
@@ -795,13 +1269,13 @@ const DetailsModal = (props) => {
                           </>
                         ) : (
                           <>
-                            <button
+                            {/* <button
                               className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
                               onClick={() => clearState()}
                             >
                               Close
-                            </button>
+                            </button> */}
                             {!isContinue ? (
                             <button
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -888,6 +1362,10 @@ const mapDispatchToProps = (dispatch) => ({
   getOrders: (token) => {
     dispatch(orderActions.getOrders(token));
   },
+  editPayment: (token, uuid, payload) =>
+  dispatch(orderActions.editPayment(token, uuid, payload)),
+  editOrder: (token, uuid, payload) =>
+  dispatch(orderActions.editOrder(token, uuid, payload)),
 });
 
 export default withRouter(

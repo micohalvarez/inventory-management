@@ -6,6 +6,8 @@ import { Alert } from 'reactstrap';
 import { useSession } from 'next-auth/client';
 import SuccessModal from '../SuccessModal';
 import Select from 'react-dropdown-select';
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
 const FormModal = (props) => {
 
   const [modalError, setModalError] = useState('');
@@ -32,6 +34,11 @@ const FormModal = (props) => {
 
   const [newItems, setNewitems] = useState([]);
   const [session, loading] = useSession();
+  const [note,setNote]= useState('')
+  const [noteError, setNoteError] = useState('');
+  const [purchaseDate, setPurchaseDate] = useState(new Date());
+  const [purchaseDateError, setPurchaseDateError] = useState(null);
+
 
   useEffect(() => {
     if (newItems.length === 0) {
@@ -152,6 +159,12 @@ const FormModal = (props) => {
     setItems(testItems);
   };
 
+  const handleNote = (event) => {
+    event.preventDefault();
+    setNoteError('');
+    setNote(event.target.value);
+  };
+
   const handleType = (index, item) => {
     let testItems = [...items];
     let subItems = [...submitItems];
@@ -230,7 +243,7 @@ const FormModal = (props) => {
       return false;
     } else {
       props
-        .createPurchaseOrder(session.user.auth_token, submitItems)
+        .createPurchaseOrder(session.user.auth_token, submitItems,note, moment(purchaseDate).format('YYYY-MM-DD'))
         .then((res) => {
           if (res.status === 200) {
             props.setModalMessage(
@@ -271,7 +284,9 @@ const FormModal = (props) => {
   };
   const clearState = () => {
     props.closeModal();
-
+    
+    setNote('')
+    setPurchaseDate(new Date())
     if(props.clearSelectedItem)
     props.clearSelectedItem()
     clearErrors();
@@ -329,6 +344,75 @@ const FormModal = (props) => {
                       <div className="mt-5 md:mt-0 md:col-span-2">
                         <form action="#" method="POST">
                           <div className="shadow overflow-hidden sm:rounded-md bg-">
+                          <div class="grid grid-cols-6 gap-6 p-6">
+                              {/* <div class="col-span-6 sm:col-span-3">
+                                <label
+                                  for="item_code"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                 Sales Order
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="Item Code"
+                                  value={code}
+                                  onChange={handleCode}
+                                  name="item_code"
+                                  id="item_code"
+                                  autocomplete="given-name"
+                                  class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                />
+                                {codeError ? (
+                                  <span className="text-red-500">
+                                    {codeError}
+                                  </span>
+                                ) : null}
+                              </div> */}
+                          
+                              <div class="col-span-6 sm:col-span-3">
+                                <label
+                                  for="customer_name"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                  Note/Remark(Optional)
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="Note/Remark"
+                                  value={note}
+                                  onChange={handleNote}
+                                  name="note"
+                                  id="note"
+                                  autocomplete="note"
+                                  class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-5/12 shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                />
+                                {noteError ? (
+                                  <span className="text-red-500">
+                                    {noteError}
+                                  </span>
+                                ) : null}
+                              </div>
+                            <div className="col-span-6 sm:col-span-3 flex flex-col">
+                              <label
+                                for="sales_date"
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                Date of Purchase
+                              </label>
+                              <DatePicker
+                        
+                                className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                selected={purchaseDate}
+                                onChange={(date) => {
+                                  setPurchaseDateError(null);
+                                  setPurchaseDate(date);
+                                }}
+                              />
+                              {purchaseDateError ? (
+                                <span className="text-red-500">{purchaseDateError}</span>
+                              ) : null}
+                            </div>
+                            </div>
                             <div className="p-6 h-2/5 max-h-80 overflow-y-auto">
                               <table className="items-center w-full bg-transparent border-collapse">
                                 <thead className="bg-gray-100 ">
@@ -685,8 +769,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  createPurchaseOrder: (authToken, payload) =>
-    dispatch(orderActions.createPurchaseOrder(authToken, payload)),
+  createPurchaseOrder: (authToken, payload,note,purchaseDate) =>
+    dispatch(orderActions.createPurchaseOrder(authToken, payload,note,purchaseDate)),
   getOrders: (token) => {
     dispatch(orderActions.getOrders(token));
   },

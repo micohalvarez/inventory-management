@@ -142,12 +142,15 @@ export const getOrdersWithFilter = (authToken, filter) => {
   };
 };
 
-export const createPurchaseOrder = (authToken, payload) => {
+export const createPurchaseOrder = (authToken, payload,  note,
+  purchaseDate) => {
   return (dispatch) => {
     dispatch({ type: actionTypes.ADD_ORDERS_START });
 
     const data = {
       items: payload,
+      ...(note && {note: note}),
+      ...(purchaseDate && {purchased_date : purchaseDate})
     };
 
     return authInstance.post(`/purchase_order/`, data, {
@@ -185,6 +188,30 @@ export const markPaid = (authToken, uuid) => {
         },
       }
     );
+  };
+};
+
+export const editPayment = (authToken, uuid,payload) => {
+  return (dispatch) => {
+
+    console.log(payload)
+    return authInstance.patch(`/payment/${uuid}/update_payment/`, payload, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+  };
+};
+
+export const editOrder = (authToken, uuid,payload) => {
+  return (dispatch) => {
+
+    console.log(payload)
+    return authInstance.patch(`/purchase_order/${uuid}/update_order/`, payload, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
   };
 };
 
