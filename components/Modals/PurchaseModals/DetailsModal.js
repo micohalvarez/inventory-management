@@ -8,11 +8,16 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import ConfirmModal from '../ConfirmModal';
 import { useSession } from 'next-auth/client';
+import SuccessModal from '../SuccessModal';
 const DetailsModal = (props) => {
 
   const [isVisible, setVisible] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [onConfirm, setOnConfirm] = useState(null);
+
+  const [successModal, setSuccessModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState(false);
+  const [modalError, setModalError] = useState(false);
 
   const [session, loading] = useSession();
   const [newItems, setNewitems] = useState([
@@ -58,6 +63,8 @@ const DetailsModal = (props) => {
   const handlePaymentType = (event) => {
     event.preventDefault();
     setPaymentTypeError('');
+    setBankNameError('');
+    setAccountNumError('');
     setPaymentType(event.target.value);
   };
   const handleAccountNum = (event) => {
@@ -220,6 +227,29 @@ const DetailsModal = (props) => {
       }
     }
 
+    if(paymentType === 1){
+      setBankName(null)
+      setAccountNum(null)
+    }
+
+    if(paymentType === null){
+      if(props.selectedItem.payment_details.type.id >= 2){
+        if (bankName === '' ) {
+          setBankNameError('Please up field');
+          error = true;
+        }
+  
+        if (accountNum === '') {
+          setAccountNumError('Please up field');
+          error = true;
+        }
+        if ( editPaymentDate !== null){
+           if(!moment(editPaymentDate).isValid() || editPaymentDate === '')
+              setPaymentDateError('Please enter a valid date');
+        }
+      }
+    }
+
     if (!error) {
   
       const payload = {
@@ -234,12 +264,12 @@ const DetailsModal = (props) => {
         .editPayment(session.user.auth_token,props.selectedItem.payment_details.uuid, payload)
         .then((res) => {
           if (res.status === 200) {
-            props.setModalMessage('Purchase order has been successfully updated.');
+            props.setModalMessage('Payment Type has been successfully updated.');
             props.setModalError(false);
             props.setSuccessModal(true);
             props.getOrders(session.user.auth_token);
           } else {
-            props.setModalMessage('Purchase order cannot be updated.');
+            props.setModalMessage('Payment Type cannot be updated.');
             props.setModalError(true);
             props.setSuccessModal(true);
           }
@@ -271,6 +301,7 @@ const DetailsModal = (props) => {
   
       const payload = {
         ...(note && {note : note}),
+        ...(note === '' && {note : 'delete_note'}),
         ...(editPurchaseDate && {purchased_date : moment(editPurchaseDate).format('YYYY-MM-DD')})
       }
 
@@ -279,12 +310,12 @@ const DetailsModal = (props) => {
         .editOrder(session.user.auth_token,props.selectedItem.uuid, payload)
         .then((res) => {
           if (res.status === 200) {
-            props.setModalMessage('Payment Type has been succesfully added.');
+            props.setModalMessage('Purchase Order has been succesfully updated.');
             props.setModalError(false);
             props.setSuccessModal(true);
             props.getOrders(session.user.auth_token);
           } else {
-            props.setModalMessage('Payment Type cannot be added.');
+            props.setModalMessage('Purchase Order  cannot be updated.');
             props.setModalError(true);
             props.setSuccessModal(true);
           }
@@ -305,6 +336,11 @@ const DetailsModal = (props) => {
     setContinue(false);
     setEditOrder(false)
     setEditPayment(false)
+    setNote(null)
+    setBankNameError('');
+    setAccountNumError('');
+    setEditPurchaseDate(null)
+    setEditPaymentDate(null)
     setNewitems([
       <>
         <tr
@@ -485,7 +521,7 @@ const DetailsModal = (props) => {
                 </label>
                 <input
                   autocomplete="off"
-                  value={accountNum ? accountNum : props.selectedItem.payment_details.account_number ? props.selectedItem.payment_details.account_number : accountNum}
+                  value={accountNum || accountNum === '' ? accountNum : props.selectedItem.payment_details.account_number ? props.selectedItem.payment_details.account_number : accountNum}
                   onChange={handleAccountNum}
                   disabled={
                     paymentType === null ?  props.selectedItem.payment_details.type.id < 2 ?  true  : false : paymentType < 2 ? true :false
@@ -509,11 +545,11 @@ const DetailsModal = (props) => {
                 </label>
                 <input
                   autocomplete="off"
-                  value={bankName ? bankName : props.selectedItem.payment_details.bank_name ? props.selectedItem.payment_details.bank_name : bankName}
+                  value={bankName || bankName === '' ? bankName  : props.selectedItem.payment_details.bank_name ? props.selectedItem.payment_details.bank_name : bankName}
     
                   onChange={handleBankName}
                   disabled={
-                    paymentType === null ?  props.selectedItem.payment_details.type.id < 2 ?  true  : false : paymentType < 2 ? true :false
+                    paymentType === null  ?  props.selectedItem.payment_details.type.id < 2 ?  true  : false : paymentType < 2 ? true :false
                   }
                   type="text"
                   placeholder="Bank Name"
@@ -632,7 +668,7 @@ const DetailsModal = (props) => {
                 </label>
                 <input
                   autocomplete="off"
-                  value={note ? note : props.selectedItem.note ? props.selectedItem.note : note}
+                  value={note  || note === '' ? note : props.selectedItem.note ? props.selectedItem.note : note}
                   onChange={handleNote}
             
                   type="text"
@@ -681,6 +717,12 @@ const DetailsModal = (props) => {
                     </span>
                   </button>
                 </div>
+                <SuccessModal
+                  showModal={successModal}
+                  closeModal={() => setSuccessModal(false)}
+                  message={modalMessage}
+                  hasError={modalError}
+                />
                 <div className="mt-5 md:mt-0 md:col-span-2">
                   <div className="shadow overflow-hidden sm:rounded-md bg-">
                     <div className="px-4 py-5 bg-white sm:p-6">
@@ -1199,6 +1241,12 @@ const DetailsModal = (props) => {
                             onClick={(event) => {
                               setEditPayment(false);
                               setEditOrder(false)
+                              setNote('')
+                              setEditPaymentDate(null)
+                              setEditPurchaseDate(null)
+                              setPaymentType(null)
+                              setAccountNum(null)
+                              setBankName(null)
                             }}
                           >
                             {'Back'}

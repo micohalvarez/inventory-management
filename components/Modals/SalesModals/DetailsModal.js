@@ -746,7 +746,7 @@ const DetailsModal = (props) => {
                 </label>
                 <input
                   autocomplete="off"
-                  value={accountNum ? accountNum : props.selectedItem.payment_details.account_number ? props.selectedItem.payment_details.account_number : accountNum}
+                  value={accountNum || accountNum === '' ? accountNum : props.selectedItem.payment_details.account_number ? props.selectedItem.payment_details.account_number : accountNum}
                   onChange={handleAccountNum}
                   disabled={
                     paymentType === null ?  props.selectedItem.payment_details.type.id < 2 ?  true  : false : paymentType < 2 ? true :false
@@ -770,7 +770,7 @@ const DetailsModal = (props) => {
                 </label>
                 <input
                   autocomplete="off"
-                  value={bankName ? bankName : props.selectedItem.payment_details.bank_name ? props.selectedItem.payment_details.bank_name : bankName}
+                  value={bankName || bankName === '' ? bankName : props.selectedItem.payment_details.bank_name ? props.selectedItem.payment_details.bank_name : bankName}
     
                   onChange={handleBankName}
                   disabled={
@@ -893,7 +893,7 @@ const DetailsModal = (props) => {
                 </label>
                 <input
                   autocomplete="off"
-                  value={note ? note : props.selectedItem.note ? props.selectedItem.note : note}
+                  value={note || note === '' ? note : props.selectedItem.note ? props.selectedItem.note : note}
                   onChange={handleNote}
             
                   type="text"
@@ -918,6 +918,8 @@ const DetailsModal = (props) => {
   const handlePaymentType = (event) => {
     event.preventDefault();
     setPaymentTypeError('');
+    setBankNameError('');
+    setAccountNumError('');
     setPaymentType(event.target.value);
   };
   const handleAccountNum = (event) => {
@@ -1011,6 +1013,8 @@ const DetailsModal = (props) => {
       setModalError(true);
       setSuccessModal(true);
     }
+
+
     
     if ((paymentType !== null && paymentType >= 2))  {
       if ((bankName === null || bankName === '') && props.selectedItem.payment_details.bank_name === null ) {
@@ -1025,6 +1029,29 @@ const DetailsModal = (props) => {
       if ( editPaymentDate !== null){
          if(!moment(editPaymentDate).isValid() || editPaymentDate === '')
             setPaymentDateError('Please enter a valid date');
+      }
+    }
+
+    if(paymentType === 1){
+      setBankName(null)
+      setAccountNum(null)
+    }
+
+    if(paymentType === null){
+      if(props.selectedItem.payment_details.type.id >= 2){
+        if (bankName === '' ) {
+          setBankNameError('Please up field');
+          error = true;
+        }
+  
+        if (accountNum === '') {
+          setAccountNumError('Please up field');
+          error = true;
+        }
+        if ( editPaymentDate !== null){
+           if(!moment(editPaymentDate).isValid() || editPaymentDate === '')
+              setPaymentDateError('Please enter a valid date');
+        }
       }
     }
 
@@ -1079,10 +1106,12 @@ const DetailsModal = (props) => {
   
       const payload = {
         ...(note && {note : note}),
+        ...(note === '' && {note : 'delete_note'}),
         ...(editPurchaseDate && {purchased_date : moment(editPurchaseDate).format('YYYY-MM-DD')})
       }
 
       
+      console.log(payload)
       props
         .editOrder(session.user.auth_token,props.selectedItem.uuid, payload)
         .then((res) => {
@@ -1171,13 +1200,19 @@ const DetailsModal = (props) => {
     setContinue(false);
     setPaymentType(null);
     setBankName(null);
+    setBankNameError('');
+    setAccountNumError('');
     setAccountNum(null);
     setAccountName(null);
     setDiscountApproval(false)
     setPaymentDate(new Date());
+    setEditPaymentDate(null)
     setEditPayment(false)
     setEditOrder(false)
+    setNote(null)
+    setEditPurchaseDate(null)
     setNewitems([
+      
       <>
         <tr
           onClick={() => {
@@ -1686,7 +1721,7 @@ const DetailsModal = (props) => {
                                 );
                               }}
                             >
-                              Delete Purchase Order
+                              Delete Sales Order
                             </button>
                           </>
                         ) : props.isPaid ? editPayment || editOrder ?  
@@ -1698,6 +1733,13 @@ const DetailsModal = (props) => {
                               onClick={(event) => {
                                 setEditPayment(false);
                                 setEditOrder(false)
+                                setNote(null)
+                                setEditPaymentDate(null)
+                                setEditPurchaseDate(null)
+                                setPaymentType(null)
+                                setAccountNum(null)
+                                setBankName(null)
+                                
                               }}
                             >
                               {'Back'}
