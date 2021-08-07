@@ -434,7 +434,7 @@ const DetailsModal = (props) => {
                   for="sales_number"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Sales Order Number
+                  Purchase Order Number
                 </label>
                 <p className="block text-base font-medium">
                   {props.selectedItem.order_number}
@@ -456,10 +456,13 @@ const DetailsModal = (props) => {
                   for="sales_date"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Sales Order Date
+                  Purchase Order Date
                 </label>
                 <p className="block text-base font-medium ">
-                  {new Date().toDateString()}
+                {(moment(
+                                    props.selectedItem.created)
+                                    .format('MMM DD, YYYY')
+                                    .toUpperCase())}
                 </p>
               </div>
               <div className="col-span-6 sm:col-span-3">
@@ -486,7 +489,7 @@ const DetailsModal = (props) => {
                     handlePaymentType(event);
                   }}
                   id="item_type"
-                  placeholder="Item Type/Category"
+                  placeholder="Payment Type"
                   name="item_type"
                   autocomplete="item_type"
                   class="mt-1 block w-full py-2 px-1 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -498,7 +501,7 @@ const DetailsModal = (props) => {
                     hidden
     
                   >
-                    Item Type/Category
+                    Payment Type
                   </option>
 
                   {props.paymentTypes.map((test) => (
@@ -599,7 +602,7 @@ const DetailsModal = (props) => {
                   for="sales_number"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Sales Order Number
+                  Purchase Order Number
                 </label>
                 <p className="block text-base font-medium">
                   {props.selectedItem.order_number}
@@ -621,10 +624,13 @@ const DetailsModal = (props) => {
                   for="sales_date"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Sales Order Date
+                  Purchase Order Date
                 </label>
                 <p className="block text-base font-medium ">
-                  {new Date().toDateString()}
+                {(moment(
+                                    props.selectedItem.created)
+                                    .format('MMM DD, YYYY')
+                                    .toUpperCase())}
                 </p>
               </div>
               <div className="col-span-6 sm:col-span-3">
@@ -798,18 +804,18 @@ const DetailsModal = (props) => {
                                 Payment Date
                               </label>
                               <p className="block text-base font-medium ">
-                                {props.selectedItem.payment_details === null
+                              {props.selectedItem.payment_details === null
                                   ? 'N/A'
-                                  : props.selectedItem.payment_details.type
-                                      .id !== 2
+                                  : props.selectedItem.payment_details
+                                      .pdc_date
                                   ? moment(
-                                      props.selectedItem.payment_details.created
+                                      props.selectedItem.payment_details.pdc_date
                                     )
                                       .format('MMM DD, YYYY')
                                       .toUpperCase()
                                   : moment(
                                       props.selectedItem.payment_details
-                                        .pdc_date
+                                        .created
                                     )
                                       .format('MMM DD, YYYY')
                                       .toUpperCase()}
@@ -982,10 +988,13 @@ const DetailsModal = (props) => {
                                     for="sales_date"
                                     className="block text-sm font-medium text-gray-700"
                                   >
-                                    Sales Order Date
+                                    Purchase Order Date
                                   </label>
                                   <p className="block text-base font-medium ">
-                                    {props.selectedItem.created}
+                                  {(moment(
+                                    props.selectedItem.created)
+                                    .format('MMM DD, YYYY')
+                                    .toUpperCase())}
                                   </p>
                                 </div>
                                 <div className="col-span-6 sm:col-span-3">
@@ -1095,11 +1104,11 @@ const DetailsModal = (props) => {
                                     for="sales_date"
                                     className="block text-sm font-medium text-gray-700"
                                   >
-                                    Amount Date
+                                    Payment Date
                                   </label>
                                   <DatePicker
                                     disabled={
-                                      paymentType === null || paymentType < 2
+                                      paymentType === null 
                                         ? true
                                         : false
                                     }

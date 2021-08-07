@@ -496,7 +496,7 @@ const DetailsModal = (props) => {
                   Sales Order Number
                 </label>
                 <p className="block text-base font-medium">
-                  {'#0000' + props.selectedItem.id}
+                {props.selectedItem.order_number}
                 </p>
               </div>
               <div className="col-span-6 sm:col-span-3">
@@ -518,7 +518,10 @@ const DetailsModal = (props) => {
                   Sales Order Date
                 </label>
                 <p className="block text-base font-medium ">
-                  {new Date().toDateString()}
+                {(moment(
+                                    props.selectedItem.created)
+                                    .format('MMM DD, YYYY')
+                                    .toUpperCase())}
                 </p>
               </div>
               <div className="col-span-6 sm:col-span-3">
@@ -627,9 +630,11 @@ const DetailsModal = (props) => {
                   Payment Date
                 </label>
                 <DatePicker
-                  disabled={
-                    paymentType === null || paymentType < 2 ? true : false
-                  }
+                       disabled={
+                        paymentType === null 
+                          ? true
+                          : false
+                      }
                   className="mt-1 py-2 px-2 w-full focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                   selected={paymentDate}
                   onChange={(date) => {
@@ -684,7 +689,10 @@ const DetailsModal = (props) => {
                   Sales Order Date
                 </label>
                 <p className="block text-base font-medium ">
-                  {new Date().toDateString()}
+                {(moment(
+                                    props.selectedItem.created)
+                                    .format('MMM DD, YYYY')
+                                    .toUpperCase())}
                 </p>
               </div>
               <div className="col-span-6 sm:col-span-3">
@@ -849,7 +857,10 @@ const DetailsModal = (props) => {
                   Sales Order Date
                 </label>
                 <p className="block text-base font-medium ">
-                  {new Date().toDateString()}
+                {(moment(
+                                    props.selectedItem.created)
+                                    .format('MMM DD, YYYY')
+                                    .toUpperCase())}
                 </p>
               </div>
               <div className="col-span-6 sm:col-span-3">
@@ -1404,16 +1415,16 @@ const DetailsModal = (props) => {
                               <p className="block text-base font-medium ">
                                 {props.selectedItem.payment_details === null
                                   ? 'N/A'
-                                  : props.selectedItem.payment_details.type
-                                      .id !== 2
+                                  : props.selectedItem.payment_details
+                                      .pdc_date
                                   ? moment(
-                                      props.selectedItem.payment_details.created
+                                      props.selectedItem.payment_details.pdc_date
                                     )
                                       .format('MMM DD, YYYY')
                                       .toUpperCase()
                                   : moment(
                                       props.selectedItem.payment_details
-                                        .pdc_date
+                                        .created
                                     )
                                       .format('MMM DD, YYYY')
                                       .toUpperCase()}
