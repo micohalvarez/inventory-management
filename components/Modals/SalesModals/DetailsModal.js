@@ -1536,7 +1536,7 @@ const DetailsModal = (props) => {
                               </p>
                             </div>
                           </div>
-                          <div className="mt-4">
+                          <div className="mt-4 overflow-auto">
                             <table className="items-center w-full bg-transparent border-collapse">
                               <thead className="bg-gray-100 ">
                                 <tr>
