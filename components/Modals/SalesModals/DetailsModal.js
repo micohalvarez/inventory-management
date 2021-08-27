@@ -50,6 +50,7 @@ const DetailsModal = (props) => {
     let totalBoxAmount = 0;
     newItems.map( item=>{
         item.isOverride = false
+        item.discountOverride = false
         submitItems.push({isOverride : false,
           product:item.product,
           unit_price:item.unit_price,
@@ -57,6 +58,7 @@ const DetailsModal = (props) => {
           product_code:item.product_code,
           quantity:item.quantity,
           box_amount:item.box_amount,
+          item_discount:item.item_discount * 100,
          })
          totalBoxAmount += parseFloat(item.box_amount)
       })
@@ -115,13 +117,27 @@ const DetailsModal = (props) => {
    
   };
 
+  const handleItemDiscount = (event, index) => {
+    event.preventDefault();
+    let newItems = [...items]
+
+    if (!(event.target.value < 0 || event.target.value > 100)) {
+      newItems[index].item_discount = event.target.value;
+    }
+
+    setItems(newItems)
+
+    handleSubTotal()
+   
+  };
+
   const handleSubTotal = () =>{
     let sub = 0
     items.map(item=>{
       if(item.unit_price === "")
         sub += 0
       else
-        sub += ((item.quantity * parseFloat(item.unit_price)) + parseFloat(item.box_amount))
+        sub += (((item.quantity * item.unit_price) - ((item.quantity * item.unit_price) * item.item_discount / 100) ) + parseFloat(item.box_amount))
     })
 
     setSubTotal(sub)
@@ -150,6 +166,8 @@ const DetailsModal = (props) => {
     items.map((item, index) =>{
         if(item.unit_price !== props.selectedItem.items[index].unit_price)
             hasChange = true  
+        if(item.item_discount !== props.selectedItem.items[index].item_discount)
+          hasChange = true  
         if(item.unit_price === ""){
           error = true
           setModalMessage('Each item must have price.');
@@ -158,9 +176,11 @@ const DetailsModal = (props) => {
          {
             unit_price:item.unit_price,
             product: item.product.id,
+            item_discount: item.item_discount / 100
          }
         )
     })
+
 
     if (error) {
       setModalError(true);
@@ -361,7 +381,7 @@ const DetailsModal = (props) => {
                     </th>
                     <th
                       className={
-                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                        ' align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
                       }
                     >
                         Item Price
@@ -371,9 +391,23 @@ const DetailsModal = (props) => {
                         'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
                       }
                     >
+                        Item Discount (%)
+                    </th>
+                    <th
+                      className={
+                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                      }
+                    >
                       Box Price
                     </th>
 
+                    <th
+                      className={
+                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                      }
+                    >
+                      Item Total
+                    </th>
                     {/* <th
                       className={
                         'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
@@ -456,19 +490,31 @@ const DetailsModal = (props) => {
                           />
                         </td>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                          <input
+                            type="number"
+                            name="item_discount"
+                  
+                            value={
+                              item.item_discount
+                            }
+                            onChange={(event) =>
+                              handleItemDiscount(event, index)
+                            }
+                            id="discount"
+                            class={`mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md ${
+                            
+                              !true
+                                ? 'opacity-80 cursor-not-allowed'
+                                : null
+                            }`}
+                          />
+                        </td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                           {`₱${item.box_amount} PHP`}
                         </td>
-
-                        {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                          {`₱ ${(
-                            props.selectedItem.items[index]
-                              .quantity *
-                            parseFloat(
-                              props.selectedItem.items[index]
-                                .unit_price
-                            )
-                          ).toFixed(2)} PHP`}
-                        </td> */}
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                        {`₱${((item.unit_price * item.quantity) - ((item.unit_price * item.quantity) * (item.item_discount / 100)))+ parseFloat(item.box_amount)} PHP`}
+                        </td>
                       </tr>
                     )
                   )}
@@ -1127,12 +1173,12 @@ const DetailsModal = (props) => {
         .editOrder(session.user.auth_token,props.selectedItem.uuid, payload)
         .then((res) => {
           if (res.status === 200) {
-            props.setModalMessage('Payment Type has been succesfully added.');
+            props.setModalMessage('Order has been successfully updated.');
             props.setModalError(false);
             props.setSuccessModal(true);
             props.getSales(session.user.auth_token);
           } else {
-            props.setModalMessage('Payment Type cannot be added.');
+            props.setModalMessage('Order cannot be edited.');
             props.setModalError(true);
             props.setSuccessModal(true);
           }
@@ -1308,7 +1354,7 @@ const DetailsModal = (props) => {
       {props.showModal ? (
         <>
           <div className=" justify-center transition duration-500 ease-in-out items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-            <div className="relative w-2/3  transition duration-500 ease-in-out">
+            <div className="relative w-9/12  transition duration-500 ease-in-out">
               {/*content*/}
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/*header*/}
@@ -1527,7 +1573,21 @@ const DetailsModal = (props) => {
                                       'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
                                     }
                                   >
+                                     Item Discount(%)
+                                  </th>
+                                  <th
+                                    className={
+                                      'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                                    }
+                                  >
                                     Box Price
+                                  </th>
+                                  <th
+                                    className={
+                                      'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                                    }
+                                  >
+                                    Item Total
                                   </th>
 
                                   {/* <th
@@ -1579,7 +1639,13 @@ const DetailsModal = (props) => {
                                         {`₱${props.selectedItem.items[index].unit_price} PHP`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                        {`${props.selectedItem.items[index].item_discount * 100}%`}
+                                      </td>
+                                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {`₱${props.selectedItem.items[index].box_amount} PHP`}
+                                      </td>
+                                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                        {`₱${((props.selectedItem.items[index].unit_price * props.selectedItem.items[index].quantity) - ((props.selectedItem.items[index].unit_price * props.selectedItem.items[index].quantity) * props.selectedItem.items[index].item_discount)) + parseFloat(props.selectedItem.items[index].box_amount)} PHP`}
                                       </td>
 
                                       {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
@@ -1617,7 +1683,7 @@ const DetailsModal = (props) => {
                                     }
                                     align="end"
                                   >
-                                    <span>{(props.selectedItem.total_discount > 0 &&
+                                    <span>{(
                             props.selectedItem.discount_approved === false ) || !props.selectedItem.price_approved   ? 'To be Discounted' : 'Total Discount'}</span>
                                   </th>
                                   <td
@@ -1625,7 +1691,7 @@ const DetailsModal = (props) => {
                                       ' px-6 py-3 text-sm uppercase border-0 border-r-0 whitespace-no-wrap font-semibold   text-red-500  border-gray-200'
                                     }
                                   >
-                                    <span>{(props.selectedItem.total_discount > 0 &&
+                                    <span>{(
                           props.selectedItem.discount_approved === false ) || !props.selectedItem.price_approved ? (`₱ ${numberWithCommas(
                                       parseFloat(
                                         (props.selectedItem.subtotal - totalBoxAmount) * props.selectedItem.total_discount
@@ -1735,7 +1801,7 @@ const DetailsModal = (props) => {
                               Delete Sales Order
                             </button>
                           </>
-                        ) : props.isPaid ? editPayment || editOrder ?  
+                        ) : props.isPaid ? editPayment || editOrder || isDiscount ?  
                         (<>
 
                             <button
@@ -1744,6 +1810,7 @@ const DetailsModal = (props) => {
                               onClick={(event) => {
                                 setEditPayment(false);
                                 setEditOrder(false)
+                                setDiscountApproval(false)
                                 setNote(null)
                                 setEditPaymentDate(null)
                                 setEditPurchaseDate(null)
@@ -1765,6 +1832,7 @@ const DetailsModal = (props) => {
                                   handleEditPayment(event)
                                 else  if(editOrder)
                                   handleEditOrder(event)
+                        
 
                               }}
                             >
@@ -1773,7 +1841,20 @@ const DetailsModal = (props) => {
                         </>):
                         (
                           <>
+                    
                             <button
+                              className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                              type="button"
+                              onClick={(event) => {
+                                confirm(
+                                  'Are you sure you want to delete the Order?',
+                                  'delete'
+                                );
+                              }}
+                            >
+                              Delete
+                            </button>
+                            {props.selectedItem.status === 'paid'?   (<> <button
                             className="bg-green-600 text-white hover:bg-green-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                             type="button"
                             onClick={(event) => {
@@ -1790,7 +1871,11 @@ const DetailsModal = (props) => {
                             }}
                               >
                               { 'Edit Payment Details' }
-                            </button>
+                            </button> 
+
+                          
+                            </>): null }
+                        
                             <ExportToPdf
                               closeModal={props.closeModal}
                               order={props.selectedItem}
@@ -1798,24 +1883,12 @@ const DetailsModal = (props) => {
                               setModalError={props.setModalError}
                               setSuccessModal={props.setSuccessModal}
                             />
-                            {/* <button
-                              className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                              type="button"
-                              onClick={() => clearState()}
-                            >
-                              Close
-                            </button> */}
+                
                           </>
                         ) : props.selectedItem.payment_details !== null &&
                           props.selectedItem.payment_details.type.id === 2 ? (
                           <>
-                            {/* <button
-                              className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                              type="button"
-                              onClick={() => clearState()}
-                            >
-                              Close
-                            </button> */}
+              
                             <button
                               className="bg-green-600 text-white hover:bg-green-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
@@ -1826,7 +1899,7 @@ const DetailsModal = (props) => {
                               Mark as Paid
                             </button>
                           </>
-                        ) : (props.selectedItem.total_discount > 0 &&
+                        ) : (
                           props.selectedItem.discount_approved === false ) || !props.selectedItem.price_approved ? (
                           <>
                             <button
@@ -1848,15 +1921,9 @@ const DetailsModal = (props) => {
                           </>
                         ) : (
                           <>
-                            {/* <button
-                              className="bg-transparent text-black hover:text-white hover:bg-gray-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                              type="button"
-                              onClick={() => clearState()}
-                            >
-                              Close
-                            </button> */}
+                  
                             {!isContinue ? 
-                            (<button
+                            (<><button
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
                               onClick={(event) => {
@@ -1867,7 +1934,9 @@ const DetailsModal = (props) => {
                               }}
                             >
                               Delete
-                            </button>) : null}
+                            </button>        
+                
+                            </>) : null}
                             <button
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
