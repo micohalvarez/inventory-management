@@ -1648,16 +1648,7 @@ const DetailsModal = (props) => {
                                         {`₱${((props.selectedItem.items[index].unit_price * props.selectedItem.items[index].quantity) - ((props.selectedItem.items[index].unit_price * props.selectedItem.items[index].quantity) * props.selectedItem.items[index].item_discount)) + parseFloat(props.selectedItem.items[index].box_amount)} PHP`}
                                       </td>
 
-                                      {/* <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱ ${(
-                                          props.selectedItem.items[index]
-                                            .quantity *
-                                          parseFloat(
-                                            props.selectedItem.items[index]
-                                              .unit_price
-                                          )
-                                        ).toFixed(2)} PHP`}
-                                      </td> */}
+                                
                                     </tr>
                                   )
                                 )}

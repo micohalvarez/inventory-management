@@ -187,14 +187,20 @@ const FormModal = (props) => {
         .addItem(session.user.auth_token, form_data)
         .then((res) => {
           if (res.status === 200) {
-            alert('Item has been successfully added');
+            props.setModalMessage('Item has been successfully added.');
+            props.setModalError(false);
+            props.setSuccessModal(true);
             props.getItems(session.user.auth_token);
           } else {
-            alert('Failed to add item');
+            props.setModalMessage('Failed to add the item.');
+            props.setModalError(true);
+            props.setSuccessModal(true);
           }
         })
         .catch(({ response }) => {
-          alert('Failed to add item');
+          props.setModalMessage('Internal Server Error. Please try again.');
+          props.setModalError(true);
+          props.setSuccessModal(true);
         });
       props.closeModal();
     }

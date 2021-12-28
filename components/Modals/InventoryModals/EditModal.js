@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import imageCompression from 'browser-image-compression';
 import { useSession } from 'next-auth/client';
+import ConfirmModal from '../ConfirmModal';
 
 const EditModal = (props) => {
   useEffect(() => {
@@ -28,6 +29,11 @@ const EditModal = (props) => {
       });
     }
   }, [props.selectedItem]);
+
+  const [isVisible, setVisible] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [onConfirm, setOnConfirm] = useState(null);
+
   const [code, setCode] = useState(null);
   const [name, setName] = useState(null);
   const [type, setType] = useState(null);
@@ -171,7 +177,7 @@ const EditModal = (props) => {
         unit_price: price,
         name: name,
         code: code,
-        cost: quantity,
+        quantity: quantity,
         cost: cost,
         categories: [type],
         description: description,
@@ -182,7 +188,7 @@ const EditModal = (props) => {
       form_data.append('unit_price', price);
       form_data.append('name', name);
       form_data.append('code', code);
-
+      form_data.append('stock', quantity);
       if (session.user.user.is_superuser) form_data.append('cost', cost);
       form_data.append('category', type);
       form_data.append('description', description);
@@ -211,14 +217,24 @@ const EditModal = (props) => {
         .editItem(session.user.auth_token, form_data, props.selectedItem.slug)
         .then((res) => {
           if (res.status === 200) {
-            alert('Item has been successfully added');
+
+            props.setModalMessage('Item has been successfully edited.');
+            props.setModalError(false);
+            props.setSuccessModal(true);
             props.getItems(session.user.auth_token);
           } else {
-            alert('Failed to add item');
+            props.setModalMessage('Failed to edit item.');
+            props.setModalError(true);
+            props.setSuccessModal(true);
+
           }
         })
         .catch(({ response }) => {
-          alert('Failed to add item');
+          props.setModalMessage(
+            'A server error has occurred. Please try again later'
+          );
+          props.setModalError(true);
+          props.setSuccessModal(true);
         });
       closeModal();
     }
@@ -232,6 +248,41 @@ const EditModal = (props) => {
     setSecondPhoto(null);
     setThirdPhoto(null);
     setFirstPhoto(null);
+  };
+
+  const confirm = (message, method) => {
+    setVisible(true);
+    setConfirmMessage(message);
+
+    setOnConfirm(method);
+  };
+
+
+
+
+  const onDelete = () => {
+    props
+      .deleteItem(session.user.auth_token, props.selectedItem.slug)
+      .then((res) => {
+        if (res.status === 204) {
+          props.setModalMessage('Item has been deleted.');
+          props.setModalError(false);
+          props.setSuccessModal(true);
+          props.getItems(session.user.auth_token);
+        } else {
+          props.setModalMessage('Item cannot be deleted since it is linked to an existing order.');
+          props.setModalError(true);
+          props.setSuccessModal(true);
+        }
+      })
+      .catch((error) => {
+        props.setModalMessage(
+          'A server error has occurred. Please try again later'
+        );
+        props.setModalError(true);
+        props.setSuccessModal(true);
+      });
+    closeModal();
   };
 
   return (
@@ -413,6 +464,29 @@ const EditModal = (props) => {
                                   ) : null}
                                 </div>
                               ) : null}
+                                   <div class="col-span-6 sm:col-span-3">
+                                  <label
+                                    for="price"
+                                    class="block text-sm font-medium text-gray-700"
+                                  >
+                                    Quantity 
+                                  </label>
+                                  <input
+                                    type="number"
+                                    value={quantity}
+                                    onChange={handleQuantity}
+                                    placeholder="Quantity"
+                                    name="quantity"
+                                    id="quantity"
+                                    autocomplete="quantity"
+                                    class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                                  />
+                                  {quantityError ? (
+                                    <span className="text-red-500">
+                                      {quantityError}
+                                    </span>
+                                  ) : null}
+                                </div>
 
                               <div class="col-span-6">
                                 <label
@@ -636,6 +710,18 @@ const EditModal = (props) => {
                             </div>
                           </div>
                           <div class="px-4 py-3 text-right sm:px-6">
+                              <button
+                              className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                              type="button"
+                              onClick={(event) => {
+                                confirm(
+                                  'Are you sure you want to delete this item?',
+                                  'delete'
+                                );
+                              }}
+                            >
+                              Delete
+                            </button>
                             <button
                               className="bg-red-600 text-white hover:bg-red-800 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                               type="button"
@@ -660,6 +746,19 @@ const EditModal = (props) => {
           <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
         </>
       ) : null}
+       <ConfirmModal
+        isVisible={isVisible}
+        closeModal={() => setVisible(false)}
+        message={confirmMessage}
+        onConfirm={() => {
+          onConfirm === 'delete'
+            ? onDelete()
+            : 'cance_delete'
+            ? setVisible(false)
+            : null;
+          setVisible(false);
+        }}
+        />
     </>
   );
 };

@@ -14,7 +14,7 @@ import ReportsModal from '../Modals/InventoryModals/ReportModal';
 import DetailsModal from '../Modals/InventoryModals/DetailsModal';
 import EditModal from '../Modals/InventoryModals/EditModal';
 import Router, { withRouter } from 'next/router';
-
+import SuccessModal from '../Modals/SuccessModal';
 import moment from 'moment';
 
 import { connect } from 'react-redux';
@@ -28,6 +28,11 @@ const InventoryTable = (props) => {
   const [selectedItem, setSelectedItem] = useState(false);
   const [showReportsModal, setShowReportsModal] = useState(false);
   const [session, loading] = useSession();
+
+
+  const [successModal, setSuccessModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState(false);
+  const [modalError, setModalError] = useState(false);
 
   const onPressRow = (item) => {
     setSelectedItem(item);
@@ -105,11 +110,21 @@ const InventoryTable = (props) => {
         showModal={showFormModal}
         categories={props.categories}
         closeModal={() => setFormShowModal(false)}
+        setSuccessModal={setSuccessModal}
+        setModalMessage={setModalMessage}
+        setModalError={setModalError}
       />
       <DetailsModal
         selectedItem={selectedItem}
         showModal={showDetailsModal}
         closeModal={() => setShowDetailsModal(false)}
+      />
+            <SuccessModal
+        showModal={successModal}
+        setSuccessModal={setSuccessModal}
+        closeModal={() => setSuccessModal(false)}
+        message={modalMessage}
+        hasError={modalError}
       />
       <EditModal
         getItems={props.getItems}
@@ -119,6 +134,10 @@ const InventoryTable = (props) => {
         categories={props.categories}
         showModal={showEditModal}
         closeModal={() => setShowEditModal(false)}
+        setSuccessModal={setSuccessModal}
+        setModalMessage={setModalMessage}
+        setModalError={setModalError}
+        deleteItem={props.deleteItem}
       />
 
       <ReportsModal

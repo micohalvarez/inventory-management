@@ -34,10 +34,11 @@ export const getSales = (authToken) => {
           });
         }
       })
-      .catch(({ response }) => {
-        console.log(response,'hi')
+      .catch(err => {
+        console.log(err,'hi')
         dispatch({ type: actionTypes.GET_SALES_FAIL });
       });
+      
   };
 };
 
