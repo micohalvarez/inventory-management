@@ -57,7 +57,7 @@ export const loginNextAuth = (payload) => {
       password: payload.password,
     })
       .then((res) => {
-
+  
         if (!res.error) {
           dispatch({ type: authActionTypes.LOGIN_SUCCESS });
           Router.replace('/admin/inventory');

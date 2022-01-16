@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   },
   tableRow: { margin: 'auto', flexDirection: 'row' },
   tableCol: {
-    width: '20%',
+    width: '14.2857142857%',
     borderStyle: 'solid',
     borderWidth: 1,
     borderLeftWidth: 0,
@@ -166,7 +166,9 @@ class ExportWinnertoPDF extends Component {
   numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
+
   getSpecificUser() {
+    console.log(this.props)
     var a = (
       <Document>
         <Page size="A4" style={styles.page}>
@@ -251,10 +253,10 @@ class ExportWinnertoPDF extends Component {
             {/* TableHeader */}
             <View style={styles.tableRow}>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>Item Code</Text>
+                <Text style={styles.tableCell}>Code</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>Item Name</Text>
+                <Text style={styles.tableCell}>Name</Text>
               </View>
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>Quantity</Text>
@@ -263,8 +265,15 @@ class ExportWinnertoPDF extends Component {
                 <Text style={styles.tableCell}>Item Price</Text>
               </View>
               <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>Item Discount</Text>
+              </View>
+              <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>Box Price</Text>
               </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>Item Total</Text>
+              </View>
+           
     
             </View>
             {/* TableContent */}
@@ -287,27 +296,36 @@ class ExportWinnertoPDF extends Component {
                 </View>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                    {`${parseFloat(
+                    {`${
                       this.props.order.items[index].unit_price
-                    ).toFixed(2)} PHP`}
+                    } `}
+                  </Text>
+                </View>
+         
+
+                <View style={styles.tableCol}>
+                  <Text style={styles.tableCell}>
+                    {`${
+                      this.props.order.items[index].item_discount * 100
+                    }%`}
                   </Text>
                 </View>
 
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                    {`${parseFloat(
+                    {`${
                       this.props.order.items[index].box_amount
-                    ).toFixed(2)} PHP`}
+                    }`}
                   </Text>
                 </View>
-                {/* <View style={styles.tableCol}>
+
+              
+                <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                    {` ${parseFloat(
-                      this.props.order.items[index].quantity *
-                        parseFloat(this.props.order.items[index].unit_price)
-                    ).toFixed(2)} PHP`}
+                  {`${  parseFloat(((this.props.order.items[index].unit_price * this.props.order.items[index].quantity) - ((this.props.order.items[index].unit_price * this.props.order.items[index].quantity) * this.props.order.items[index].item_discount)) + parseFloat(this.props.order.items[index].box_amount)).toFixed(2)}`}
                   </Text>
-                </View> */}
+                </View>
+       
               </View>
             ))}
           </View>

@@ -1902,9 +1902,12 @@ const DetailsModal = (props) => {
                               }`}
                               type="button"
                               onClick={(event) =>
-                                !isDiscount
-                                  ? setDiscountApproval(true)
-                                  : submitDiscount(event)
+                                {
+                                  if(session.user.user.is_superuser)
+                                    if(!isDiscount)
+                                      setDiscountApproval(true)
+                                  else submitDiscount(event)
+                                }
                               }
                             >
                               {!isDiscount ? 'Approve Order' : 'Submit'}
