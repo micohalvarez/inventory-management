@@ -10,7 +10,7 @@ import ConfirmModal from '../ConfirmModal';
 import { useSession } from 'next-auth/client';
 import SuccessModal from '../SuccessModal';
 const DetailsModal = (props) => {
-
+  
   const [isVisible, setVisible] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [onConfirm, setOnConfirm] = useState(null);
@@ -893,14 +893,17 @@ const DetailsModal = (props) => {
                                       <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
                                         <div className="h-8 w-8  bg-white rounded-full border justify-center flex">
                                           <img
-                                            src={
-                                              props.selectedItem.items[index]
-                                                .product.images[0]
-                                                ? props.selectedItem.items[
-                                                    index
-                                                  ].product.images[0].image
-                                                : '/img/sketch.jpg'
-                                            }
+                                         src={
+                                          props.selectedItem.items[index]
+                                          .product ?
+                                          props.selectedItem.items[index]
+                                            .product.images[0]
+                                            ? props.selectedItem.items[
+                                                index
+                                              ].product.images[0].image
+                                            : '/img/sketch.jpg'
+                                          :'/img/sketch.jpg'
+                                        }
                                             className="h-full overflow-hidden bg-white rounded-full  object-fit"
                                             alt="..."
                                           ></img>

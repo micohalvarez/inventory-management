@@ -1224,12 +1224,12 @@ const DetailsModal = (props) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
-  const markCancel = (event) => {
-    event.preventDefault();
-
+  const markCancel = () => {
+    console.log('huy')
     props
       .markCancel(session.user.auth_token, props.selectedItem.uuid)
       .then((res) => {
+        console.log(res,'hi')
         if (res.status === 200) {
           props.setModalMessage('Sales order has been marked as cancelled.');
           props.setModalError(false);
@@ -1289,7 +1289,6 @@ const DetailsModal = (props) => {
   const confirm = (message, method) => {
     setVisible(true);
     setConfirmMessage(message);
-
     setOnConfirm(method);
   };
 
@@ -1607,11 +1606,14 @@ const DetailsModal = (props) => {
                                           <img
                                             src={
                                               props.selectedItem.items[index]
+                                              .product ?
+                                              props.selectedItem.items[index]
                                                 .product.images[0]
                                                 ? props.selectedItem.items[
                                                     index
                                                   ].product.images[0].image
                                                 : '/img/sketch.jpg'
+                                              :'/img/sketch.jpg'
                                             }
                                             className="h-full overflow-hidden bg-white rounded-full  object-fit"
                                             alt="..."
@@ -1945,7 +1947,10 @@ const DetailsModal = (props) => {
                               type="button"
                               onClick={(event) => {
                                 !isContinue
-                                  ? markCancel(event)
+                                  ? confirm(
+                                    'Are you sure you want to cancel the order?',
+                                    'cancel'
+                                  )
                                   : setContinue(false);
                               }}
                             >
@@ -1979,10 +1984,13 @@ const DetailsModal = (props) => {
         closeModal={() => setVisible(false)}
         message={confirmMessage}
         onConfirm={() => {
+     
           onConfirm === 'delete'
             ? onDelete()
-            : 'cance_delete'
-            ? cancelDelete()
+            :  onConfirm === 'cancel_delete'
+            ? cancelDelete() 
+            :  onConfirm === 'cancel' 
+            ? markCancel() 
             : null;
           setVisible(false);
         }}
