@@ -10,7 +10,6 @@ import ConfirmModal from '../ConfirmModal';
 import ExportToPdf from '../../ExportToPdf';
 import SuccessModal from '../SuccessModal';
 const DetailsModal = (props) => {
-  console.log(props)
 
   const [items,setItems] = useState({})
   const [session, loading] = useSession();
@@ -67,7 +66,7 @@ const DetailsModal = (props) => {
 
     setItems(submitItems)
   }
-  // console.log(items,'tanginanaman')
+  
   const [isContinue, setContinue] = useState(false);
   const [editPayment, setEditPayment] = useState(false);
   const [editOrder, setEditOrder] = useState(false);
@@ -1168,7 +1167,7 @@ const DetailsModal = (props) => {
       }
 
       
-      console.log(payload)
+     
       props
         .editOrder(session.user.auth_token,props.selectedItem.uuid, payload)
         .then((res) => {
@@ -1536,7 +1535,7 @@ const DetailsModal = (props) => {
                               </p>
                             </div>
                           </div>
-                          <div className="mt-4 overflow-auto">
+                          <div className="mt-4 overflow-auto max-h-80">
                             <table className="items-center w-full bg-transparent border-collapse">
                               <thead className="bg-gray-100 ">
                                 <tr>
@@ -1916,6 +1915,16 @@ const DetailsModal = (props) => {
                         ) : (
                           <>
                   
+                  {!isContinue ? 
+                            <ExportToPdf
+                              closeModal={props.closeModal}
+                              order={props.selectedItem}
+                              setModalMessage={props.setModalMessage}
+                              setModalError={props.setModalError}
+                              setSuccessModal={props.setSuccessModal}
+                            />
+                            :null}
+
                             {!isContinue ? 
                             (<><button
                               className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"

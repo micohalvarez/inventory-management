@@ -188,7 +188,7 @@ const FormModal = (props) => {
     event.preventDefault();
     let testItems = [...items];
     let subItems = [...submitItems];
-
+    
     if (!(event.target.value > 10000 || event.target.value < 0)) {
       testItems[index].quantity = event.target.value;
 
@@ -243,11 +243,15 @@ const FormModal = (props) => {
   const handleTotalAmount = () => {
     let totalAmount = 0;
     let totalBox = 0
+    console.log(items)
+    console.log((((items[0].unit_price ? items[0].unit_price : items[0].price) * items[0].quantity) * (items[0].item_discount || items[0].item_discount !== 0 ? parseFloat(items[0].item_discount / 100) : 0)))
     items.map((item) => {
 
-      totalAmount += (((item.unit_price ? item.unit_price : item.price) * item.quantity) - (((item.unit_price ? item.unit_price : item.price) * item.quantity) * (item.item_discount || item.item_discount !== 0 ? parseFloat(item.item_discount / 100) : 1))) + (item.box_amount ? parseFloat(item.box_amount) : 0)
+      totalAmount += (((item.unit_price ? item.unit_price : item.price) * item.quantity) - (((item.unit_price ? item.unit_price : item.price) * item.quantity) * (item.item_discount || item.item_discount !== 0 ? parseFloat(item.item_discount / 100) : 0))) + (item.box_amount ? parseFloat(item.box_amount) : 0)
       totalBox += (item.box_amount ? parseFloat(item.box_amount) : 0)
     });
+
+    console.log(totalAmount)  
 
     setTotalAmount(totalAmount);
     setTotalBoxAmount(totalBox);
@@ -288,6 +292,8 @@ const FormModal = (props) => {
       delete testItems[index].images;
       subItems[index].product = null;
     }
+
+  
 
     subItems[index].quantity = testItems[index].quantity;
     

@@ -184,9 +184,11 @@ class ExportWinnertoPDF extends Component {
             <View style={styles.textContainer}>
               <Text style={styles.text}>
                 {`Created By:  \n ${
-                  this.props.order.created_by.first_name +
+                this.props.order.created_by ?
+                (this.props.order.created_by.first_name +
                   ' ' +
-                  this.props.order.created_by.last_name
+                  this.props.order.created_by.last_name)
+                  : ' '
                 }`}
               </Text>
             </View>
@@ -209,7 +211,7 @@ class ExportWinnertoPDF extends Component {
                 {`Payment Type:  \n${
                   this.props.order.payment_details
                     ? this.props.order.payment_details.type.name
-                    : 'N/A'
+                    : ''
                 }`}
               </Text>
             </View>
@@ -217,7 +219,7 @@ class ExportWinnertoPDF extends Component {
               <Text style={styles.text}>
                 {`Payment Date:  \n${
                   this.props.order.payment_details === null
-                    ? 'N/A'
+                    ? ''
                     : this.props.order.payment_details.type.id !== 2
                     ? moment(this.props.order.payment_details.created)
                         .format('MMM DD, YYYY')
@@ -233,9 +235,11 @@ class ExportWinnertoPDF extends Component {
             <View style={styles.textContainer}>
               <Text style={styles.text}>
               {`Received By:  \n ${
-                  this.props.order.received_by.first_name +
-                  ' ' +
-                  this.props.order.received_by.last_name
+                    this.props.order.received_by ?
+                    (this.props.order.received_by.first_name +
+                      ' ' +
+                      this.props.order.received_by.last_name)
+                      : ' '
                 }`}
               </Text>
             </View>
