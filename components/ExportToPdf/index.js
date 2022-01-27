@@ -125,10 +125,6 @@ class ExportWinnertoPDF extends Component {
                 {`Payment Date:  \n${
                   this.props.order.payment_details === null
                     ? ''
-                    : this.props.order.payment_details.type.id !== 2
-                    ? moment(this.props.order.payment_details.created)
-                        .format('MMM DD, YYYY')
-                        .toUpperCase()
                     : moment(this.props.order.payment_details.pdc_date)
                         .format('MMM DD, YYYY')
                         .toUpperCase()
@@ -291,7 +287,7 @@ class ExportWinnertoPDF extends Component {
         {this.state.pdf ? (
           <PDFDownloadLink
             document={this.getPdfDocument()}
-            fileName={`orders.pdf`}
+            fileName={`Sales Order #` + this.props.order.order_number + '.pdf'}
           >
             {({ blob, url, loading, error }) =>
               loading ? (
