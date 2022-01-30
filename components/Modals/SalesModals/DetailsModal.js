@@ -17,6 +17,7 @@ const DetailsModal = (props) => {
   const [confirmMessage, setConfirmMessage] = useState('');
   const [onConfirm, setOnConfirm] = useState(null);
   const [totalBoxAmount, setBoxAmount] = useState(0);
+  const [totalLessAmount, setLessAmount] = useState(0);
 
   const [newItems, setNewitems] = useState([
     <>
@@ -47,6 +48,7 @@ const DetailsModal = (props) => {
     var newItems = [...props.selectedItem.items]
     let submitItems = []
     let totalBoxAmount = 0;
+    let totalLess = 0;
     newItems.map( item=>{
         item.isOverride = false
         item.discountOverride = false
@@ -57,13 +59,15 @@ const DetailsModal = (props) => {
           product_code:item.product_code,
           quantity:item.quantity,
           box_amount:item.box_amount,
+          less_amount:item.less_amount,
           item_discount:item.item_discount * 100,
          })
          totalBoxAmount += parseFloat(item.box_amount)
+         totalLess += parseFloat(item.less_amount)
       })
 
     setBoxAmount(totalBoxAmount)
-
+    setLessAmount(totalLess)
     setItems(submitItems)
   }
   
@@ -399,7 +403,13 @@ const DetailsModal = (props) => {
                     >
                       Box Price
                     </th>
-
+                    <th
+                      className={
+                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                      }
+                    >
+                      Less Amount
+                    </th>
                     <th
                       className={
                         'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
@@ -512,7 +522,10 @@ const DetailsModal = (props) => {
                           {`₱${item.box_amount} PHP`}
                         </td>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                        {`₱${((item.unit_price * item.quantity) - ((item.unit_price * item.quantity) * (item.item_discount / 100)))+ parseFloat(item.box_amount)} PHP`}
+                          {`₱${item.less_amount} PHP`}
+                        </td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                        {`₱${((item.unit_price * item.quantity) - ((item.unit_price * item.quantity) * (item.item_discount / 100)))+ parseFloat(item.box_amount) - + parseFloat(item.less_amount)} PHP`}
                         </td>
                       </tr>
                     )
@@ -1434,7 +1447,7 @@ const DetailsModal = (props) => {
                                 {props.selectedItem.status.toUpperCase()}
                               </p>
                             </div>
-                            <div className="col-span-6 sm:col-span-3">
+                            <div className="col-span-6 sm:col-span-3 flex-wrap">
                               <label
                                 for="shipment_date"
                                 className="block text-sm font-medium text-gray-700"
@@ -1581,6 +1594,13 @@ const DetailsModal = (props) => {
                                     Box Price
                                   </th>
                                   <th
+                                  className={
+                                    'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                                  }
+                                >
+                                  Less Amount
+                                </th>
+                                  <th
                                     className={
                                       'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
                                     }
@@ -1646,7 +1666,10 @@ const DetailsModal = (props) => {
                                         {`₱${props.selectedItem.items[index].box_amount} PHP`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${((props.selectedItem.items[index].unit_price * props.selectedItem.items[index].quantity) - ((props.selectedItem.items[index].unit_price * props.selectedItem.items[index].quantity) * props.selectedItem.items[index].item_discount)) + parseFloat(props.selectedItem.items[index].box_amount)} PHP`}
+                                        {`₱${props.selectedItem.items[index].less_amount} PHP`}
+                                      </td>
+                                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                        {`₱${((props.selectedItem.items[index].unit_price * props.selectedItem.items[index].quantity) - ((props.selectedItem.items[index].unit_price * props.selectedItem.items[index].quantity) * props.selectedItem.items[index].item_discount)) + parseFloat(props.selectedItem.items[index].box_amount) - parseFloat(props.selectedItem.items[index].less_amount)} PHP`}
                                       </td>
 
                                 

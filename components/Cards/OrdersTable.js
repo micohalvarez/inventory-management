@@ -157,7 +157,7 @@ const OrdersTable = (props) => {
           'mt-4 relative flex flex-col min-w-0 break-words w-full mb-12 flex-1 shadow-lg rounded '
         }
       >
-        <div className="block w-full minoverflow-x-auto">
+        <div className="block w-full minoverflow-x-auto overflow-y-auto">
           <table className="items-center w-full bg-transparent border-collapse">
             <thead className="bg-gray-100 ">
               <tr>
