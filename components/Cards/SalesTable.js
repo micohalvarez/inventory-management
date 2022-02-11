@@ -72,22 +72,20 @@ const SalesTable = (props) => {
 
   const renderPagination = () => {
     var pagination = [];
-    var maxPages = Math.ceil(props.totalCount / 10);
-    var indexStart =
-      parseInt(props.page) >= 5
-        ? parseInt(props.page) === maxPages - 1
-          ? 1
-          : props.page - 4
-        : 0;
+    var maxPages = 15;
+    var totalPages = Math.ceil(props.totalCount / 10);
+    var pageNumbers = totalPages < maxPages ? totalPages : maxPages
+    var indexStart = parseInt(props.page) >= maxPages ? props.page - 19 : 0
 
-    for (var i = indexStart + 1; i <= maxPages; i++) {
+
+    for (var i = indexStart + 1; i <= pageNumbers + indexStart; i++) {
       pagination.push(
         <>
           <a
             key={i}
             onClick={onPressNumber}
             className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ${
-              props.page === maxPages && i === maxPages
+              props.page === pageNumbers + indexStart && i === pageNumbers + indexStart
                 ? 'pointer-events-none'
                 : 'cursor-pointer'
             } ${
@@ -319,7 +317,7 @@ const SalesTable = (props) => {
             </tbody>
           </table>
         </div>
-        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+        <div className="overflow-y-auto bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
           <div className="flex-1 flex justify-between sm:hidden">
             <a
               href="#"

@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   tableRow: { margin: 'auto', flexDirection: 'row' },
   tableCol: {
-    width: '12.5%',
+    width: '11.111111111111111%',
     borderStyle: 'solid',
     borderWidth: 1,
     borderLeftWidth: 0,
@@ -178,6 +178,10 @@ class ExportWinnertoPDF extends Component {
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>Less Amount</Text>
               </View>
+
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>Add Amount</Text>
+              </View>
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>Item Total</Text>
               </View>
@@ -235,11 +239,18 @@ class ExportWinnertoPDF extends Component {
                     }`}
                   </Text>
                 </View>
+                <View style={styles.tableCol}>
+                  <Text style={styles.tableCell}>
+                    {`${
+                      this.props.order.items[index].add_amount
+                    }`}
+                  </Text>
+                </View>
 
               
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                  {`${parseFloat(((this.props.order.items[index].unit_price * this.props.order.items[index].quantity) - ((this.props.order.items[index].unit_price * this.props.order.items[index].quantity) * this.props.order.items[index].item_discount)) + parseFloat(this.props.order.items[index].box_amount) - parseFloat(this.props.order.items[index].less_amount)).toFixed(2)  }`}
+                  {`${parseFloat(((this.props.order.items[index].unit_price * this.props.order.items[index].quantity) - ((this.props.order.items[index].unit_price * this.props.order.items[index].quantity) * this.props.order.items[index].item_discount)) + (parseFloat(this.props.order.items[index].box_amount) - parseFloat(this.props.order.items[index].less_amount)) + parseFloat(this.props.order.items[index].less_amount) ).toFixed(2)  }`}
                   </Text>
                 </View>
        
