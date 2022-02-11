@@ -73,9 +73,9 @@ const SalesTable = (props) => {
   const renderPagination = () => {
     var pagination = [];
     var maxPages = 15;
-    var totalPages = Math.ceil(props.totalCount / 10);
+    var totalPages = Math.ceil(382   / 10);
     var pageNumbers = totalPages < maxPages ? totalPages : maxPages
-    var indexStart = parseInt(props.page) >= maxPages ? props.page - 19 : 0
+    var indexStart = parseInt(props.page) >= maxPages ? props.page - 14 : 0
 
 
     for (var i = indexStart + 1; i <= pageNumbers + indexStart; i++) {
