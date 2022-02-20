@@ -10,8 +10,9 @@ import ConfirmModal from '../ConfirmModal';
 import ExportToPdf from '../../ExportToPdf';
 import SuccessModal from '../SuccessModal';
 const DetailsModal = (props) => {
-  console.log(props)
+
   const [items,setItems] = useState({})
+
   const [session, loading] = useSession();
   const [isVisible, setVisible] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
@@ -46,7 +47,9 @@ const DetailsModal = (props) => {
 
 
   const initItems = ()=>{
-    var newItems = [...props.selectedItem.items]
+ 
+    var newItems = props.displayItem
+      
     let submitItems = []
     let totalBoxAmount = 0;
     let totalLess = 0;
@@ -172,9 +175,9 @@ const DetailsModal = (props) => {
     let error = false
 
     items.map((item, index) =>{
-        if(item.unit_price !== props.selectedItem.items.reverse()[index].unit_price)
+        if(item.unit_price !== item.unit_price)
             hasChange = true  
-        if(item.item_discount !== props.selectedItem.items.reverse()[index].item_discount)
+        if(item.item_discount !== item.item_discount)
           hasChange = true  
         if(item.unit_price === ""){
           error = true
@@ -476,7 +479,7 @@ const DetailsModal = (props) => {
                             (item.isOverride =
                               !item.isOverride)
                             if(item.unit_price === "")
-                              item.unit_price = props.selectedItem.items.reverse()[index].unit_price
+                              item.unit_price = item.unit_price
                             }
                             }
                             className={`z-10 h-full  cursor-pointer leading-snug font-normal absolute right-0 pr-2 py-3 ${
@@ -1641,20 +1644,18 @@ const DetailsModal = (props) => {
                                 </tr>
                               </thead>
                               <tbody>
-                                {Object.keys(props.selectedItem.items).map(
-                                  (name, index) => (
+                                {props.displayItem.map(
+                                  (item, index) => (
                                     <tr className="mt-1 justify-center align-center text-gray-800 border-gray-200 ">
                                       <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4 text-left flex items-center">
                                         <div className="h-8 w-8  bg-white rounded-full border justify-center flex">
                                           <img
                                             src={
-                                              props.selectedItem.items.reverse()[index]
+                                              item
                                               .product ?
-                                              props.selectedItem.items.reverse()[index]
+                                              item
                                                 .product.images[0]
-                                                ? props.selectedItem.items[
-                                                    index
-                                                  ].product.images[0].image
+                                                ? item.product.images[0].image
                                                 : '/img/sketch.jpg'
                                               :'/img/sketch.jpg'
                                             }
@@ -1665,37 +1666,37 @@ const DetailsModal = (props) => {
 
                                         <span className={'ml-3 font-bold '}>
                                           {
-                                            props.selectedItem.items.reverse()[index]
+                                            item
                                               .product_code
                                           }
                                         </span>
                                       </th>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                     {props.selectedItem.items.reverse()[index]
+                                     {item
                                             .product_name}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {'x' +
-                                          props.selectedItem.items.reverse()[index]
+                                          item
                                             .quantity}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${props.selectedItem.items.reverse()[index].unit_price} PHP`}
+                                        {`₱${item.unit_price} PHP`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`${props.selectedItem.items.reverse()[index].item_discount * 100}%`}
+                                        {`${item.item_discount * 100}%`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${props.selectedItem.items.reverse()[index].box_amount} PHP`}
+                                        {`₱${item.box_amount} PHP`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${props.selectedItem.items.reverse()[index].less_amount} PHP`}
+                                        {`₱${item.less_amount} PHP`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${props.selectedItem.items.reverse()[index].add_amount} PHP`}
+                                        {`₱${item.add_amount} PHP`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${((props.selectedItem.items.reverse()[index].unit_price * props.selectedItem.items.reverse()[index].quantity) - ((props.selectedItem.items.reverse()[index].unit_price * props.selectedItem.items.reverse()[index].quantity) * props.selectedItem.items.reverse()[index].item_discount)) + (parseFloat(props.selectedItem.items.reverse()[index].box_amount) - parseFloat(props.selectedItem.items.reverse()[index].less_amount)) + parseFloat(props.selectedItem.items.reverse()[index].add_amount)} PHP`}
+                                        {`₱${((item.unit_price * item.quantity) - ((item.unit_price * item.quantity) * item.item_discount)) + (parseFloat(item.box_amount) - parseFloat(item.less_amount)) + parseFloat(item.add_amount)} PHP`}
                                       </td>
 
                                 
@@ -1920,6 +1921,7 @@ const DetailsModal = (props) => {
                             <ExportToPdf
                               closeModal={props.closeModal}
                               order={props.selectedItem}
+                              displayItem={props.displayItem}
                               setModalMessage={props.setModalMessage}
                               setModalError={props.setModalError}
                               setSuccessModal={props.setSuccessModal}
@@ -1970,6 +1972,7 @@ const DetailsModal = (props) => {
                             <ExportToPdf
                               closeModal={props.closeModal}
                               order={props.selectedItem}
+                              displayItem={props.displayItem}
                               setModalMessage={props.setModalMessage}
                               setModalError={props.setModalError}
                               setSuccessModal={props.setSuccessModal}

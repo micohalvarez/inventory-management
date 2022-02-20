@@ -28,7 +28,7 @@ const SalesTable = (props) => {
   const [isPaid, setPaid] = useState(false);
 
   const [selectedItem, setSelectedItem] = useState(false);
-
+  const [displayItems, setDisplayItems] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState(false);
   const [modalError, setModalError] = useState(false);
@@ -36,8 +36,13 @@ const SalesTable = (props) => {
   const [session, loading] = useSession();
 
   const onPressRow = (item) => {
+    console.log(item.items,'onPressRow')
     setShowDetailsModal(true);
     setSelectedItem(item);
+    var newarray = item.items.slice().reverse();
+    console.log(newarray,'new')
+    console.log(item.items,'orrig')
+    setDisplayItems(newarray)
   };
 
   const onPressNumber = (event) => {
@@ -125,6 +130,7 @@ const SalesTable = (props) => {
             selectedItem.status === 'cancelled'
           )
         }
+        displayItem={displayItems}
         forDelete={selectedItem.for_delete}
         showModal={showDetailsModal}
         closeModal={() => setShowDetailsModal(false)}

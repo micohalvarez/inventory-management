@@ -202,7 +202,7 @@ class ExportWinnertoPDF extends Component {
     
             </View>
             {/* TableContent */}
-            {this.props.order.items.reverse().map((item, index) => (
+            {this.props.displayItem.map((item, index) => (
               <View style={styles.tableRow}>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
