@@ -25,6 +25,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
+    flexWrap:'wrap',
+
   },
   textContainer: {
     flex: '1',
@@ -76,7 +78,7 @@ class ExportWinnertoPDF extends Component {
     console.log(this.props)
     var a = (
       <Document>
-        <Page size="A4" style={styles.page}>
+        <Page size="A4" style={styles.page} wrap>
           <View style={styles.section}>
             <Text style={styles.title}>Sales Order Receipt</Text>
           </View>
@@ -153,7 +155,18 @@ class ExportWinnertoPDF extends Component {
                 }`}
               </Text>
             </View>
+            <View style={styles.textContainer}>
+            <Text style={styles.text}>
+                {`Note:  \n${
+                  this.props.order.note
+                    ? this.props.order.note
+                    : 'N/A'
+                }`}
+              </Text>
+            </View>
           </View>
+
+        
           <View style={styles.table}>
             {/* TableHeader */}
             <View style={styles.tableRow}>
@@ -189,27 +202,27 @@ class ExportWinnertoPDF extends Component {
     
             </View>
             {/* TableContent */}
-            {Object.keys(this.props.order.items).map((name, index) => (
+            {this.props.order.items.reverse().map((item, index) => (
               <View style={styles.tableRow}>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                    {this.props.order.items[index].product_code}
+                    {item.product_code}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                    {this.props.order.items[index].product_name}
+                    {item.product_name}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                    {'x' + this.props.order.items[index].quantity}
+                    {'x' + item.quantity}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
                     {`${
-                      this.props.order.items[index].unit_price
+                      item.unit_price
                     } `}
                   </Text>
                 </View>
@@ -218,7 +231,7 @@ class ExportWinnertoPDF extends Component {
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
                     {`${
-                      this.props.order.items[index].item_discount * 100
+                      item.item_discount * 100
                     }%`}
                   </Text>
                 </View>
@@ -226,7 +239,7 @@ class ExportWinnertoPDF extends Component {
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
                     {`${
-                      this.props.order.items[index].box_amount
+                      item.box_amount
                     }`}
                   </Text>
                 </View>
@@ -235,14 +248,14 @@ class ExportWinnertoPDF extends Component {
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
                     {`${
-                      this.props.order.items[index].less_amount
+                      item.less_amount
                     }`}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
                     {`${
-                      this.props.order.items[index].add_amount
+                      item.add_amount
                     }`}
                   </Text>
                 </View>
@@ -250,7 +263,7 @@ class ExportWinnertoPDF extends Component {
               
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                  {`${parseFloat(((this.props.order.items[index].unit_price * this.props.order.items[index].quantity) - ((this.props.order.items[index].unit_price * this.props.order.items[index].quantity) * this.props.order.items[index].item_discount)) + (parseFloat(this.props.order.items[index].box_amount) - parseFloat(this.props.order.items[index].less_amount)) + parseFloat(this.props.order.items[index].less_amount) ).toFixed(2)  }`}
+                  {`${parseFloat(((item.unit_price * item.quantity) - ((item.unit_price * item.quantity) * item.item_discount)) + (parseFloat(item.box_amount) - parseFloat(item.less_amount)) + parseFloat(item.less_amount) ).toFixed(2)  }`}
                   </Text>
                 </View>
        

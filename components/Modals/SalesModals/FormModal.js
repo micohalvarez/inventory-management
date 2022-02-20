@@ -113,6 +113,8 @@ const FormModal = (props) => {
     });
     subItems.push({ product: null, quantity: 1, box_amount: 0,less_amount:0,    add_amount: 0,item_discount: 0, });
 
+
+    
     setSubmitItems(subItems);
 
     setItems(testItems);
@@ -408,6 +410,8 @@ const FormModal = (props) => {
         setModalMessage('Customer Name is required.');
       }
     });
+
+    console.log(submitItems)
 
     if (hasError) {
       setModalError(true);

@@ -10,7 +10,7 @@ import ConfirmModal from '../ConfirmModal';
 import ExportToPdf from '../../ExportToPdf';
 import SuccessModal from '../SuccessModal';
 const DetailsModal = (props) => {
-
+  console.log(props)
   const [items,setItems] = useState({})
   const [session, loading] = useSession();
   const [isVisible, setVisible] = useState(false);
@@ -172,9 +172,9 @@ const DetailsModal = (props) => {
     let error = false
 
     items.map((item, index) =>{
-        if(item.unit_price !== props.selectedItem.items[index].unit_price)
+        if(item.unit_price !== props.selectedItem.items.reverse()[index].unit_price)
             hasChange = true  
-        if(item.item_discount !== props.selectedItem.items[index].item_discount)
+        if(item.item_discount !== props.selectedItem.items.reverse()[index].item_discount)
           hasChange = true  
         if(item.unit_price === ""){
           error = true
@@ -476,7 +476,7 @@ const DetailsModal = (props) => {
                             (item.isOverride =
                               !item.isOverride)
                             if(item.unit_price === "")
-                              item.unit_price = props.selectedItem.items[index].unit_price
+                              item.unit_price = props.selectedItem.items.reverse()[index].unit_price
                             }
                             }
                             className={`z-10 h-full  cursor-pointer leading-snug font-normal absolute right-0 pr-2 py-3 ${
@@ -1470,7 +1470,7 @@ const DetailsModal = (props) => {
                               >
                                 Customer Name
                               </label>
-                              <p className="block text-base font-medium ">
+                              <p className="block truncate text-base font-medium break-words">
                                 {props.selectedItem.customer_name === null
                                   ? 'N/A'
                                   : props.selectedItem.customer_name}
@@ -1648,9 +1648,9 @@ const DetailsModal = (props) => {
                                         <div className="h-8 w-8  bg-white rounded-full border justify-center flex">
                                           <img
                                             src={
-                                              props.selectedItem.items[index]
+                                              props.selectedItem.items.reverse()[index]
                                               .product ?
-                                              props.selectedItem.items[index]
+                                              props.selectedItem.items.reverse()[index]
                                                 .product.images[0]
                                                 ? props.selectedItem.items[
                                                     index
@@ -1665,37 +1665,37 @@ const DetailsModal = (props) => {
 
                                         <span className={'ml-3 font-bold '}>
                                           {
-                                            props.selectedItem.items[index]
+                                            props.selectedItem.items.reverse()[index]
                                               .product_code
                                           }
                                         </span>
                                       </th>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                     {props.selectedItem.items[index]
+                                     {props.selectedItem.items.reverse()[index]
                                             .product_name}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {'x' +
-                                          props.selectedItem.items[index]
+                                          props.selectedItem.items.reverse()[index]
                                             .quantity}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${props.selectedItem.items[index].unit_price} PHP`}
+                                        {`₱${props.selectedItem.items.reverse()[index].unit_price} PHP`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`${props.selectedItem.items[index].item_discount * 100}%`}
+                                        {`${props.selectedItem.items.reverse()[index].item_discount * 100}%`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${props.selectedItem.items[index].box_amount} PHP`}
+                                        {`₱${props.selectedItem.items.reverse()[index].box_amount} PHP`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${props.selectedItem.items[index].less_amount} PHP`}
+                                        {`₱${props.selectedItem.items.reverse()[index].less_amount} PHP`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${props.selectedItem.items[index].add_amount} PHP`}
+                                        {`₱${props.selectedItem.items.reverse()[index].add_amount} PHP`}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                        {`₱${((props.selectedItem.items[index].unit_price * props.selectedItem.items[index].quantity) - ((props.selectedItem.items[index].unit_price * props.selectedItem.items[index].quantity) * props.selectedItem.items[index].item_discount)) + (parseFloat(props.selectedItem.items[index].box_amount) - parseFloat(props.selectedItem.items[index].less_amount)) + parseFloat(props.selectedItem.items[index].add_amount)} PHP`}
+                                        {`₱${((props.selectedItem.items.reverse()[index].unit_price * props.selectedItem.items.reverse()[index].quantity) - ((props.selectedItem.items.reverse()[index].unit_price * props.selectedItem.items.reverse()[index].quantity) * props.selectedItem.items.reverse()[index].item_discount)) + (parseFloat(props.selectedItem.items.reverse()[index].box_amount) - parseFloat(props.selectedItem.items.reverse()[index].less_amount)) + parseFloat(props.selectedItem.items.reverse()[index].add_amount)} PHP`}
                                       </td>
 
                                 
