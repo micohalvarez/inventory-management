@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   },
   tableRow: { margin: 'auto', flexDirection: 'row' },
   tableCol: {
-    width: '11.111111111111111%',
+    width: '14.285714285714286%',
     borderStyle: 'solid',
     borderWidth: 1,
     borderLeftWidth: 0,
@@ -188,13 +188,7 @@ class ExportWinnertoPDF extends Component {
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>Box Price</Text>
               </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>Less Amount</Text>
-              </View>
-
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>Add Amount</Text>
-              </View>
+        
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>Item Total</Text>
               </View>
@@ -239,31 +233,18 @@ class ExportWinnertoPDF extends Component {
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
                     {`${
-                      item.box_amount
+                      item.box_amount - parseFloat(item.less_amount) + parseFloat(item.add_amount)
                     }`}
                   </Text>
                 </View>
 
 
-                <View style={styles.tableCol}>
-                  <Text style={styles.tableCell}>
-                    {`${
-                      item.less_amount
-                    }`}
-                  </Text>
-                </View>
-                <View style={styles.tableCol}>
-                  <Text style={styles.tableCell}>
-                    {`${
-                      item.add_amount
-                    }`}
-                  </Text>
-                </View>
+            
 
               
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                  {`${parseFloat(((item.unit_price * item.quantity) - ((item.unit_price * item.quantity) * item.item_discount)) + (parseFloat(item.box_amount) - parseFloat(item.less_amount)) + parseFloat(item.less_amount) ).toFixed(2)  }`}
+                  {`${parseFloat(((item.unit_price * item.quantity) - ((item.unit_price * item.quantity) * item.item_discount)) + (parseFloat(item.box_amount) - parseFloat(item.less_amount) + parseFloat(item.add_amount))).toFixed(2)  }`}
                   </Text>
                 </View>
        

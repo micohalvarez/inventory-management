@@ -38,9 +38,8 @@ const FormModal = (props) => {
       product: null,
       price: 0,
       quantity: 1,
-      box_amount: 0,
-      less_amount: 0,
-      add_amount: 0,
+      box_amount: 0
+      ,add_amount:0,less_amount:0,
       item_discount:0,
       total:0,
       isOverride: false,
@@ -48,15 +47,14 @@ const FormModal = (props) => {
   ]);
 
   const [submitItems, setSubmitItems] = useState([
-    { product: null, quantity: 1, box_amount: 0,less_amount : 0 ,item_discount:0, add_amount: 0}
+    { product: null, quantity: 1, box_amount: 0 ,item_discount:0,add_amount:0,less_amount:0}
   ]);
 
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [totalDiscountAmount, setTotalDiscountAmount] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalBoxAmount, setTotalBoxAmount] = useState(0);
-  const [totalLessAmount, setTotalLessAmount] = useState(0);
-  const [totalAddAmount, setTotalAddAmount] = useState(0);
+
   const [quantity, setQuantity] = useState([0]);
 
   const [boxError, setBoxError] = useState('');
@@ -106,12 +104,11 @@ const FormModal = (props) => {
       quantity: 1,
       price: 0,
       box_amount: 0,
-      less_amount : 0,
-      add_amount: 0,
       item_discount: 0,
       total:0
+      ,add_amount:0,less_amount:0
     });
-    subItems.push({ product: null, quantity: 1, box_amount: 0,less_amount:0,    add_amount: 0,item_discount: 0, });
+    subItems.push({ product: null, quantity: 1, box_amount: 0,item_discount: 0,add_amount:0,less_amount:0 });
 
 
     
@@ -141,18 +138,6 @@ const FormModal = (props) => {
     if (!(event.target.value > 100 || event.target.value < 0)) {
       setTotalDiscount(event.target.value);
     }
-    console.log(totalAmount)
-    console.log(totalBoxAmount)
-    console.log(totalLessAmount )
-    console.log(   parseFloat(
-      (totalAmount) *
-        (totalDiscount / 100)
-    ))
-    console.log(numberWithCommas(
-      parseFloat(
-        (totalAmount ) *
-          (totalDiscount / 100)
-      ).toFixed(2)))
   };
 
   const handleCustomerName = (event) => {
@@ -176,7 +161,7 @@ const FormModal = (props) => {
       testItems[index].quantity = event.target.value;
 
       subItems[index].quantity = event.target.value;
-      testItems[index].total = ((event.target.value * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - ((event.target.value * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price) ) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0))) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0) - (testItems[index].less_amount ? parseFloat(testItems[index].less_amount) : 0)) + (testItems[index].add_amount ? parseFloat(testItems[index].add_amount) : 0)
+      testItems[index].total = ((event.target.value * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - ((event.target.value * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price) ) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0))) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0))
 
       handleTotalAmount();
       setSubmitItems(subItems);
@@ -193,7 +178,7 @@ const FormModal = (props) => {
       testItems[index].box_amount = event.target.value;
 
       subItems[index].box_amount = event.target.value;
-      testItems[index].total = ( (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0)) +  ((event.target.value ? parseFloat(event.target.value) : 0)  - (testItems[index].less_amount ? parseFloat(testItems[index].less_amount) : 0)) + (testItems[index].add_amount ? parseFloat(testItems[index].add_amount) : 0)
+      testItems[index].total = ( (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0)) +  ((event.target.value ? parseFloat(event.target.value) : 0) )
 
       handleTotalAmount();
       setSubmitItems(subItems);
@@ -201,39 +186,39 @@ const FormModal = (props) => {
     }
   };
 
-  const handleLessAmount = (event, index) => {
-    event.preventDefault();
-    let testItems = [...items];
-    let subItems = [...submitItems];
-    if (!(event.target.value > 10000 || event.target.value < 0)) {
+  // const handleLessAmount = (event, index) => {
+  //   event.preventDefault();
+  //   let testItems = [...items];
+  //   let subItems = [...submitItems];
+  //   if (!(event.target.value > 10000 || event.target.value < 0)) {
 
-      testItems[index].less_amount = event.target.value;
+  //     testItems[index].less_amount = event.target.value;
 
-      subItems[index].less_amount = event.target.value;
-      testItems[index].total = ( (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0)) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0) -  (event.target.value ? parseFloat(event.target.value) : 0)) + (testItems[index].add_amount ? parseFloat(testItems[index].add_amount) : 0)
+  //     subItems[index].less_amount = event.target.value;
+  //     testItems[index].total = ( (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0)) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0)) 
 
-      handleTotalAmount();
-      setSubmitItems(subItems);
-      setItems(testItems);
-    }
-  };
+  //     handleTotalAmount();
+  //     setSubmitItems(subItems);
+  //     setItems(testItems);
+  //   }
+  // };
 
-  const handleAddAmount = (event, index) => {
-    event.preventDefault();
-    let testItems = [...items];
-    let subItems = [...submitItems];
-    if (!(event.target.value > 10000 || event.target.value < 0)) {
+  // const handleAddAmount = (event, index) => {
+  //   event.preventDefault();
+  //   let testItems = [...items];
+  //   let subItems = [...submitItems];
+  //   if (!(event.target.value > 10000 || event.target.value < 0)) {
 
-      testItems[index].add_amount = event.target.value;
+  //     testItems[index].add_amount = event.target.value;
 
-      subItems[index].add_amount = event.target.value;
-      testItems[index].total = ( (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0)) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0) -  (testItems[index].less_amount ? parseFloat(testItems[index].less_amount) : 0)) + (event.target.value ? parseFloat(event.target.value) : 0)
+  //     subItems[index].add_amount = event.target.value;
+  //     testItems[index].total = ( (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0)) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0) -  (testItems[index].less_amount ? parseFloat(testItems[index].less_amount) : 0)) + (event.target.value ? parseFloat(event.target.value) : 0)
 
-      handleTotalAmount();
-      setSubmitItems(subItems);
-      setItems(testItems);
-    }
-  };
+  //     handleTotalAmount();
+  //     setSubmitItems(subItems);
+  //     setItems(testItems);
+  //   }
+  // };
 
   const handleItemDiscount = (event, index) => {
     event.preventDefault();
@@ -244,7 +229,7 @@ const FormModal = (props) => {
       testItems[index].item_discount = event.target.value ;
       
       subItems[index].item_discount = event.target.value / 100;
-      testItems[index].total = ((testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - ((testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) * (event.target.value ? parseFloat(event.target.value) / 100 : 0))) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0) -  (testItems[index].less_amount ? parseFloat(testItems[index].less_amount) : 0)) + (testItems[index].add_amount ? parseFloat(testItems[index].add_amount) : 0)
+      testItems[index].total = ((testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - ((testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) * (event.target.value ? parseFloat(event.target.value) / 100 : 0))) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0)) 
 
       handleTotalAmount();
       setSubmitItems(subItems);
@@ -260,21 +245,18 @@ const FormModal = (props) => {
   const handleTotalAmount = () => {
     let totalAmount = 0;
     let totalBox = 0
-    let totalLess = 0;
-    let totalAdd = 0
+  
     items.map((item) => {
 
-      totalAmount += (((item.unit_price ? item.unit_price : item.price) * item.quantity) - (((item.unit_price ? item.unit_price : item.price) * item.quantity) * (item.item_discount || item.item_discount !== 0 ? parseFloat(item.item_discount / 100) : 0))) + (item.box_amount ? parseFloat(item.box_amount) : 0) - (item.less_amount ? parseFloat(item.less_amount) : 0) + (item.add_amount ? parseFloat(item.add_amount) : 0)
+      totalAmount += (((item.unit_price ? item.unit_price : item.price) * item.quantity) - (((item.unit_price ? item.unit_price : item.price) * item.quantity) * (item.item_discount || item.item_discount !== 0 ? parseFloat(item.item_discount / 100) : 0))) + (item.box_amount ? parseFloat(item.box_amount) : 0) 
 
       totalBox += (item.box_amount ? parseFloat(item.box_amount) : 0)
-      totalLess += (item.less_amount ? parseFloat(item.less_amount) : 0)
-      totalAdd += (item.add_amount ? parseFloat(item.add_amount) : 0)
+
     });
 
     setTotalAmount(totalAmount);
     setTotalBoxAmount(totalBox);
-    setTotalLessAmount(totalLess);
-    setTotalAddAmount(totalAdd)
+ 
   };
 
   const handlePrice = (event, index) => {
@@ -285,7 +267,7 @@ const FormModal = (props) => {
       testItems[index].unit_price = event.target.value;
 
       subItems[index].unit_price = event.target.value;
-      testItems[index].total = ((testItems[index].quantity * event.target.value) - ((testItems[index].quantity * event.target.value ) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0))) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0) - (testItems[index].less_amount ? parseFloat(testItems[index].less_amount) : 0)) + (testItems[index].add_amount ? parseFloat(testItems[index].add_amount) : 0)
+      testItems[index].total = ((testItems[index].quantity * event.target.value) - ((testItems[index].quantity * event.target.value ) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0))) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0)) 
       handleTotalAmount();
       setSubmitItems(subItems);
       setItems(testItems);
@@ -295,7 +277,6 @@ const FormModal = (props) => {
   const handleType = (index, item) => {
     let testItems = [...items];
     let subItems = [...submitItems];
-    console.log(items)
 
     if (item != null) {
       testItems[index].price = item.unit_price;
@@ -304,11 +285,11 @@ const FormModal = (props) => {
       testItems[index].box_amount = 0;
       testItems[index].quantity = 1;
       testItems[index].unit_price = null;
-      testItems[index].less_amount = 0;
-      testItems[index].add_amount = 0;
       testItems[index].images = item.images;
       testItems[index].isOverride = false;
       subItems[index].product = item.id;
+      subItems[index].less_amount = 0;
+      subItems[index].add_amount = 0;
       testItems[index].total = item.unit_price;
     } else {
       testItems[index].price = 0;
@@ -321,7 +302,7 @@ const FormModal = (props) => {
       subItems[index].product = null;
     }
 
-  
+    console.log(subItems)
 
     subItems[index].quantity = testItems[index].quantity;
     
@@ -374,28 +355,11 @@ const FormModal = (props) => {
         setModalMessage('Box Prices must be numeric and greater than 0.');
       }
 
-      if (item.less_amount < 0 || isNaN(item.less_amount)) {
-        hasError = true;
-        setModalMessage('Less Amount must be numeric and greater than 0.');
-      }
-
-      if (item.add_amount < 0 || isNaN(item.add_amount)) {
-        hasError = true;
-        setModalMessage('Add Amount must be numeric and greater than 0.');
-      }
 
       if(item.box_amount === ""){
         item.box_amount = 0
       }
 
-      if(item.less_amount === ""){
-        item.less_amount = 0
-      }
-
-      if(item.add_amount === ""){
-        item.add_amount = 0
-      }
-      
       if(item.item_discount === ""){
         item.item_discount = 1
       }
@@ -411,7 +375,7 @@ const FormModal = (props) => {
       }
     });
 
-    console.log(submitItems)
+  
 
     if (hasError) {
       setModalError(true);
@@ -469,7 +433,7 @@ const FormModal = (props) => {
     props.closeModal();
     setContinue(false);
     setItems([
-      { type: null, product: null, price: 0, quantity: 1, isOverride: false, box_amount:0,item_discount:0, less_amount:0,add_amount:0, total:0 },
+      { type: null, product: null, price: 0, quantity: 1, isOverride: false, box_amount:0,item_discount:0, total:0 },
     ]);
     setTotalAmount(0);
     setCustomerName('')
@@ -478,7 +442,7 @@ const FormModal = (props) => {
     setTotalDiscount(0);
     setTotalDiscountAmount(0);
     setSuccessModal(false);
-    setSubmitItems([{ product: null, quantity: 0 ,box_amount:0, less_amount:0,add_amount:0, item_discount:0}]);
+    setSubmitItems([{ product: null, quantity: 0 ,box_amount:0, item_discount:0}]);
   };
 
   return (
@@ -661,20 +625,7 @@ const FormModal = (props) => {
                                       Box Price
                                     </th>
 
-                                    <th
-                                      className={
-                                        'px-4 align-middle border-l-0 border-r-0 border border-solid py-3 text-sm uppercase  whitespace-no-wrap font-semibold text-left'
-                                      }
-                                    >
-                                      Less Amount
-                                    </th>
-                                    <th
-                                      className={
-                                        'px-4 align-middle border-l-0 border-r-0 border border-solid py-3 text-sm uppercase  whitespace-no-wrap font-semibold text-left'
-                                      }
-                                    >
-                                      Add Amount
-                                    </th>
+                              
                               
                             
                                     <th
@@ -855,49 +806,7 @@ const FormModal = (props) => {
                                           />
                                         </td>
 
-                                        <td className="border-t-0 px-4 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap ">
-                                          <input
-                                            type="number"
-                                            disabled={
-                                              item.type === null ? true : false
-                                            }
-                                            value={item.less_amount}
-                                            onChange={(event) =>
-                                              handleLessAmount(event, index)
-                                            }
-                                            placeholder="Less Amount"
-                                            name="less_amount"
-                                            id="less_amount"
-                                            autocomplete="less_amount"
-                                            className={`mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-7/12 shadow-sm sm:text-sm border border-gray-300 rounded-md ${
-                                              item.type === null
-                                                ? 'opacity-60 cursor-not-allowed'
-                                                : null
-                                            }`}
-                                          />
-                                        </td>
 
-                                        <td className="border-t-0 px-4 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap ">
-                                          <input
-                                            type="number"
-                                            disabled={
-                                              item.type === null ? true : false
-                                            }
-                                            value={item.add_amount}
-                                            onChange={(event) =>
-                                              handleAddAmount(event, index)
-                                            }
-                                            placeholder="Add Amount"
-                                            name="add_amount"
-                                            id="add_amount"
-                                            autocomplete="add_amount"
-                                            className={`mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-400 focus:border-blue-400 block w-7/12 shadow-sm sm:text-sm border border-gray-300 rounded-md ${
-                                              item.type === null
-                                                ? 'opacity-60 cursor-not-allowed'
-                                                : null
-                                            }`}
-                                          />
-                                        </td>
 
                                         <td className="border-t-0 px-4 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap ">
                                         <span>{item.total}</span>
@@ -965,7 +874,7 @@ const FormModal = (props) => {
                                         totalDiscount > 0
                                           ? numberWithCommas(
                                               parseFloat(
-                                                (totalAmount - (totalBoxAmount - totalLessAmount + totalAddAmount) ) *
+                                                (totalAmount - (totalBoxAmount) ) *
                                                   (totalDiscount / 100)
                                               ).toFixed(2)
                                             )
@@ -1010,7 +919,7 @@ const FormModal = (props) => {
                                     
                                       totalDiscount
                                         ?   numberWithCommas(parseFloat(totalAmount -
-                                          (totalAmount - (totalBoxAmount - totalLessAmount + totalAddAmount) ) *
+                                          (totalAmount - (totalBoxAmount) ) *
                                           (totalDiscount / 100)).toFixed(2))
                                         : numberWithCommas(parseFloat(totalAmount).toFixed(2))
                                     } PHP`}</span>
