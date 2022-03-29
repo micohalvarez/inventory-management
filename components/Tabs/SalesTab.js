@@ -26,7 +26,7 @@ const SalesTab = (props) => {
   const onSelectDelete = () => {
     props.clearDiscount();
     props.addDelete();
-    props.addFilter('pending');
+    // props.addFilter('pending');
     props.getSalesWithFilter(session.user.auth_token);
   };
 

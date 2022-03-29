@@ -43,7 +43,7 @@ export const getSales = (authToken) => {
 };
 
 
-export const editPayment = (authToken, uuid,payload) => {
+export const editPayment = (authToken, uuid, payload) => {
   return (dispatch) => {
 
     console.log(payload)
@@ -83,7 +83,7 @@ export const getNextItems = (authToken, offSet, page) => {
         }
       )
       .then((res) => {
-        console.log(res);
+
         if (res.status === 200 && res.data.results) {
           dispatch({
             type: actionTypes.GET_SALES_SUCCESS,
@@ -113,7 +113,7 @@ export const getSalesWithFilter = (authToken, filter) => {
         },
       })
       .then((res) => {
-        console.log(res);
+
         if (res.status === 200 && res.data.results) {
           console.log(res);
           dispatch({
@@ -134,7 +134,7 @@ export const getSalesWithFilter = (authToken, filter) => {
 export const getPaymentTypes = (authToken, filter) => {
   return (dispatch) => {
     dispatch({ type: actionTypes.GET_PAYMENT_START });
-    console.log(filter);
+
     authInstance
       .get(`/payment/types/`, {
         headers: {
@@ -238,7 +238,7 @@ export const approveDiscount = (authToken, uuid, discount, unit_price) => {
       ...(unit_price && {unit_price: unit_price})
     }
 
-    console.log(data)
+
     return authInstance.post(
       `/sales_order/${uuid}/approve_discount/`,
       data,
