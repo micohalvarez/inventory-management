@@ -237,7 +237,7 @@ export const approveDiscount = (authToken, uuid, discount, unit_price) => {
       total_discount: discount,
       ...(unit_price && {unit_price: unit_price})
     }
-
+    console.log(data,'hi')
 
     return authInstance.post(
       `/sales_order/${uuid}/approve_discount/`,

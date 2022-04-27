@@ -170,9 +170,9 @@ const DetailsModal = (props) => {
     let error = false
 
     items.map((item, index) =>{
-        if(item.unit_price !== item.unit_price)
+        if(item.unit_price !== props.selectedItem.items[index].unit_price)
             hasChange = true  
-        if(item.item_discount !== item.item_discount)
+        if(item.item_discount !== props.selectedItem.items[index].item_discount)
           hasChange = true  
         if(item.unit_price === ""){
           error = true
@@ -186,8 +186,7 @@ const DetailsModal = (props) => {
          }
         )
     })
-
-
+ 
     if (error) {
       setModalError(true);
       setSuccessModal(true);
@@ -351,7 +350,6 @@ const DetailsModal = (props) => {
                   placeholder="Discount Percent"
                   name="discount"
                   id="discount"
-                  autocomplete="discount"
                   className="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                 />
                   {discountError ? (
