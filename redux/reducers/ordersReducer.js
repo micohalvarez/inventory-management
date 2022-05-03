@@ -10,7 +10,7 @@ const initialState = {
   filter: null,
   delete: null,
   gettingPayment: false,
-  loadingMore: false,
+  loading: false,
   newSales: [],
 };
 
@@ -20,6 +20,7 @@ const data = (state = initialState, action) => {
       return {
         ...state,
         gettingOrders: true,
+        loading: true
       };
     case actionTypes.GET_ORDERS_SUCCESS:
       return {
@@ -29,25 +30,19 @@ const data = (state = initialState, action) => {
         ordersCount: action.payload.count,
         ordersOffset: action.payload.offSet,
         ordersPage: action.payload.page,
+        loading: false
       };
     case actionTypes.GET_ORDERS_FAIL:
       return {
         ...state,
         gettingOrders: false,
+        loading: false
       };
 
     case actionTypes.ADD_ORDERS_SUCCESS:
-      // var newArray = [];
-      // newArray.push(action.payload);
-      // const curPreviousPlays = [...state.orders];
-
-      // const newPreviousPlays = newArray.concat(curPreviousPlays);
-
       return {
         ...state,
         gettingOrders: false,
-        // orders: newPreviousPlays,
-        // ordersCount: state.ordersCount + 1,
       };
     case actionTypes.ADD_ORDERS_FAIL:
       return {
@@ -91,6 +86,17 @@ const data = (state = initialState, action) => {
       return {
         ...state,
         filter: null,
+      };
+
+    case actionTypes.ADD_SEARCH_ORDER:
+      return {
+        ...state,
+        search: action.payload.search,
+      };
+    case actionTypes.CLEAR_SEARCH_ORDER:
+      return {
+        ...state,
+        search: null,
       };
     default:
       return state;

@@ -71,7 +71,7 @@ export const getNextItems = (authToken, offSet, page) => {
   return (dispatch, getState) => {
     const sales = getState().sales;
     dispatch({ type: actionTypes.GET_SALES_START });
-    console.log(sales)
+
     authInstance
       .get(
         `/sales_order/?limit=${SALES_LIMIT}&offset=${offSet}` +
@@ -190,7 +190,7 @@ export const createSalesOrder = (
         ...(purchaseDate && {purchased_date : purchaseDate})
       };
 
-    console.log(data)
+
     return authInstance.post(`/sales_order/`, data, {
       headers: {
         Authorization: `Token ${authToken}`,

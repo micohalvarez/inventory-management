@@ -43,6 +43,9 @@ export const searchOrders = (authToken, id) => {
   return (dispatch, getState) => {
     dispatch({ type: actionTypes.GET_ORDERS_START });
 
+
+    dispatch({ type: actionTypes.GET_ORDERS_START });
+
     authInstance
       .get(`/purchase_order/?order_number=${id}`, {
         headers: {
@@ -88,6 +91,8 @@ export const getNextItems = (authToken, offSet, page) => {
       .get(
         `/purchase_order/?limit=${ORDERS_LIMIT}&offset=${offSet}` +
           (orders.filter ? `&status=${orders.filter}` : ''),
+          (orders.search ? `&order_number=${orders.search}` : ''),
+          (orders.delete ? `&for_delete=${orders.delete}` : ''),
         {
           headers: {
             Authorization: `Token ${authToken}`,
@@ -268,5 +273,20 @@ export const declineDelete = (authToken, uuid) => {
         },
       }
     );
+  };
+};
+
+export const addSearch = (search) => {
+  return (dispatch) => {
+    dispatch({
+      type: actionTypes.ADD_SEARCH_ORDER,
+      payload: { search: search },
+    });
+  };
+};
+
+export const clearSearch = () => {
+  return (dispatch) => {
+    dispatch({ type: actionTypes.CLEAR_SEARCH_ORDER });
   };
 };

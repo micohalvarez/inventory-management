@@ -12,7 +12,7 @@ const initialState = {
   delete: null,
   search: null,
   gettingPayment: false,
-  loadingMore: false,
+  loading: false,
   newOrder: [],
 };
 
@@ -23,6 +23,7 @@ const data = (state = initialState, action) => {
       return {
         ...state,
         gettingSales: true,
+        loading : true,
       };
     case actionTypes.GET_SALES_SUCCESS:
       return {
@@ -32,11 +33,13 @@ const data = (state = initialState, action) => {
         salesCount: action.payload.count,
         salesOffset: action.payload.offSet,
         salesPage: action.payload.page,
+        loading : false,
       };
     case actionTypes.ADD_SALES_FAIL:
       return {
         ...state,
         gettingSales: false,
+        loading : false,
       };
 
     case actionTypes.ADD_SALES_SUCCESS:

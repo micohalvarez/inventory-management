@@ -27,7 +27,9 @@ const Sales = (props) => {
   }, []);
 
   return (
+    
     <Admin showSideBar={showSideBar}>
+   
       <AdminNavbar
         isClicked={!isClicked}
         user={session.user}
@@ -44,6 +46,7 @@ const Sales = (props) => {
         }}
         className=" flex flex-col flex-1 px-4 mt-24  "
       >
+
         <SalesTable isClicked={!isClicked} />
       </div>
     </Admin>
