@@ -379,6 +379,13 @@ const DetailsModal = (props) => {
                     </th>
                     <th
                       className={
+                        'px-6 align-middle border border-solid py-3 text-sm uppercase border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                      }
+                    >
+                      Item Type
+                    </th>
+                    <th
+                      className={
                         'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
                       }
                     >
@@ -446,6 +453,9 @@ const DetailsModal = (props) => {
                         </th>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                         {item.product_name}
+                        </td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                        {item.product.category.name}
                         </td>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                           {'x' +
@@ -1560,6 +1570,13 @@ const DetailsModal = (props) => {
                                   </th>
                                   <th
                                     className={
+                                      'px-6 align-middle border border-solid py-3 text-sm uppercase border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
+                                    }
+                                  >
+                                    Item Type
+                                  </th>
+                                  <th
+                                    className={
                                       'px-6 align-middle border border-solid py-3 text-sm uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left bg-gray-100 text-gray-600 border-gray-200'
                                     }
                                   >
@@ -1633,8 +1650,10 @@ const DetailsModal = (props) => {
                                         </span>
                                       </th>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
-                                     {item
-                                            .product_name}
+                                     {item.product_name}
+                                      </td>
+                                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
+                                     {item.product.category.name}
                                       </td>
                                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                         {'x' +

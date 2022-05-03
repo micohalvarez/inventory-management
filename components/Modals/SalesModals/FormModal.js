@@ -36,6 +36,7 @@ const FormModal = (props) => {
     {
       type: null,
       product: null,
+      category:null,
       price: 0,
       quantity: 1,
       box_amount: 0
@@ -104,6 +105,7 @@ const FormModal = (props) => {
       quantity: 1,
       price: 0,
       box_amount: 0,
+      product:null,
       item_discount: 0,
       total:0
       ,add_amount:0,less_amount:0
@@ -170,7 +172,7 @@ const FormModal = (props) => {
   };
 
   const handleBoxAmount = (event, index) => {
-    event.preventDefault();
+    
     let testItems = [...items];
     let subItems = [...submitItems];
     if (!(event.target.value > 10000 || event.target.value < 0)) {
@@ -185,40 +187,6 @@ const FormModal = (props) => {
       setItems(testItems);
     }
   };
-
-  // const handleLessAmount = (event, index) => {
-  //   event.preventDefault();
-  //   let testItems = [...items];
-  //   let subItems = [...submitItems];
-  //   if (!(event.target.value > 10000 || event.target.value < 0)) {
-
-  //     testItems[index].less_amount = event.target.value;
-
-  //     subItems[index].less_amount = event.target.value;
-  //     testItems[index].total = ( (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0)) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0)) 
-
-  //     handleTotalAmount();
-  //     setSubmitItems(subItems);
-  //     setItems(testItems);
-  //   }
-  // };
-
-  // const handleAddAmount = (event, index) => {
-  //   event.preventDefault();
-  //   let testItems = [...items];
-  //   let subItems = [...submitItems];
-  //   if (!(event.target.value > 10000 || event.target.value < 0)) {
-
-  //     testItems[index].add_amount = event.target.value;
-
-  //     subItems[index].add_amount = event.target.value;
-  //     testItems[index].total = ( (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) - (testItems[index].quantity * (testItems[index].unit_price ? testItems[index].unit_price : testItems[index].price)) * (testItems[index].item_discount ? parseFloat(testItems[index].item_discount) / 100 : 0)) + ((testItems[index].box_amount ? parseFloat(testItems[index].box_amount) : 0) -  (testItems[index].less_amount ? parseFloat(testItems[index].less_amount) : 0)) + (event.target.value ? parseFloat(event.target.value) : 0)
-
-  //     handleTotalAmount();
-  //     setSubmitItems(subItems);
-  //     setItems(testItems);
-  //   }
-  // };
 
   const handleItemDiscount = (event, index) => {
     event.preventDefault();
@@ -288,6 +256,7 @@ const FormModal = (props) => {
       testItems[index].images = item.images;
       testItems[index].isOverride = false;
       subItems[index].product = item.id;
+      testItems[index].category = item.category
       subItems[index].less_amount = 0;
       subItems[index].add_amount = 0;
       testItems[index].total = item.unit_price;
@@ -295,14 +264,15 @@ const FormModal = (props) => {
       testItems[index].price = 0;
       testItems[index].type = null;
       testItems[index].quantity = 1;
+      testItems[index].product = null
       testItems[index].total = 0;
       testItems[index].total_discount = 0;
       testItems[index].isOverride = false;
       delete testItems[index].images;
-      subItems[index].product = null;
+      subItems[index].category = null;
     }
 
-    console.log(subItems)
+    console.log(item)
 
     subItems[index].quantity = testItems[index].quantity;
     
@@ -523,13 +493,14 @@ const FormModal = (props) => {
                                   Customer Name
                                 </label>
                                 <input
+                                
                                   type="text"
                                   placeholder="Customer Name"
                                   value={customerName}
                                   onChange={handleCustomerName}
                                   name="customer_name"
                                   id="customer_name"
-                                  autocomplete="customer-name"
+                                  autocomplete="off"
                                   class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-5/12 shadow-sm sm:text-sm border border-gray-300 rounded-md"
                                 />
                                 {customerNameError ? (
@@ -552,7 +523,7 @@ const FormModal = (props) => {
                                   onChange={handleNote}
                                   name="note"
                                   id="note"
-                                  autocomplete="note"
+                                  autocomplete="off"
                                   class="mt-1 py-2 px-2 focus:outline-none focus:ring-border-blue-300 focus:border-blue-300 block w-5/12 shadow-sm sm:text-sm border border-gray-300 rounded-md"
                                 />
                                 {noteError ? (
@@ -598,8 +569,16 @@ const FormModal = (props) => {
                                         'px-6 align-middle border-l-0 border-r-0 border border-solid py-3 text-sm uppercase  whitespace-no-wrap font-semibold text-left'
                                       }
                                     >
+                                      Item Type
+                                    </th>
+                                    <th
+                                      className={
+                                        'px-6 align-middle border-l-0 border-r-0 border border-solid py-3 text-sm uppercase  whitespace-no-wrap font-semibold text-left'
+                                      }
+                                    >
                                       Quantity
                                     </th>
+                           
                                     <th
                                       className={
                                         'px-2 align-middle border-l-0 border-r-0  border border-solid py-3 text-sm uppercase  whitespace-no-wrap font-semibold text-left '
@@ -689,6 +668,10 @@ const FormModal = (props) => {
                                             />
                                           </div>
                                         </td>
+                                        <td className="border-t-0 px-4 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap ">
+                                        <span>{item.category ? item.category.name : "N/A"}</span>
+                                        </td>
+
                                         <td className="border-t-0 px-4 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap p-4">
                                           <input
                                             type="number"
@@ -710,6 +693,7 @@ const FormModal = (props) => {
                                             }`}
                                           />
                                         </td>
+                                     
                     
                                         {true ? (
                                           <td className="border-t-0 align-middle border-l-0 border-r-0 text-sm whitespace-no-wrap relative items-stretch">

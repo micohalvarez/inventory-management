@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   },
   tableRow: { margin: 'auto', flexDirection: 'row' },
   tableCol: {
-    width: '14.285714285714286%',
+    width: '12.5%',
     borderStyle: 'solid',
     borderWidth: 1,
     borderLeftWidth: 0,
@@ -177,6 +177,9 @@ class ExportWinnertoPDF extends Component {
                 <Text style={styles.tableCell}>Name</Text>
               </View>
               <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>Type</Text>
+              </View>
+              <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>Quantity</Text>
               </View>
               <View style={styles.tableCol}>
@@ -206,6 +209,11 @@ class ExportWinnertoPDF extends Component {
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
                     {item.product_name}
+                  </Text>
+                </View>
+                <View style={styles.tableCol}>
+                  <Text style={styles.tableCell}>
+                    {'x' + item.product.category.name}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
