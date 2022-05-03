@@ -71,11 +71,14 @@ export const getNextItems = (authToken, offSet, page) => {
   return (dispatch, getState) => {
     const sales = getState().sales;
     dispatch({ type: actionTypes.GET_SALES_START });
-
+    console.log(sales)
     authInstance
       .get(
         `/sales_order/?limit=${SALES_LIMIT}&offset=${offSet}` +
-          (sales.filter ? `&status=${sales.filter}` : ''),
+          (sales.filter ? `&status=${sales.filter}` : '') +
+          (sales.discounted ? `&discount_approved=${sales.discounted}` : '') +
+          (sales.delete ? `&for_delete=${sales.delete}` : '') + 
+          (sales.search ? `&order_number=${sales.search}` : ''),
         {
           headers: {
             Authorization: `Token ${authToken}`,
@@ -83,6 +86,7 @@ export const getNextItems = (authToken, offSet, page) => {
         }
       )
       .then((res) => {
+        console.log(res)
 
         if (res.status === 200 && res.data.results) {
           dispatch({
@@ -256,7 +260,7 @@ export const searchSales = (authToken, id) => {
     dispatch({ type: actionTypes.GET_SALES_START });
 
     authInstance
-      .get(`/sales_order/?order_number=${id}`, {
+      .get(`/sales_order/?limit=${SALES_LIMIT}&offset=0&ordering=-created&order_number=${id}`, {
         headers: {
           Authorization: `Token ${authToken}`,
         },
@@ -391,10 +395,11 @@ export const clearDelete = () => {
   };
 };
 
-export const addSearch = () => {
+export const addSearch = (search) => {
   return (dispatch) => {
     dispatch({
       type: actionTypes.ADD_SEARCH_SALES,
+      payload: { search: search },
     });
   };
 };

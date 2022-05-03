@@ -37,6 +37,7 @@ const Orders = (props) => {
         showSideBar={showSideBar}
         searchItem={props.searchOrders}
         resetData={props.getOrders}
+        
       />
       <div
         onClick={(e) => {
@@ -65,6 +66,8 @@ const mapDispatchToProps = (dispatch) => ({
   getAllItems: (authToken) => dispatch(inventoryActions.getAllItems(authToken)),
   searchOrders: (authToken, id) =>
     dispatch(orderActions.searchOrders(authToken, id)),
+  addSearch: () => dispatch(ordersActions.addSearch()),
+  clearSearch: () => dispatch(ordersActions.clearSearch()),
 });
 
 export async function getServerSideProps(context) {

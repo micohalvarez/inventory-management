@@ -11,12 +11,16 @@ const Navbar = (props) => {
   const handleSubmit = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    if (search === '') props.resetData(session.user.auth_token);
+    if (search === ''){ 
+      props.clearSearch()
+      props.resetData(session.user.auth_token);
+    }
     else props.searchItem(session.user.auth_token, search);
   };
 
   const handleSearch = (event) => {
     event.preventDefault();
+    props.addSearch(event.target.value)
     setSearch(event.target.value);
   };
   return (

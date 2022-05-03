@@ -405,8 +405,7 @@ const mapDispatchToProps = (dispatch) => ({
   getOrders: (authToken) => dispatch(ordersActions.getOrders(authToken)),
   addFilter: (filter) => dispatch(ordersActions.addFilter(filter)),
   clearFilter: () => dispatch(ordersActions.clearFilter()),
-  addDelete: () => dispatch(ordersActions.addDelete()),
-  clearDelete: () => dispatch(ordersActions.clearDelete()),
+
 });
 
 export default withRouter(
