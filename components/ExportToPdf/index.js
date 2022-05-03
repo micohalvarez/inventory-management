@@ -10,8 +10,12 @@ import {
   BlobProvider,
   pdf,
   Image,
+  Font
 } from '@react-pdf/renderer';
 import moment from 'moment';
+
+
+
 
 const styles = StyleSheet.create({
   page: {
@@ -33,11 +37,13 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 10,
+    
   },
 
   title: {
     fontSize: 15,
     fontWeight: 'bold',
+    textAlign: 'justify',
   },
   table: {
     display: 'table',
@@ -56,26 +62,39 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0,
     borderTopWidth: 0,
   },
-  tableCell: { margin: 'auto', marginTop: 5, fontSize: 10 },
+  tableCell: { margin: 'auto', marginTop: 5, fontSize: 10}
+});
+Font.registerHyphenationCallback(word => {
+  // Return entire word as unique part
+  return [word];
 });
 
+
 class ExportWinnertoPDF extends Component {
+  
+
   constructor(props) {
     super(props);
     this.state = {
       pdf: null,
-    };
+    };    
+
   }
 
+
+ 
+  
   getPdfDocument() {
     return this.state.pdf;
   }
   numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
+  
 
   getSpecificUser() {
-    console.log(this.props)
+
+
     var a = (
       <Document>
         <Page size="A4" style={styles.page} wrap>
@@ -208,12 +227,13 @@ class ExportWinnertoPDF extends Component {
                 </View>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
+             
                     {item.product_name}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
                   <Text style={styles.tableCell}>
-                    {'x' + item.product.category.name}
+                     {item.product.category.name}
                   </Text>
                 </View>
                 <View style={styles.tableCol}>
@@ -349,6 +369,9 @@ class ExportWinnertoPDF extends Component {
       </>
     );
   }
+
+
 }
+
 
 export default ExportWinnertoPDF;
