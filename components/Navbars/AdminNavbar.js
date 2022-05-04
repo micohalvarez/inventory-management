@@ -12,7 +12,8 @@ const Navbar = (props) => {
     e.stopPropagation();
     e.preventDefault();
     if (search === ''){ 
-      props.clearSearch()
+      if(props.clearSearch)
+          props.clearSearch()
       props.resetData(session.user.auth_token);
     }
     else props.searchItem(session.user.auth_token, search);
@@ -20,7 +21,8 @@ const Navbar = (props) => {
 
   const handleSearch = (event) => {
     event.preventDefault();
-    props.addSearch(event.target.value)
+    if(props.addSearch)
+        props.addSearch(event.target.value)
     setSearch(event.target.value);
   };
   return (
