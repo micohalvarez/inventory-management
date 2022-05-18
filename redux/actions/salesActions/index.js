@@ -236,12 +236,12 @@ export const addPaymentMethod = (authToken, payload) => {
 export const approveDiscount = (authToken, uuid, discount, unit_price) => {
   return (dispatch) => {
     
-    console.log(discount)
+    unit_price.reverse();
     var data = {
       total_discount: discount,
       ...(unit_price && {unit_price: unit_price})
     }
-    console.log(data,'hi')
+
 
     return authInstance.post(
       `/sales_order/${uuid}/approve_discount/`,
@@ -266,7 +266,6 @@ export const searchSales = (authToken, id) => {
         },
       })
       .then((res) => {
-        console.log(res);
         if (res.status === 200 && res.data) {
           var array = [];
           dispatch({
