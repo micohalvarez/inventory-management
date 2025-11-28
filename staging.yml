@@ -3,10 +3,22 @@ version: '3'
 services:
   nextjs:
     build: ./
-
+    environment:
+      - PORT=3000       # <--- CRITICAL: Tells Next.js to use port 3000
+      - NODE_ENV=production
+    expose:
+      - "3000"
+    networks:
+      - app-network
   nginx:
     build: ./nginx/staging
     ports:
       - 80:80
+    networks:
+      - app-network
     depends_on:
       - nextjs
+networks:
+  app-network:
+    external: true
+
