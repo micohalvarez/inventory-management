@@ -3,10 +3,16 @@ version: '3'
 services:
   nextjs:
     build: ./
-
+    networks:
+      - app-network
   nginx:
     build: ./nginx/staging
     ports:
       - 80:80
+    networks:
+      - app-network
     depends_on:
       - nextjs
+networks:
+  app-network:
+    external: true
