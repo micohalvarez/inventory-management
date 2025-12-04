@@ -10,14 +10,17 @@ export default NextAuth({
     providers: [
         Providers.Credentials({
             async authorize (credentials) {
+
+		console.log("--- AUTHORIZE FUNCTION STARTING ---");
                 const data = {
                     username: credentials.emailAddress,
                     password: credentials.password
                 }
 
                 const res = await authInstance
-                    .post('/account/login/', data)
+                    .post('api/v1/account/login/', data)
 
+		console.log(res)	
                 if (res.status === 200) {
                     return res.data
                 } else {

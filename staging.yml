@@ -6,6 +6,9 @@ services:
     environment:
       - PORT=3000       # <--- CRITICAL: Tells Next.js to use port 3000
       - NODE_ENV=production
+      - NEXTAUTH_URL=http://47.128.72.67
+      - NEXTAUTH_SECRET=X3h1Y2Y3anZ4bXlrNDRzazZlbWJxcmRzMWt4c3BvY3Zxa3d6ejJqNm8=
+      - INTERNAL_DJANGO_URL=http://merged-inventory-django-1:5000
     expose:
       - "3000"
     networks:
